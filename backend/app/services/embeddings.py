@@ -59,10 +59,19 @@ def upsert_chunks(collection: str, chunks: list[dict], batch_size: int = 48):
         client.upsert(collection_name=collection, points=points)
 
 
+NON_CONTENT = {"references", "bibliography", "acknowledgements", "acknowledgments"}
+
+
 def search(collection: str, query: str, limit: int = 6) -> list[dict]:
+    """Semantic search, dropping bibliography chunks (still present in
+    collections indexed before they were excluded from chunking)."""
     client = get_client()
     if not client.collection_exists(collection):
         return []
     vec = embed([query])[0]
-    res = client.query_points(collection_name=collection, query=vec, limit=limit, with_payload=True)
-    return [{**p.payload, "score": p.score} for p in res.points]
+    res = client.query_points(collection_name=collection, query=vec,
+                              limit=limit + 6, with_payload=True)
+    hits = [{**p.payload, "score": p.score} for p in res.points]
+    content = [h for h in hits
+               if str(h.get("section", "")).lower() not in NON_CONTENT]
+    return (content or hits)[:limit]

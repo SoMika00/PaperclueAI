@@ -16,7 +16,10 @@ def search(db, manuscript_id: str, query: str, limit: int = 6) -> list[dict]:
     if not words:
         return []
     scored = []
-    sections = db.query(Section).filter_by(manuscript_id=manuscript_id).all()
+    skip = {"references", "bibliography", "acknowledgements", "acknowledgments"}
+    sections = [s for s in
+                db.query(Section).filter_by(manuscript_id=manuscript_id).all()
+                if s.name.lower() not in skip]
     for s in sections:
         for para in _paragraphs(s):
             low = para.lower()

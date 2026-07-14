@@ -1,3 +1,5 @@
+import os
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 
@@ -27,6 +29,30 @@ def list_manuscripts(db=Depends(get_db)):
 @router.get("/manuscripts/{ms_id}")
 def get_manuscript(ms_id: str, db=Depends(get_db)):
     return manuscript_out(get_ms(db, ms_id), full=True)
+
+
+@router.delete("/manuscripts/{ms_id}")
+def delete_manuscript(ms_id: str, db=Depends(get_db)):
+    """Full cleanup: DB rows (cascade), the PDF blob and the vector collection."""
+    ms = get_ms(db, ms_id)
+    collection = ms.qdrant_collection
+    path = ms.file_path
+    db.delete(ms)
+    db.commit()
+    try:
+        if path and os.path.exists(path):
+            os.remove(path)
+    except OSError:
+        pass
+    try:
+        if collection:
+            from ..services import embeddings
+            client = embeddings.get_client()
+            if client.collection_exists(collection):
+                client.delete_collection(collection)
+    except Exception:
+        pass
+    return {"deleted": ms_id}
 
 
 @router.get("/documents/{ms_id}/status")

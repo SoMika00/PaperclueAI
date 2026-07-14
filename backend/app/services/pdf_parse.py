@@ -55,8 +55,14 @@ def extract_reference_block(sections: list[dict]) -> str:
     return ""
 
 
+NON_CONTENT_SECTIONS = {"references", "bibliography", "acknowledgements",
+                        "acknowledgments"}
+
+
 def chunk_pages(pages: list[str], sections: list[dict], size: int = 900, overlap: int = 150) -> list[dict]:
-    """Chunk per page, tagging each chunk with its page + enclosing section."""
+    """Chunk per page, tagging each chunk with its page + enclosing section.
+    Bibliography/acknowledgements are skipped: they drown semantic retrieval
+    in citation strings without ever answering a question."""
     def section_for(pno: int) -> str:
         name = "Front matter"
         for s in sections:
@@ -66,11 +72,14 @@ def chunk_pages(pages: list[str], sections: list[dict], size: int = 900, overlap
 
     chunks = []
     for pno, text in enumerate(pages, start=1):
+        section = section_for(pno)
+        if section.lower() in NON_CONTENT_SECTIONS:
+            continue
         text = re.sub(r"\s+", " ", text).strip()
         i = 0
         while i < len(text):
             piece = text[i:i + size]
             if len(piece) > 100:
-                chunks.append({"text": piece, "page": pno, "section": section_for(pno)})
+                chunks.append({"text": piece, "page": pno, "section": section})
             i += size - overlap
     return chunks
