@@ -1,6 +1,7 @@
 "use client";
 /* University Repository: the tenant's private corpus. Read-only; never leaves
    the tenant. */
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { GraduationCap, Search } from "lucide-react";
 import { api } from "@/lib/api";
@@ -50,7 +51,7 @@ export default function UniversityPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Filter by title…"
+            placeholder="Search title, abstract or topic (semantic)…"
             className="w-full rounded-lg border border-line bg-paper pl-9 pr-3 py-2 text-sm outline-none focus:border-brand"
           />
         </div>
@@ -67,7 +68,7 @@ export default function UniversityPage() {
               {(papers || [])
                 .filter((p) => p.collection === c)
                 .map((p) => (
-                  <div key={p.id} className="py-3">
+                  <Link key={p.id} href={`/university/${p.id}`} className="block py-3 -mx-2 px-2 rounded hover:bg-surface2/60 transition-colors">
                     <div className="flex items-center gap-2">
                       <ScopeBadge scope="university" />
                       {p.year && <span className="text-[11px] text-inkmut">{p.year}</span>}
@@ -84,7 +85,7 @@ export default function UniversityPage() {
                         {p.abstract}
                       </p>
                     )}
-                  </div>
+                  </Link>
                 ))}
             </div>
           </section>

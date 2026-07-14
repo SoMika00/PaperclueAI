@@ -18,10 +18,10 @@ import { ReadinessGauge } from "@/components/ui";
 
 const WEIGHT: Record<string, number> = { citations: 30, review: 40, insight: 15, base: 15 };
 const LABEL: Record<string, string> = {
-  citations: "Citations verified",
-  review: "Review issues resolved",
-  insight: "Insight coverage",
-  base: "Ingestion & structure",
+  citations: "Citation integrity",
+  review: "Review findings addressed",
+  insight: "Understanding coverage",
+  base: "Document processed",
 };
 
 export default function OverviewPage() {
@@ -52,7 +52,7 @@ export default function OverviewPage() {
       done: d.open_issues === 0,
     },
     {
-      seg: "review",
+      seg: "review?tab=citations",
       icon: ClipboardCheck,
       label: "Citations",
       status: d.refs_total
@@ -91,7 +91,9 @@ export default function OverviewPage() {
           <div className="flex-1">
             <h1 className="font-serif text-xl font-semibold">Submission readiness</h1>
             <p className="text-sm text-inkmut mt-0.5 mb-3">
-              How the score is built — each component is inspectable.
+              How the score is built — each component is inspectable. These are
+              automated indicators of submission preparation, not a judgment of
+              the work&apos;s scientific quality.
             </p>
             <div className="flex flex-col gap-1.5">
               {Object.entries(WEIGHT).map(([k, w]) => {

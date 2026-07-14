@@ -21,7 +21,6 @@ const SCOPES = [
   { id: "combined", label: "All" },
   { id: "public", label: "Public" },
   { id: "university", label: "University" },
-  { id: "mine", label: "My research" },
 ] as const;
 
 function linkCitations(md: string): string {
@@ -36,9 +35,12 @@ function linkCitations(md: string): string {
 
 export default function LiteratureSearch({
   manuscriptId,
+  prefill,
   placeholder = "Search papers, methods, datasets or research questions…",
 }: {
   manuscriptId?: string;
+  /** "query#nonce" — setting it fills the box and runs the search */
+  prefill?: string | null;
   placeholder?: string;
 }) {
   const router = useRouter();
@@ -99,7 +101,7 @@ export default function LiteratureSearch({
     [query, scope, yearFrom, task, manuscriptId]
   );
 
-  // Deep link: /literature?q=…
+  // Deep link: ?q=…
   useEffect(() => {
     const q = params.get("q");
     if (q && !lastQuery) {
@@ -108,6 +110,15 @@ export default function LiteratureSearch({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Suggested-search chips (Related Research) push a "query#nonce" prefill.
+  useEffect(() => {
+    if (!prefill) return;
+    const q = prefill.split("#")[0];
+    setQuery(q);
+    run(q);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefill]);
 
   const save = useCallback(async (p: BrowsePaper) => {
     try {
@@ -192,7 +203,6 @@ export default function LiteratureSearch({
                 {s.label}
                 {s.id === "public" && <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-pub align-middle" />}
                 {s.id === "university" && <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-uni align-middle" />}
-                {s.id === "mine" && <span className="ml-1 inline-block h-1.5 w-1.5 rounded-full bg-manuscript align-middle" />}
               </button>
             ))}
           </div>
@@ -251,7 +261,16 @@ export default function LiteratureSearch({
                 <ScopeBadge scope={p.source_scope} />
                 {p.collection && <span className="text-[11px] text-uni">{p.collection}</span>}
               </div>
-              <div className="font-medium text-[14px] leading-snug mt-1">{p.title}</div>
+              {p.source_scope === "university" ? (
+                <a
+                  href={`/paperclue/university/${p.corpus_id}`}
+                  className="block font-medium text-[14px] leading-snug mt-1 hover:text-brand-deep hover:underline"
+                >
+                  {p.title}
+                </a>
+              ) : (
+                <div className="font-medium text-[14px] leading-snug mt-1">{p.title}</div>
+              )}
               <div className="text-xs text-inkmut mt-0.5">
                 {(p.authors || []).slice(0, 4).join(", ")}
                 {p.authors?.length > 4 ? " et al." : ""}

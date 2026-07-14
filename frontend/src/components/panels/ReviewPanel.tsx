@@ -45,7 +45,9 @@ export default function ReviewPanel() {
   const [task, setTask] = useState<{ step: string; progress: number } | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<"issues" | "citations">("issues");
+  const [view, setView] = useState<"issues" | "citations">(
+    params.get("tab") === "citations" ? "citations" : "issues"
+  );
   const [sevFilter, setSevFilter] = useState<string | "resolved" | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);

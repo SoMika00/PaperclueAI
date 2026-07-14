@@ -16,10 +16,10 @@ import TopBar from "@/components/TopBar";
 import { ReadinessGauge, Spinner } from "@/components/ui";
 
 const SCORE_PARTS: { key: string; label: string; max: number; doneKey?: string }[] = [
-  { key: "base", label: "Ingested & structured", max: 15 },
-  { key: "insight", label: "Insight brief", max: 15, doneKey: "insight_done" },
-  { key: "citations", label: "Citations verified", max: 30, doneKey: "citations_checked" },
-  { key: "review", label: "Review issues resolved", max: 40, doneKey: "review_done" },
+  { key: "base", label: "Document processed", max: 15 },
+  { key: "insight", label: "Understanding coverage", max: 15, doneKey: "insight_done" },
+  { key: "citations", label: "Citation integrity", max: 30, doneKey: "citations_checked" },
+  { key: "review", label: "Review findings addressed", max: 40, doneKey: "review_done" },
 ];
 
 function timeAgo(iso: string | null): string {
@@ -39,7 +39,8 @@ function ScorePopover({ ms }: { ms: Manuscript }) {
         Submission readiness — {ms.readiness}/100
       </div>
       <p className="text-[11px] text-inkmut mb-2.5">
-        Each part is earned by doing the work — nothing is credited in advance.
+        Earned by doing the work — nothing credited in advance. Indicators of
+        submission preparation, not of scientific quality.
       </p>
       <div className="flex flex-col gap-1.5">
         {SCORE_PARTS.map((p) => {

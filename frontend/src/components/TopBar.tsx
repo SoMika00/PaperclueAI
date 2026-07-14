@@ -3,13 +3,11 @@
    menu (auto-connected demo user, sign out / sign in template). */
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, LogOut, Plus, User } from "lucide-react";
+import { ChevronDown, LogOut, User } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import UploadModal from "./UploadModal";
 
 export default function TopBar() {
   const { user, signOut } = useAuth();
-  const [showUpload, setShowUpload] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -35,14 +33,7 @@ export default function TopBar() {
           Every claim traced to a real source
         </span>
 
-        <button
-          onClick={() => setShowUpload(true)}
-          className="ml-auto inline-flex items-center gap-1 rounded-lg bg-white text-topbar px-3 py-1.5 text-sm font-semibold hover:bg-white/90 transition-colors shadow-sm"
-        >
-          <Plus className="h-4 w-4" /> Upload
-        </button>
-
-        <div className="relative" ref={menuRef}>
+        <div className="relative ml-auto" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="flex items-center gap-1.5 rounded-lg px-1.5 py-1 hover:bg-white/10 transition-colors"
@@ -74,7 +65,6 @@ export default function TopBar() {
           )}
         </div>
       </header>
-      {showUpload && <UploadModal onClose={() => setShowUpload(false)} />}
     </>
   );
 }
