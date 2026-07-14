@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-ivory text-ink font-sans antialiased;
+}
+
+h1, h2, h3, .font-display {
+  @apply font-serif;
+}
+
+/* Provenance badges - constant everywhere */
+.badge {
+  @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold;
+}
+.badge-university { @apply bg-uni-soft text-uni border border-uni/50; }
+.badge-public { @apply bg-pub-soft text-pub border border-pub/50; }
+.badge-manuscript { @apply bg-manuscript-soft text-manuscript border border-manuscript/50; }
+.badge-ai { @apply bg-aigray-soft text-aigray border border-aigray/40; }
+
+.card {
+  @apply bg-paper rounded-lg border border-line shadow-card;
+}
+.card-hover {
+  @apply transition-all duration-200 hover:shadow-lift hover:-translate-y-px;
+}
+
+.btn {
+  @apply inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+}
+.btn-primary { @apply bg-brand text-white hover:bg-brand-deep; }
+.btn-ghost { @apply text-inkmut hover:bg-surface2 hover:text-ink; }
+.btn-outline { @apply border border-line text-ink hover:bg-surface2; }
+.btn-danger { @apply border border-danger/40 text-danger hover:bg-danger/10; }
+
+/* Section separators instead of card soup */
+.section-title {
+  @apply text-[11px] font-semibold uppercase tracking-wider text-inkmut;
+}
+.hr-line { @apply border-t border-line; }
+
+/* PDF highlight layers */
+.react-pdf__Page__textContent mark {
+  border-radius: 2px;
+  padding: 0 1px;
+}
+mark.hl-review { background: rgba(214, 138, 25, 0.4); color: transparent; }
+mark.hl-insight { background: rgba(47, 128, 237, 0.35); color: transparent; }
+mark.hl-citation { background: rgba(21, 149, 106, 0.35); color: transparent; }
+
+.hl-flash {
+  animation: flash 1.6s ease-out;
+}
+@keyframes flash {
+  0% { box-shadow: 0 0 0 6px rgba(47, 128, 237, 0.55); }
+  100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+}
+
+/* Thin scrollbars for panels */
+.panel-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+.panel-scroll::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.22); border-radius: 3px; }
+
+/* Markdown report styling */
+.report-md h1, .report-md h2 { @apply font-serif text-base font-semibold mt-4 mb-1.5 text-ink; }
+.report-md h3 { @apply font-serif text-sm font-semibold mt-3 mb-1 text-ink; }
+.report-md p { @apply text-sm leading-relaxed mb-2 text-ink; }
+.report-md table { @apply w-full text-xs border-collapse my-2; }
+.report-md th { @apply text-left border-b border-line py-1 pr-2 font-semibold; }
+.report-md td { @apply border-b border-line/60 py-1 pr-2 align-top; }
+.report-md ul, .report-md ol { @apply list-disc pl-5 text-sm mb-2; }
+.report-md li { @apply mb-0.5; }
+.report-md strong { @apply font-semibold; }
+
+/* Evidence drawer slide */
+.drawer-enter {
+  animation: drawer-in 220ms cubic-bezier(.22,1,.36,1);
+}
+@keyframes drawer-in {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
