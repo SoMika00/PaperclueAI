@@ -62,18 +62,50 @@ def remove_paper(paper_id: str, db=Depends(get_db)):
     return {"deleted": paper_id}
 
 
+def _uni_out(r: UniversityPaper, full: bool = False) -> dict:
+    return {
+        "id": r.id, "title": r.title,
+        "abstract": (r.abstract or "") if full else (r.abstract or "")[:400],
+        "authors": r.authors or [], "year": r.year, "venue": r.venue,
+        "doi": r.doi, "s2_id": r.s2_id, "collection": r.collection_name,
+        "source_scope": "university",
+    }
+
+
 @router.get("/university")
 def list_university(q: str | None = None, db=Depends(get_db)):
-    query = db.query(UniversityPaper).filter_by(tenant_id=settings.tenant_id)
-    if q:
-        query = query.filter(UniversityPaper.title.ilike(f"%{q}%"))
-    rows = query.order_by(UniversityPaper.year.desc().nullslast()).limit(100).all()
-    return [{
-        "id": r.id, "title": r.title, "abstract": (r.abstract or "")[:400],
-        "authors": r.authors or [], "year": r.year, "venue": r.venue,
-        "doi": r.doi, "collection": r.collection_name,
-        "source_scope": "university",
-    } for r in rows]
+    """Tenant-scoped search: lexical on title+abstract, merged with semantic
+    hits from the tenant's private vector collection."""
+    base = db.query(UniversityPaper).filter_by(tenant_id=settings.tenant_id)
+    if not q:
+        rows = base.order_by(UniversityPaper.year.desc().nullslast()).limit(100).all()
+        return [_uni_out(r) for r in rows]
+
+    from sqlalchemy import or_
+    lexical = (base.filter(or_(UniversityPaper.title.ilike(f"%{q}%"),
+                               UniversityPaper.abstract.ilike(f"%{q}%")))
+               .limit(50).all())
+    found = {r.id: r for r in lexical}
+    try:
+        from ..services import embeddings
+        hits = embeddings.search(f"uni_{settings.tenant_id}", q, limit=10)
+        for h in hits:
+            pid = h.get("paper_id")
+            if pid and pid not in found:
+                r = base.filter(UniversityPaper.id == pid).first()
+                if r:
+                    found[r.id] = r
+    except Exception:
+        pass
+    return [_uni_out(r) for r in found.values()]
+
+
+@router.get("/university/{paper_id}")
+def get_university_paper(paper_id: str, db=Depends(get_db)):
+    r = db.get(UniversityPaper, paper_id)
+    if not r or r.tenant_id != settings.tenant_id:
+        raise HTTPException(404, "paper not found")
+    return _uni_out(r, full=True)
 
 
 @router.get("/searches/recent")

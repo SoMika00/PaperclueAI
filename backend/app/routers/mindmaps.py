@@ -14,7 +14,7 @@ from .browse import _search_university
 
 router = APIRouter()
 
-MAX_FIRST_RENDER = 18
+MAX_FIRST_RENDER = 20
 
 
 class CreateBody(BaseModel):
@@ -90,12 +90,14 @@ def _retrieve_public(query: str, limit: int, seed_ids: list[str] | None = None) 
         except Exception:
             papers = []
     if len(papers) < limit // 2:
-        try:
-            extra = s2.search(query[:250], limit=limit)
-            known = {p["corpus_id"] for p in papers}
-            papers += [p for p in extra if p["corpus_id"] not in known]
-        except Exception:
-            pass
+        for q in (query[:250], query[:90]):  # retry with a shorter query
+            try:
+                extra = s2.search(q, limit=limit)
+                known = {p["corpus_id"] for p in papers}
+                papers += [p for p in extra if p["corpus_id"] not in known]
+                break
+            except Exception:
+                continue
     return papers
 
 
@@ -129,10 +131,27 @@ def run_generate(task_id: str, map_id: str):
             q = ms.title
             if insight.get("keywords"):
                 q = f"{ms.title} {' '.join(insight['keywords'][:5])}"
-            cited_ids = {r.corpus_id for r in
-                         db.query(Reference).filter_by(manuscript_id=ms.id, status="verified")
-                         .limit(15).all() if r.corpus_id}
-            papers = _retrieve_public(q, 14, seed_ids=list(cited_ids)[:10])
+            verified = (db.query(Reference)
+                        .filter_by(manuscript_id=ms.id, status="verified")
+                        .limit(15).all())
+            cited_ids = {r.corpus_id for r in verified if r.corpus_id}
+            # The manuscript's own (verified) citations become nodes too, so
+            # solid 'cites' edges exist and gap analysis is discriminating.
+            for r in verified[:6]:
+                meta = r.resolved_meta or {}
+                if not r.corpus_id:
+                    continue
+                papers.append({
+                    "corpus_id": r.corpus_id,
+                    "title": meta.get("title") or r.title,
+                    "abstract": "", "tldr": None,
+                    "year": meta.get("year") or r.year,
+                    "venue": meta.get("venue") or "",
+                    "citation_count": meta.get("citation_count"),
+                    "authors": r.authors or [], "doi": None,
+                    "url": meta.get("url"), "source_scope": "public",
+                })
+            papers += _retrieve_public(q, 10, seed_ids=list(cited_ids)[:10])
             try:
                 papers += _search_university(q[:250], limit=5)
             except Exception:

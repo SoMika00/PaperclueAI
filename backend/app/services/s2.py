@@ -12,6 +12,8 @@ from ..config import settings
 
 BASE = "https://api.semanticscholar.org/graph/v1"
 FIELDS = "paperId,title,abstract,year,venue,citationCount,influentialCitationCount,authors,externalIds,openAccessPdf,tldr,fieldsOfStudy"
+# The recommendations endpoint rejects `tldr` (400 Unrecognized field).
+REC_FIELDS = "paperId,title,abstract,year,venue,citationCount,influentialCitationCount,authors,externalIds,openAccessPdf,fieldsOfStudy"
 TIMEOUT = 9.0
 
 TTL_SEARCH = 24 * 3600       # search results: 24 h
@@ -128,7 +130,7 @@ def match_title(title: str) -> dict | None:
 def _recs_raw(paper_ids: list[str], limit: int) -> list[dict]:
     r = _throttled(
         "POST", "https://api.semanticscholar.org/recommendations/v1/papers",
-        {"fields": FIELDS, "limit": limit},
+        {"fields": REC_FIELDS, "limit": limit},
         {"positivePaperIds": paper_ids[:10]},
     )
     r.raise_for_status()

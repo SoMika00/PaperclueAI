@@ -11,7 +11,9 @@ UNI_COLLECTION = f"uni_{settings.tenant_id}"
 SEED_QUERIES = [
     ("retrieval augmented generation evaluation", "NLP Lab"),
     ("large language model hallucination detection", "NLP Lab"),
+    ("dense passage retrieval question answering", "NLP Lab"),
     ("scientific literature citation analysis", "Scientometrics Group"),
+    ("peer review quality assessment", "Scientometrics Group"),
     ("transformer attention interpretability", "ML Theory Group"),
 ]
 
@@ -20,9 +22,12 @@ def seed():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
-        if db.query(UniversityPaper).filter_by(tenant_id=settings.tenant_id).count() > 0:
-            print("University corpus already seeded.")
+        existing = db.query(UniversityPaper).filter_by(tenant_id=settings.tenant_id).count()
+        if existing >= 10:
+            print(f"University corpus already seeded ({existing} papers).")
             return
+        known_ids = {r.s2_id for r in
+                     db.query(UniversityPaper).filter_by(tenant_id=settings.tenant_id).all()}
         chunks, count = [], 0
         for query, collection_name in SEED_QUERIES:
             try:
@@ -31,8 +36,9 @@ def seed():
                 print(f"seed query failed: {e}")
                 continue
             for p in papers:
-                if not p.get("abstract"):
+                if not p.get("abstract") or p.get("corpus_id") in known_ids:
                     continue
+                known_ids.add(p.get("corpus_id"))
                 up = UniversityPaper(
                     tenant_id=settings.tenant_id, collection_name=collection_name,
                     title=p["title"], abstract=p["abstract"],
