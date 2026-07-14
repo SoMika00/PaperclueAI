@@ -17,6 +17,10 @@ def _migrate():
             "ALTER TABLE manuscripts ADD COLUMN IF NOT EXISTS "
             "index_status VARCHAR DEFAULT 'ready'"
         ))
+        conn.execute(text(
+            "ALTER TABLE mindmaps ADD COLUMN IF NOT EXISTS "
+            "saved BOOLEAN DEFAULT FALSE"
+        ))
 
 
 def _warmup():

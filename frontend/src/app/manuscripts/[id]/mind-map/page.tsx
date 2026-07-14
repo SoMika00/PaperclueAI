@@ -1,19 +1,20 @@
 "use client";
-/* Manuscript mind map: finds (or creates) the map seeded by this manuscript
-   and renders the shared canvas — Gap Finder included. */
+/* Manuscript mind map: nothing is generated behind your back — you press
+   Generate, you inspect, you decide to save (or it stays a draft). */
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { RefreshCw } from "lucide-react";
+import { Bookmark, BookmarkCheck, Network, RefreshCw, Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
 import type { MindMapRecord } from "@/lib/types";
 import { useWorkspace } from "@/lib/ws";
-import { Spinner } from "@/components/ui";
+import { EmptyState, Spinner } from "@/components/ui";
 
 const MindMapCanvas = dynamic(() => import("@/components/MindMapCanvas"), { ssr: false });
 
 export default function ManuscriptMapPage() {
   const { ms } = useWorkspace();
   const [map, setMap] = useState<MindMapRecord | null>(null);
+  const [checked, setChecked] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const stopped = useRef(false);
@@ -29,7 +30,7 @@ export default function ManuscriptMapPage() {
     }
   }, []);
 
-  const create = useCallback(async () => {
+  const generate = useCallback(async () => {
     setMap(null);
     setError(null);
     try {
@@ -43,16 +44,18 @@ export default function ManuscriptMapPage() {
     }
   }, [ms.id, poll]);
 
+  // Load an existing map for this manuscript if one exists — never create one.
   useEffect(() => {
     stopped.current = false;
     (async () => {
       try {
         const existing = await api<MindMapRecord[]>(`/mindmaps?manuscript_id=${ms.id}`);
-        const ready = existing.find((m) => m.status !== "error");
-        if (ready) poll(ready.id);
-        else create();
+        const usable = existing.find((m) => m.status !== "error");
+        if (usable) poll(usable.id);
       } catch {
-        create();
+        /* show the generate state */
+      } finally {
+        setChecked(true);
       }
     })();
     return () => {
@@ -62,17 +65,47 @@ export default function ManuscriptMapPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ms.id]);
 
+  const toggleSave = async () => {
+    if (!map) return;
+    const r = await api<MindMapRecord>(`/mindmaps/${map.id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ saved: !map.saved }),
+    });
+    setMap({ ...map, saved: r.saved });
+  };
+
+  const remove = async () => {
+    if (!map) return;
+    await api(`/mindmaps/${map.id}`, { method: "DELETE" });
+    setMap(null);
+  };
+
+  if (!checked)
+    return (
+      <div className="h-full grid place-items-center text-inkmut">
+        <Spinner className="h-5 w-5 text-brand" />
+      </div>
+    );
+
+  if (!map)
+    return (
+      <div className="h-full grid place-items-center">
+        <EmptyState
+          icon={<Network className="h-10 w-10" />}
+          title="Position this manuscript in the research landscape"
+          sub="PaperClue seeds the map with your verified citations, related public work and university neighbors — then reveals research families and the clusters you don't cite yet."
+        >
+          {error && <div className="text-xs text-danger mb-2">{error}</div>}
+          <button onClick={generate} className="btn btn-primary mt-2">
+            <Network className="h-4 w-4" /> Generate research map
+          </button>
+        </EmptyState>
+      </div>
+    );
+
   return (
     <div className="h-full relative">
-      {error && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 card p-3 text-xs text-danger flex items-center gap-2">
-          {error}
-          <button onClick={create} className="btn btn-outline text-xs py-0.5">
-            <RefreshCw className="h-3 w-3" /> Retry
-          </button>
-        </div>
-      )}
-      {!error && (!map || map.status === "building") && (
+      {map.status === "building" && (
         <div className="h-full grid place-items-center text-inkmut">
           <div className="flex flex-col items-center gap-2">
             <Spinner className="h-6 w-6 text-brand" />
@@ -82,30 +115,49 @@ export default function ManuscriptMapPage() {
           </div>
         </div>
       )}
-      {map?.status === "error" && (
+      {map.status === "error" && (
         <div className="h-full grid place-items-center">
           <div className="card p-4 text-sm text-danger flex items-center gap-3">
             {map.error}
-            <button onClick={create} className="btn btn-outline text-xs">
+            <button onClick={generate} className="btn btn-outline text-xs">
               <RefreshCw className="h-3 w-3" /> Retry
             </button>
           </div>
         </div>
       )}
-      {map?.status === "ready" && map.graph && (
+      {map.status === "ready" && map.graph && (
         <>
           <MindMapCanvas
             mapId={map.id}
             graph={map.graph}
             onGraphChange={(g) => setMap({ ...map, graph: g })}
           />
-          <button
-            onClick={create}
-            className="absolute top-4 right-4 z-10 btn btn-outline bg-paper text-xs"
-            title="Rebuild the map"
-          >
-            <RefreshCw className="h-3 w-3" /> Rebuild
-          </button>
+          <div className="absolute top-4 right-4 z-10 flex gap-2">
+            <button
+              onClick={toggleSave}
+              className={`btn bg-paper ${map.saved ? "btn-outline" : "btn-primary"}`}
+            >
+              {map.saved ? (
+                <>
+                  <BookmarkCheck className="h-3.5 w-3.5 text-manuscript" /> Saved
+                </>
+              ) : (
+                <>
+                  <Bookmark className="h-3.5 w-3.5" /> Save map
+                </>
+              )}
+            </button>
+            <button onClick={generate} className="btn btn-outline bg-paper text-xs" title="Rebuild">
+              <RefreshCw className="h-3 w-3" /> Rebuild
+            </button>
+            <button
+              onClick={remove}
+              className="btn btn-ghost bg-paper hover:text-danger"
+              title="Delete this map"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
         </>
       )}
     </div>

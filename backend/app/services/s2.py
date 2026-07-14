@@ -140,3 +140,17 @@ def _recs_raw(paper_ids: list[str], limit: int) -> list[dict]:
 def recommendations(paper_ids: list[str], limit: int = 10) -> list[dict]:
     key = f"recs:{','.join(sorted(paper_ids[:10]))}:{limit}"
     return _cached(key, TTL_META, lambda: _recs_raw(paper_ids, limit))
+
+
+@_retry
+def _details_raw(paper_id: str) -> dict | None:
+    r = _throttled("GET", f"{BASE}/paper/{paper_id}", {"fields": FIELDS})
+    if r.status_code == 404:
+        return None
+    r.raise_for_status()
+    return _norm(r.json())
+
+
+def paper_details(paper_id: str) -> dict | None:
+    """Live metadata for one paper (citation count, TLDR…), cached 7 days."""
+    return _cached(f"paper:{paper_id}", TTL_META, lambda: _details_raw(paper_id))

@@ -52,6 +52,31 @@ def list_library(db=Depends(get_db)):
     return [_saved_out(r) for r in rows]
 
 
+@router.get("/library/{paper_id}")
+def get_saved_paper(paper_id: str, db=Depends(get_db)):
+    """Focus data for a saved paper: stored meta enriched with live public
+    metadata (citation count, TLDR) when the paper is public."""
+    r = db.get(SavedPaper, paper_id)
+    if not r or r.tenant_id != settings.tenant_id:
+        raise HTTPException(404, "not found")
+    out = _saved_out(r)
+    out["abstract"] = r.abstract or ""
+    if r.source_scope == "public" and r.corpus_id:
+        try:
+            from ..services import s2
+            live = s2.paper_details(r.corpus_id)
+            if live:
+                out["citation_count"] = live.get("citation_count")
+                out["tldr"] = live.get("tldr")
+                out["venue"] = out["venue"] or live.get("venue")
+                out["year"] = out["year"] or live.get("year")
+                out["open_access_pdf_url"] = live.get("open_access_pdf_url")
+                out["abstract"] = out["abstract"] or live.get("abstract") or ""
+        except Exception:
+            pass
+    return out
+
+
 @router.delete("/library/{paper_id}")
 def remove_paper(paper_id: str, db=Depends(get_db)):
     r = db.get(SavedPaper, paper_id)

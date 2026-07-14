@@ -308,7 +308,7 @@ export default function MindMapCanvas({
             [
               ["public", "Public", "#3155C6"],
               ["university", "University", "#D68A19"],
-              ["manuscript", "My research", "#15956A"],
+              ["manuscript", "Manuscript", "#15956A"],
             ] as const
           ).map(([k, label, color]) => (
             <button

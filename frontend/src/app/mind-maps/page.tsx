@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FileText, FolderOpen, HelpCircle, Network } from "lucide-react";
+import { FileText, FolderOpen, HelpCircle, Network, Trash2 } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Manuscript, MindMapRecord, SavedPaper } from "@/lib/types";
 import GlobalShell from "@/components/GlobalShell";
@@ -24,8 +24,11 @@ export default function MindMapsPage() {
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadMaps = () =>
     api<MindMapRecord[]>("/mindmaps").then(setMaps).catch(() => setMaps([]));
+
+  useEffect(() => {
+    loadMaps();
     api<Manuscript[]>("/manuscripts")
       .then((m) => {
         const ready = m.filter((x) => x.status === "ready");
@@ -211,27 +214,43 @@ export default function MindMapsPage() {
 
         {error && <div className="card p-3 text-xs text-danger mb-4">{error}</div>}
 
-        <h2 className="section-title mb-1 mt-6">Your maps</h2>
+        <h2 className="section-title mb-1 mt-6">Your saved maps</h2>
         {maps === null && <Spinner className="h-5 w-5 text-brand" />}
         <div className="flex flex-col divide-y divide-line/70">
           {(maps || []).map((m) => (
-            <Link
+            <div
               key={m.id}
-              href={`/mind-maps/${m.id}`}
-              className="py-3 flex items-center gap-3 hover:bg-surface2/50 -mx-2 px-2 rounded"
+              className="py-1 flex items-center gap-1 hover:bg-surface2/50 -mx-2 px-2 rounded group"
             >
-              <Network className="h-4 w-4 text-pub shrink-0" />
-              <div className="flex-1 min-w-0">
-                <div className="text-[14px] font-medium truncate">{m.title}</div>
-                <div className="text-[11px] text-inkmut">
-                  {m.seed_type} · {m.status}
-                  {m.n_nodes != null ? ` · ${m.n_nodes} nodes` : ""}
+              <Link
+                href={`/mind-maps/${m.id}`}
+                className="flex-1 min-w-0 flex items-center gap-3 py-2"
+              >
+                <Network className="h-4 w-4 text-pub shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[14px] font-medium truncate">{m.title}</div>
+                  <div className="text-[11px] text-inkmut">
+                    {m.seed_type} · {m.status}
+                    {m.n_nodes != null ? ` · ${m.n_nodes} nodes` : ""}
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+              <button
+                onClick={async () => {
+                  await api(`/mindmaps/${m.id}`, { method: "DELETE" });
+                  loadMaps();
+                }}
+                className="btn btn-ghost p-1.5 opacity-0 group-hover:opacity-100 hover:text-danger"
+                title="Delete this map"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
           ))}
           {maps !== null && maps.length === 0 && (
-            <div className="py-4 text-sm text-inkmut">No maps yet — pick a seed above.</div>
+            <div className="py-4 text-sm text-inkmut">
+              No saved maps yet — build one from a seed above, then choose to save it.
+            </div>
           )}
         </div>
       </div>

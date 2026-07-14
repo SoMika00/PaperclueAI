@@ -106,7 +106,7 @@ def run_browse(task_id: str, body: BrowseBody):
                 papers += _search_university(body.query)
             except Exception:
                 warnings.append("University corpus search failed.")
-        if body.scope in ("mine", "combined"):
+        if body.scope == "mine":
             try:
                 papers += _search_mine(body.query)
             except Exception:

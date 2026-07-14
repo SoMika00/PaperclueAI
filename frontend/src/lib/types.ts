@@ -171,6 +171,7 @@ export interface MindMapRecord {
   seed_ref: any;
   status: "building" | "ready" | "error";
   error: string | null;
+  saved?: boolean;
   created_at: string;
   graph?: { nodes: MapNode[]; edges: MapEdge[]; gaps: MapGap[] } | null;
   n_nodes?: number;

@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import (JSON, Column, DateTime, Float, ForeignKey,
+from sqlalchemy import (JSON, Boolean, Column, DateTime, Float, ForeignKey,
                         Integer, String, Text)
 from sqlalchemy.orm import relationship
 
@@ -133,6 +133,7 @@ class MindMap(Base):
     __tablename__ = "mindmaps"
     id = Column(String, primary_key=True, default=uid)
     tenant_id = Column(String, nullable=False, index=True)
+    saved = Column(Boolean, default=False)  # user chooses to keep a map
     title = Column(String, default="Untitled map")
     seed_type = Column(String)     # question | manuscript | collection
     seed_ref = Column(JSON, default=dict)   # {question} | {manuscript_id} | {paper_ids}

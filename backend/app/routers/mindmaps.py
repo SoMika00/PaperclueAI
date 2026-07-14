@@ -29,6 +29,7 @@ def _mindmap_out(m: MindMap, with_graph: bool = True) -> dict:
     out = {
         "id": m.id, "title": m.title, "seed_type": m.seed_type,
         "seed_ref": m.seed_ref or {}, "status": m.status, "error": m.error,
+        "saved": bool(m.saved),
         "created_at": m.created_at.isoformat() if m.created_at else None,
     }
     if with_graph:
@@ -275,12 +276,48 @@ def create_mindmap(body: CreateBody, background: BackgroundTasks, db=Depends(get
 
 @router.get("/mindmaps")
 def list_mindmaps(manuscript_id: str | None = None, db=Depends(get_db)):
+    """Saved maps only — creating a map never clutters the list; keeping it
+    is the user's choice. Unsaved drafts older than a day are purged."""
+    from datetime import datetime, timedelta, timezone
+    cutoff = datetime.now(timezone.utc) - timedelta(days=1)
+    (db.query(MindMap)
+     .filter(MindMap.tenant_id == settings.tenant_id,
+             MindMap.saved.is_(False), MindMap.created_at < cutoff)
+     .delete(synchronize_session=False))
+    db.commit()
+
     q = db.query(MindMap).filter_by(tenant_id=settings.tenant_id)
-    rows = q.order_by(MindMap.created_at.desc()).limit(30).all()
     if manuscript_id:
-        rows = [r for r in rows
+        rows = [r for r in q.order_by(MindMap.created_at.desc()).limit(50).all()
                 if (r.seed_ref or {}).get("manuscript_id") == manuscript_id]
+    else:
+        rows = (q.filter(MindMap.saved.is_(True))
+                .order_by(MindMap.created_at.desc()).limit(30).all())
     return [_mindmap_out(r, with_graph=False) for r in rows]
+
+
+class SavedBody(BaseModel):
+    saved: bool
+
+
+@router.patch("/mindmaps/{map_id}")
+def save_mindmap(map_id: str, body: SavedBody, db=Depends(get_db)):
+    m = db.get(MindMap, map_id)
+    if not m or m.tenant_id != settings.tenant_id:
+        raise HTTPException(404, "map not found")
+    m.saved = body.saved
+    db.commit()
+    return _mindmap_out(m, with_graph=False)
+
+
+@router.delete("/mindmaps/{map_id}")
+def delete_mindmap(map_id: str, db=Depends(get_db)):
+    m = db.get(MindMap, map_id)
+    if not m or m.tenant_id != settings.tenant_id:
+        raise HTTPException(404, "map not found")
+    db.delete(m)
+    db.commit()
+    return {"deleted": map_id}
 
 
 @router.get("/mindmaps/{map_id}")

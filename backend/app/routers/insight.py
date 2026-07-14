@@ -90,9 +90,14 @@ async def chat(ms_id: str, body: ChatBody, db=Depends(get_db)):
     )
     system = (
         "You are PaperClue's 'chat with your paper'. Answer ONLY from the provided "
-        "manuscript excerpts. Cite pages inline as (p.X). If the excerpts do not "
-        "contain the answer, say so - never invent. Be concise. Answer in the "
-        "language of the question."
+        "manuscript metadata and excerpts. Cite pages inline as (p.X). If neither "
+        "contains the answer, say so - never invent. Be concise. Answer in the "
+        "language of the question.\n\n"
+        "MANUSCRIPT METADATA (verified at ingestion):\n"
+        f"- Title: {ms.title}\n"
+        f"- Authors: {', '.join(ms.authors or []) or 'unknown'} (title page, p.1)\n"
+        f"- Field: {ms.field_of_study or 'unknown'} - {ms.n_pages} pages, "
+        f"language: {ms.language}"
     )
     messages = [*body.history[-6:], {
         "role": "user",
