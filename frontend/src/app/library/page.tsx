@@ -55,16 +55,18 @@ export default function LibraryPage() {
               {(papers || [])
                 .filter((p) => p.collection === c)
                 .map((p) => (
-                  <Link
+                  <div
                     key={p.id}
-                    href={
-                      p.source_scope === "university"
-                        ? `/university/${p.corpus_id}`
-                        : `/library/${p.id}`
-                    }
                     className="group flex gap-3 py-3 -mx-2 px-2 rounded hover:bg-surface2/60 transition-colors"
                   >
-                    <div className="flex-1 min-w-0">
+                    <Link
+                      href={
+                        p.source_scope === "university"
+                          ? `/university/${p.corpus_id}`
+                          : `/library/${p.id}`
+                      }
+                      className="flex-1 min-w-0 block"
+                    >
                       <div className="flex items-center gap-2">
                         <ScopeBadge scope={p.source_scope} />
                         {p.year && <span className="text-[11px] text-inkmut">{p.year}</span>}
@@ -80,7 +82,7 @@ export default function LibraryPage() {
                       <div className="text-xs text-inkmut mt-0.5 truncate">
                         {(p.authors || []).slice(0, 4).join(", ")}
                       </div>
-                    </div>
+                    </Link>
                     <button
                       onClick={(e) => remove(e, p.id)}
                       className="btn btn-ghost p-1.5 self-start opacity-0 group-hover:opacity-100 hover:text-danger"
@@ -88,7 +90,7 @@ export default function LibraryPage() {
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
-                  </Link>
+                  </div>
                 ))}
             </div>
           </section>
