@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: paperclue-postgres
+    environment:
+      POSTGRES_USER: paperclue
+      POSTGRES_PASSWORD: paperclue
+      POSTGRES_DB: paperclue
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U paperclue"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.5
+    container_name: paperclue-qdrant
+    volumes:
+      - qdrant_data:/qdrant/storage
+    restart: unless-stopped
+
+  api:
+    build: ./backend
+    container_name: paperclue-api
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://paperclue:paperclue@postgres:5432/paperclue
+      QDRANT_URL: http://qdrant:6333
+      STORAGE_DIR: /data/pdfs
+    volumes:
+      - pdf_data:/data/pdfs
+      - embed_cache:/root/.cache
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    restart: unless-stopped
+
+  web:
+    build: ./frontend
+    container_name: paperclue-web
+    environment:
+      API_URL: http://api:8000
+      HOSTNAME: 0.0.0.0
+    depends_on:
+      - api
+    networks:
+      - default
+      - edge
+    restart: unless-stopped
+
+networks:
+  # Shared with the MIRROR stack so mirror-caddy can reverse-proxy
+  # mymirror.fr/paperclue -> paperclue-web:3000 without touching the mirror app.
+  edge:
+    external: true
+    name: mirror_default
+
+volumes:
+  pg_data:
+  qdrant_data:
+  pdf_data:
+  embed_cache:
