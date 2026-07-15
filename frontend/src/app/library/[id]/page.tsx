@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   ExternalLink,
   FileSearch,
+  FileText,
   Network,
   Quote,
   Trash2,
@@ -38,6 +39,28 @@ export default function SavedPaperPage() {
   const [paper, setPaper] = useState<SavedDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [mapping, setMapping] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+
+  const openInFocus = async () => {
+    if (!paper || importing) return;
+    setImporting(true);
+    setImportError(null);
+    try {
+      const r = await api<{ manuscript_id: string }>("/import", {
+        method: "POST",
+        body: JSON.stringify({ kind: "library", id: paper.id }),
+      });
+      router.push(`/manuscripts/${r.manuscript_id}/overview`);
+    } catch (e: any) {
+      setImportError(
+        e.message?.includes("open-access")
+          ? "No open-access full text available — Focus needs the PDF."
+          : e.message?.slice(0, 140) || "Import failed"
+      );
+      setImporting(false);
+    }
+  };
 
   useEffect(() => {
     api<SavedDetail>(`/library/${params.id}`)
@@ -105,12 +128,16 @@ export default function SavedPaperPage() {
             </div>
 
             <div className="flex flex-wrap gap-2 mt-5">
+              <button onClick={openInFocus} disabled={importing} className="btn btn-primary">
+                {importing ? <Spinner className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
+                {importing ? "Fetching full text…" : "Open in Focus"}
+              </button>
               {paper.url && (
                 <a
                   href={paper.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="btn btn-primary"
+                  className="btn btn-outline"
                 >
                   <ExternalLink className="h-4 w-4" /> Open on Semantic Scholar
                 </a>
@@ -139,6 +166,12 @@ export default function SavedPaperPage() {
                 <Trash2 className="h-4 w-4" /> Remove
               </button>
             </div>
+
+            {importError && (
+              <div className="mt-3 text-xs text-warn bg-uni-soft/60 border border-uni/40 rounded-lg px-3 py-2 inline-block">
+                {importError}
+              </div>
+            )}
 
             {paper.tldr && (
               <section className="mt-7 card p-4 bg-brand-soft/40 border-brand/30">

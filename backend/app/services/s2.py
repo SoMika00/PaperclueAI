@@ -72,6 +72,7 @@ def _norm(p: dict) -> dict:
         "influential_citation_count": p.get("influentialCitationCount") or 0,
         "authors": [a.get("name") for a in (p.get("authors") or [])][:8],
         "doi": (p.get("externalIds") or {}).get("DOI"),
+        "arxiv_id": (p.get("externalIds") or {}).get("ArXiv"),
         "open_access_pdf_url": (p.get("openAccessPdf") or {}).get("url"),
         "fields_of_study": p.get("fieldsOfStudy") or [],
         "url": f"https://www.semanticscholar.org/paper/{p.get('paperId')}",

@@ -4,7 +4,9 @@ lexical-search fallback until the semantic index is ready."""
 import os
 import re
 
+import httpx
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile
+from pydantic import BaseModel
 
 from ..config import settings
 from ..db import SessionLocal, get_db
@@ -110,6 +112,100 @@ def run_pipeline(ms_id: str):
         db.commit()
     finally:
         db.close()
+
+
+class ImportBody(BaseModel):
+    kind: str  # "library" | "university"
+    id: str
+
+
+MAX_PDF_BYTES = 30 * 1024 * 1024
+
+
+def _download_pdf(url: str, dest: str):
+    headers = {"User-Agent": "PaperClue/1.0 (research assistant; open-access import)"}
+    with httpx.Client(timeout=30, follow_redirects=True, headers=headers) as c:
+        r = c.get(url)
+        r.raise_for_status()
+        data = r.content
+    if len(data) > MAX_PDF_BYTES:
+        raise HTTPException(413, "PDF larger than 30 MB")
+    if not data[:5].startswith(b"%PDF"):
+        raise HTTPException(422, "The open-access link did not return a PDF")
+    with open(dest, "wb") as f:
+        f.write(data)
+
+
+@router.post("/import")
+def import_paper(body: ImportBody, background: BackgroundTasks, db=Depends(get_db)):
+    """Open any known paper in Focus: resolve its open-access PDF, download it
+    and run the normal ingestion pipeline. The document joins My Research with
+    its origin recorded."""
+    from ..models import SavedPaper, UniversityPaper
+    from ..services import s2
+
+    if body.kind == "library":
+        row = db.get(SavedPaper, body.id)
+        if not row or row.tenant_id != settings.tenant_id:
+            raise HTTPException(404, "paper not found")
+        corpus_id, title, origin_from = row.corpus_id, row.title, row.source_scope
+    elif body.kind == "university":
+        row = db.get(UniversityPaper, body.id)
+        if not row or row.tenant_id != settings.tenant_id:
+            raise HTTPException(404, "paper not found")
+        corpus_id, title, origin_from = row.s2_id, row.title, "university"
+    else:
+        raise HTTPException(400, "kind must be library|university")
+
+    # Already imported? Reopen the existing focus document.
+    existing = (db.query(Manuscript)
+                .filter_by(tenant_id=settings.tenant_id)
+                .filter(Manuscript.origin.isnot(None)).all())
+    for m in existing:
+        if (m.origin or {}).get("corpus_id") == corpus_id and m.status != "error":
+            return {"manuscript_id": m.id, "already": True}
+
+    candidates = []
+    if corpus_id:
+        try:
+            details = s2.paper_details(corpus_id) or {}
+            if details.get("open_access_pdf_url"):
+                candidates.append(details["open_access_pdf_url"])
+            if details.get("arxiv_id"):  # most reliable host
+                candidates.append(f"https://arxiv.org/pdf/{details['arxiv_id']}")
+        except Exception:
+            pass
+    if not candidates:
+        raise HTTPException(
+            404, "No open-access full text is available for this paper — "
+                 "Focus needs the PDF. You can still read its abstract here.")
+
+    os.makedirs(settings.storage_dir, exist_ok=True)
+    ms = Manuscript(
+        tenant_id=settings.tenant_id, file_path="", title=(title or "Imported paper")[:200],
+        origin={"corpus_id": corpus_id, "from": origin_from},
+        ingest_steps={st: "pending" for st in STEPS},
+    )
+    db.add(ms)
+    db.commit()
+    path = os.path.join(settings.storage_dir, f"{ms.id}.pdf")
+    last_err = None
+    for url in candidates:
+        try:
+            _download_pdf(url, path)
+            last_err = None
+            break
+        except Exception as e:
+            last_err = e
+    if last_err is not None:
+        db.delete(ms)
+        db.commit()
+        raise HTTPException(
+            502, f"Could not fetch the open-access PDF ({str(last_err)[:80]})")
+    ms.file_path = path
+    db.commit()
+    background.add_task(run_pipeline, ms.id)
+    return {"manuscript_id": ms.id, "already": False}
 
 
 @router.post("/ingest")

@@ -31,6 +31,7 @@ class Manuscript(Base):
     ingest_steps = Column(JSON, default=dict)
     qdrant_collection = Column(String, default="")
     source_scope = Column(String, default="manuscript")
+    origin = Column(JSON, nullable=True)  # {corpus_id, from: university|public} when imported
     readiness = Column(Integer, default=0)
     readiness_detail = Column(JSON, default=dict)
     insight = Column(JSON, nullable=True)  # cached structured brief

@@ -14,6 +14,7 @@ def manuscript_out(ms: Manuscript, full: bool = False) -> dict:
         "readiness": ms.readiness,
         "readiness_detail": ms.readiness_detail or {},
         "source_scope": ms.source_scope,
+        "origin": ms.origin,
         "created_at": ms.created_at.isoformat() if ms.created_at else None,
         "updated_at": ms.updated_at.isoformat() if ms.updated_at else None,
         "has_insight": bool(ms.insight),

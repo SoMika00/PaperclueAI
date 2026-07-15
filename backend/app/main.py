@@ -21,6 +21,9 @@ def _migrate():
             "ALTER TABLE mindmaps ADD COLUMN IF NOT EXISTS "
             "saved BOOLEAN DEFAULT FALSE"
         ))
+        conn.execute(text(
+            "ALTER TABLE manuscripts ADD COLUMN IF NOT EXISTS origin JSON"
+        ))
 
 
 def _warmup():

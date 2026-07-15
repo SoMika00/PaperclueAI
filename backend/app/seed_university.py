@@ -38,6 +38,9 @@ def seed():
             for p in papers:
                 if not p.get("abstract") or p.get("corpus_id") in known_ids:
                     continue
+                # The datalake must be openable in Focus: full text required.
+                if not (p.get("open_access_pdf_url") or p.get("arxiv_id")):
+                    continue
                 known_ids.add(p.get("corpus_id"))
                 up = UniversityPaper(
                     tenant_id=settings.tenant_id, collection_name=collection_name,
