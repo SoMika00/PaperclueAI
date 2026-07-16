@@ -15,7 +15,7 @@ const PdfViewer = dynamic(() => import("@/components/PdfViewer"), {
 export default function InsightPage() {
   return (
     <div className="h-full flex">
-      <section className="w-[330px] shrink-0 border-r border-line bg-paper overflow-y-auto panel-scroll">
+      <section className="w-[330px] shrink-0 border-r border-line dark:border-dark-line bg-paper dark:bg-dark-surface overflow-y-auto panel-scroll">
         <InsightPanel />
       </section>
       <section className="flex-1 min-w-0">

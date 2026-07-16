@@ -31,6 +31,7 @@ class Manuscript(Base):
     ingest_steps = Column(JSON, default=dict)
     qdrant_collection = Column(String, default="")
     source_scope = Column(String, default="manuscript")
+    user_id = Column(String, nullable=True, index=True)
     origin = Column(JSON, nullable=True)  # {corpus_id, from: university|public} when imported
     readiness = Column(Integer, default=0)
     readiness_detail = Column(JSON, default=dict)
@@ -134,6 +135,7 @@ class MindMap(Base):
     __tablename__ = "mindmaps"
     id = Column(String, primary_key=True, default=uid)
     tenant_id = Column(String, nullable=False, index=True)
+    user_id = Column(String, nullable=True, index=True)
     saved = Column(Boolean, default=False)  # user chooses to keep a map
     title = Column(String, default="Untitled map")
     seed_type = Column(String)     # question | manuscript | collection
@@ -149,6 +151,7 @@ class SavedPaper(Base):
     __tablename__ = "saved_papers"
     id = Column(String, primary_key=True, default=uid)
     tenant_id = Column(String, nullable=False, index=True)
+    user_id = Column(String, nullable=True, index=True)
     collection = Column(String, default="Saved papers")
     corpus_id = Column(String, index=True)
     title = Column(String)
@@ -165,6 +168,7 @@ class SearchLog(Base):
     __tablename__ = "search_logs"
     id = Column(String, primary_key=True, default=uid)
     tenant_id = Column(String, nullable=False, index=True)
+    user_id = Column(String, nullable=True, index=True)
     query = Column(Text)
     scope = Column(String, default="combined")
     n_results = Column(Integer, default=0)

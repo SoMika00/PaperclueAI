@@ -16,6 +16,7 @@ import {
 import { api } from "@/lib/api";
 import GlobalShell from "@/components/GlobalShell";
 import { ScopeBadge, Spinner } from "@/components/ui";
+import { useLocale } from "@/lib/i18n";
 
 interface UniPaper {
   id: string;
@@ -30,6 +31,7 @@ interface UniPaper {
 }
 
 export default function UniversityPaperPage() {
+  const { t } = useLocale();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const [paper, setPaper] = useState<UniPaper | null>(null);
@@ -52,7 +54,7 @@ export default function UniversityPaperPage() {
     } catch (e: any) {
       setImportError(
         e.message?.includes("open-access")
-          ? "No open-access full text available — Focus needs the PDF."
+          ? t("no_oa_fulltext")
           : e.message?.slice(0, 140) || "Import failed"
       );
       setImporting(false);
@@ -108,7 +110,7 @@ export default function UniversityPaperPage() {
           href="/university"
           className="flex items-center gap-1 text-sm text-inkmut hover:text-ink mb-5"
         >
-          <ArrowLeft className="h-4 w-4" /> University Repository
+          <ArrowLeft className="h-4 w-4" /> {t("back_to_university")}
         </Link>
 
         {error && <div className="card p-4 text-sm text-danger">{error}</div>}
@@ -134,16 +136,16 @@ export default function UniversityPaperPage() {
             <div className="flex flex-wrap gap-2 mt-5">
               <button onClick={openInFocus} disabled={importing} className="btn btn-primary">
                 {importing ? <Spinner className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
-                {importing ? "Fetching full text…" : "Open in Focus"}
+                {importing ? t("fetching_fulltext") : t("open_in_focus")}
               </button>
               <button onClick={save} disabled={saved} className="btn btn-outline">
                 {saved ? (
                   <>
-                    <BookmarkCheck className="h-4 w-4" /> In your library
+                    <BookmarkCheck className="h-4 w-4" /> {t("in_your_library")}
                   </>
                 ) : (
                   <>
-                    <Bookmark className="h-4 w-4" /> Add to my research
+                    <Bookmark className="h-4 w-4" /> {t("add_to_research")}
                   </>
                 )}
               </button>
@@ -151,11 +153,11 @@ export default function UniversityPaperPage() {
                 href={`/discover?q=${encodeURIComponent(paper.title.slice(0, 180))}`}
                 className="btn btn-outline"
               >
-                <FileSearch className="h-4 w-4" /> Find related work
+                <FileSearch className="h-4 w-4" /> {t("find_related_work")}
               </Link>
               <button onClick={mapIt} disabled={mapping} className="btn btn-outline">
                 {mapping ? <Spinner className="h-4 w-4" /> : <Network className="h-4 w-4" />}
-                Map the literature around it
+                {t("map_literature_around")}
               </button>
               {paper.doi && (
                 <a
@@ -176,15 +178,14 @@ export default function UniversityPaperPage() {
             )}
 
             <section className="mt-7">
-              <h2 className="section-title mb-2">Abstract</h2>
+              <h2 className="section-title mb-2">{t("abstract_label")}</h2>
               <p className="text-[15px] leading-relaxed text-ink whitespace-pre-line">
-                {paper.abstract || "No abstract available."}
+                {paper.abstract || t("no_abstract")}
               </p>
             </section>
 
             <p className="text-[11px] text-inkmut mt-8 border-t border-line pt-3">
-              Institutional document — private to your tenant, searchable in Discover
-              under the University scope, never sent to public engines.
+              {t("university_footer_note")}
             </p>
           </article>
         )}

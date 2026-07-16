@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider, SignInGate } from "@/lib/auth";
+import { ThemeProvider } from "@/lib/theme";
+import { LocaleProvider } from "@/lib/i18n";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "PaperClue - Grounded research workspace",
@@ -10,11 +15,15 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body>
-        <AuthProvider>
-          <SignInGate>{children}</SignInGate>
-        </AuthProvider>
+        <ThemeProvider>
+          <LocaleProvider>
+            <AuthProvider>
+              <SignInGate>{children}</SignInGate>
+            </AuthProvider>
+          </LocaleProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,6 +1,4 @@
 "use client";
-/* Template auth: always auto-connected to the demo user; sign out / sign in
-   just toggles the client session so the flow exists for the demo. */
 import {
   createContext,
   useCallback,
@@ -8,89 +6,133 @@ import {
   useEffect,
   useState,
 } from "react";
+import { supabase } from "./supabase";
+import { useLocale } from "./i18n";
+import type { Session } from "@supabase/supabase-js";
 
-export interface DemoUser {
-  name: string;
-  email: string;
-  tenant: string;
-  initials: string;
+export interface Profile {
+  full_name: string | null;
+  role: string;
+  institution_name: string | null;
 }
 
-const TEST_USER: DemoUser = {
-  name: "Dr. Test Researcher",
-  email: "researcher@demo-university.edu",
-  tenant: "Demo University",
-  initials: "TR",
-};
-
 interface AuthState {
-  user: DemoUser | null;
+  session: Session | null;
+  profile: Profile | null;
   ready: boolean;
-  signIn: () => void;
-  signOut: () => void;
+  signOut: () => Promise<void>;
 }
 
 const Ctx = createContext<AuthState>({
-  user: null,
+  session: null,
+  profile: null,
   ready: false,
-  signIn: () => {},
-  signOut: () => {},
+  signOut: async () => {},
 });
 
 export const useAuth = () => useContext(Ctx);
 
+async function loadProfile(userId: string): Promise<Profile | null> {
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("full_name, role, institutions(name)")
+    .eq("id", userId)
+    .maybeSingle();
+  if (error || !data) return null;
+  const inst = (data as any).institutions;
+  return {
+    full_name: data.full_name,
+    role: data.role,
+    institution_name: inst?.name ?? null,
+  };
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<DemoUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Auto-connect by default; only an explicit sign-out persists.
-    const out = localStorage.getItem("pc_signed_out") === "1";
-    setUser(out ? null : TEST_USER);
-    setReady(true);
+    supabase.auth.getSession().then(async ({ data }) => {
+      setSession(data.session);
+      if (data.session) setProfile(await loadProfile(data.session.user.id));
+      setReady(true);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      if (s) loadProfile(s.user.id).then(setProfile);
+      else setProfile(null);
+    });
+    return () => listener.subscription.unsubscribe();
   }, []);
 
-  const signIn = useCallback(() => {
-    localStorage.removeItem("pc_signed_out");
-    setUser(TEST_USER);
-  }, []);
-
-  const signOut = useCallback(() => {
-    localStorage.setItem("pc_signed_out", "1");
-    setUser(null);
+  const signOut = useCallback(async () => {
+    await supabase.auth.signOut();
+    setSession(null);
+    setProfile(null);
   }, []);
 
   return (
-    <Ctx.Provider value={{ user, ready, signIn, signOut }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ session, profile, ready, signOut }}>{children}</Ctx.Provider>
   );
 }
 
 export function SignInGate({ children }: { children: React.ReactNode }) {
-  const { user, ready, signIn } = useAuth();
+  const { session, ready } = useAuth();
+  const { t, locale, toggle: toggleLocale } = useLocale();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
   if (!ready) return null;
-  if (user) return <>{children}</>;
+  if (session) return <>{children}</>;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) setError(error.message);
+  };
+
   return (
-    <div className="h-screen grid place-items-center bg-ivory px-6">
-      <div className="card p-8 w-full max-w-sm text-center shadow-drawer">
-        <span className="mx-auto h-11 w-11 rounded-xl bg-topbar text-white grid place-items-center font-serif font-bold text-lg">
-          P
-        </span>
-        <h1 className="font-serif text-xl font-semibold mt-3">Sign in to PaperClue</h1>
-        <p className="text-sm text-inkmut mt-1 mb-5">
-          Grounded research workspace for your institution.
+    <div className="h-screen grid place-items-center bg-ivory dark:bg-dark-bg px-6 transition-colors">
+      <form onSubmit={handleSubmit} className="card p-8 w-full max-w-sm text-center shadow-drawer relative">
+        <button
+          type="button"
+          onClick={toggleLocale}
+          className="absolute top-3 right-3 text-xs font-semibold text-inkmut dark:text-dark-inkmut hover:text-ink dark:hover:text-dark-ink"
+        >
+          {locale === "en" ? "日本語" : "English"}
+        </button>
+        <img src="/paperclue/paperclue-logo.png" alt="PaperClue" className="mx-auto h-9 w-auto" />
+        <h1 className="font-serif text-xl font-semibold mt-3">{t("signin_title")}</h1>
+        <p className="text-sm text-inkmut dark:text-dark-inkmut mt-1 mb-5">
+          {t("signin_subtitle")}
         </p>
         <input
-          value="researcher@demo-university.edu"
-          readOnly
-          className="w-full rounded-lg border border-line bg-surface2 px-3 py-2 text-sm text-inkmut mb-2"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={t("signin_email_placeholder")}
+          className="w-full rounded-lg border border-line dark:border-dark-line bg-surface2 dark:bg-dark-surface2 dark:text-dark-ink px-3 py-2 text-sm mb-2"
+          required
         />
-        <button onClick={signIn} className="btn btn-primary w-full justify-center">
-          Continue as Dr. Test Researcher
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder={t("signin_password_placeholder")}
+          className="w-full rounded-lg border border-line dark:border-dark-line bg-surface2 dark:bg-dark-surface2 dark:text-dark-ink px-3 py-2 text-sm mb-3"
+          required
+        />
+        {error && <p className="text-xs text-red-600 mb-3">{error}</p>}
+        <button type="submit" disabled={loading} className="btn btn-primary w-full justify-center">
+          {loading ? t("signin_loading") : t("signin_button")}
         </button>
-        <p className="text-[11px] text-inkmut mt-3">
-          Demo tenant: Demo University — SSO and invitations come with team plans.
-        </p>
-      </div>
+      </form>
     </div>
   );
 }

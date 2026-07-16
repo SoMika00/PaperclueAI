@@ -9,11 +9,13 @@ import { api } from "@/lib/api";
 import type { Manuscript, MindMapRecord, SavedPaper } from "@/lib/types";
 import GlobalShell from "@/components/GlobalShell";
 import { Spinner } from "@/components/ui";
+import { useLocale } from "@/lib/i18n";
 
 type Mode = "question" | "manuscript" | "collection" | null;
 
 export default function MindMapsPage() {
   const router = useRouter();
+  const { t } = useLocale();
   const [maps, setMaps] = useState<MindMapRecord[] | null>(null);
   const [mode, setMode] = useState<Mode>(null);
   const [question, setQuestion] = useState("");
@@ -67,30 +69,29 @@ export default function MindMapsPage() {
     {
       id: "question" as Mode,
       icon: <HelpCircle className="h-5 w-5" />,
-      title: "From a research question",
-      sub: "Explore an academic topic from scratch",
+      title: t("mode_question_title"),
+      sub: t("mode_question_sub"),
     },
     {
       id: "manuscript" as Mode,
       icon: <FileText className="h-5 w-5" />,
-      title: "From a manuscript",
-      sub: "Position your paper inside existing research",
+      title: t("mode_manuscript_title"),
+      sub: t("mode_manuscript_sub"),
     },
     {
       id: "collection" as Mode,
       icon: <FolderOpen className="h-5 w-5" />,
-      title: "From a collection",
-      sub: "Organize selected papers into themes",
+      title: t("mode_collection_title"),
+      sub: t("mode_collection_sub"),
     },
   ];
 
   return (
     <GlobalShell>
       <div className="max-w-3xl mx-auto px-8 py-8">
-        <h1 className="font-serif text-2xl font-semibold">Create a research map</h1>
+        <h1 className="font-serif text-2xl font-semibold">{t("mindmaps_title")}</h1>
         <p className="text-sm text-inkmut mt-0.5 mb-5">
-          Map the literature around a seed, reveal research families and missing
-          references.
+          {t("mindmaps_subtitle")}
         </p>
 
         <div className="grid sm:grid-cols-3 gap-3 mb-4">
@@ -111,12 +112,12 @@ export default function MindMapsPage() {
 
         {mode === "question" && (
           <div className="card p-4 mb-4 flex flex-col gap-2">
-            <label className="section-title">Research question</label>
+            <label className="section-title">{t("research_question_label")}</label>
             <textarea
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               rows={2}
-              placeholder="e.g. How do RAG systems handle conflicting retrieved evidence?"
+              placeholder={t("question_placeholder")}
               className="rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-brand resize-none"
             />
             <button
@@ -125,19 +126,19 @@ export default function MindMapsPage() {
               className="btn btn-primary self-start"
             >
               {creating ? <Spinner className="h-4 w-4" /> : <Network className="h-4 w-4" />}
-              Build map
+              {t("build_map")}
             </button>
           </div>
         )}
 
         {mode === "manuscript" && (
           <div className="card p-4 mb-4 flex flex-col gap-2">
-            <label className="section-title">Manuscript</label>
+            <label className="section-title">{t("manuscript_label")}</label>
             {mss.length === 0 ? (
               <div className="text-sm text-inkmut">
-                No ready manuscript — upload one from{" "}
+                {t("no_ready_manuscript")}{" "}
                 <Link href="/home" className="text-brand underline">
-                  Home
+                  {t("home_link")}
                 </Link>
                 .
               </div>
@@ -156,7 +157,7 @@ export default function MindMapsPage() {
                 </select>
                 <button onClick={create} disabled={creating} className="btn btn-primary self-start">
                   {creating ? <Spinner className="h-4 w-4" /> : <Network className="h-4 w-4" />}
-                  Position this manuscript
+                  {t("position_manuscript")}
                 </button>
               </>
             )}
@@ -166,13 +167,13 @@ export default function MindMapsPage() {
         {mode === "collection" && (
           <div className="card p-4 mb-4 flex flex-col gap-2">
             <label className="section-title">
-              Pick 2–30 saved papers ({selected.size} selected)
+              {t("pick_papers_label")} ({selected.size} {t("selected_label")})
             </label>
             {library.length < 2 ? (
               <div className="text-sm text-inkmut">
-                Your library needs at least 2 saved papers — save some from the{" "}
+                {t("library_needs_two")}{" "}
                 <Link href="/literature" className="text-brand underline">
-                  Literature Explorer
+                  {t("literature_explorer_link")}
                 </Link>
                 .
               </div>
@@ -205,7 +206,7 @@ export default function MindMapsPage() {
                   className="btn btn-primary self-start"
                 >
                   {creating ? <Spinner className="h-4 w-4" /> : <Network className="h-4 w-4" />}
-                  Build map
+                  {t("build_map")}
                 </button>
               </>
             )}
@@ -214,7 +215,7 @@ export default function MindMapsPage() {
 
         {error && <div className="card p-3 text-xs text-danger mb-4">{error}</div>}
 
-        <h2 className="section-title mb-1 mt-6">Your saved maps</h2>
+        <h2 className="section-title mb-1 mt-6">{t("your_saved_maps")}</h2>
         {maps === null && <Spinner className="h-5 w-5 text-brand" />}
         <div className="flex flex-col divide-y divide-line/70">
           {(maps || []).map((m) => (
@@ -249,7 +250,7 @@ export default function MindMapsPage() {
           ))}
           {maps !== null && maps.length === 0 && (
             <div className="py-4 text-sm text-inkmut">
-              No saved maps yet — build one from a seed above, then choose to save it.
+              {t("no_saved_maps")}
             </div>
           )}
         </div>

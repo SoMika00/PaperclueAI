@@ -8,6 +8,7 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import { useRouter } from "next/navigation";
 import { FileSearch, Loader2, Sparkles, X } from "lucide-react";
 import { BASE, api } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import { useWorkspace } from "@/lib/ws";
 import { Spinner } from "./ui";
 
@@ -31,7 +32,17 @@ export default function PdfViewer() {
   const [explain, setExplain] = useState<{ loading: boolean; text: string } | null>(null);
 
   const fileUrl = useMemo(() => `${BASE}/manuscripts/${ms.id}/pdf`, [ms.id]);
-  const file = useMemo(() => ({ url: fileUrl }), [fileUrl]);
+  const [file, setFile] = useState<{ url: string; httpHeaders?: Record<string, string> } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      const token = data.session?.access_token;
+      setFile({ url: fileUrl, httpHeaders: token ? { Authorization: `Bearer ${token}` } : {} });
+    });
+    return () => { cancelled = true; };
+  }, [fileUrl]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -142,6 +153,9 @@ export default function PdfViewer() {
       className="relative h-full overflow-y-auto panel-scroll bg-ink/[0.03]"
       onMouseUp={onMouseUp}
     >
+      {file === null ? (
+        <div className="flex items-center gap-2 p-8 text-inkmut"><Spinner /> Loading…</div>
+      ) : (
       <Document
         file={file}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
@@ -171,6 +185,7 @@ export default function PdfViewer() {
           ))}
         </div>
       </Document>
+      )}
 
       {selMenu && (
         <div

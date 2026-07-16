@@ -1,10 +1,11 @@
 """Federated grounded search. Scopes: public (Semantic Scholar) | university (tenant
 Qdrant+Postgres, RLS-filtered BEFORE scoring) | combined (per-source normalized ranking).
 Report synthesis via Claude, citations strictly restricted to retrieved papers."""
-from fastapi import APIRouter, BackgroundTasks, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
 from .. import tasks
+from ..auth import get_current_user
 from ..config import settings
 from ..db import SessionLocal
 from ..models import EvidenceItem, Manuscript, SearchLog, UniversityPaper
@@ -22,14 +23,13 @@ class BrowseBody(BaseModel):
     year_from: int | None = None
 
 
-def _search_mine(query: str, limit: int = 6) -> list[dict]:
-    """Private RAG over the user's own uploaded manuscripts: answers
-    'what do my papers say about X?' with page-level excerpts."""
+def _search_mine(query: str, user_id: str, limit: int = 6) -> list[dict]:
+    """Private RAG over THIS user's own uploaded manuscripts only."""
     db = SessionLocal()
     try:
         out = []
         mss = (db.query(Manuscript)
-               .filter_by(tenant_id=settings.tenant_id, status="ready").all())
+               .filter_by(tenant_id=settings.tenant_id, user_id=user_id, status="ready").all())
         for ms in mss:
             if not ms.qdrant_collection:
                 continue
@@ -89,7 +89,7 @@ def _rank_explanation(p: dict, query: str) -> str:
     return " - ".join(bits)
 
 
-def run_browse(task_id: str, body: BrowseBody):
+def run_browse(task_id: str, body: BrowseBody, user_id: str):
     try:
         papers: list[dict] = []
         tasks.update(task_id, step="retrieving", progress=15)
@@ -108,7 +108,7 @@ def run_browse(task_id: str, body: BrowseBody):
                 warnings.append("University corpus search failed.")
         if body.scope == "mine":
             try:
-                papers += _search_mine(body.query)
+                papers += _search_mine(body.query, user_id)
             except Exception:
                 pass
         if not papers:
@@ -116,8 +116,6 @@ def run_browse(task_id: str, body: BrowseBody):
                        else "No papers retrieved for this query.")
             return
 
-        # Dedup by DOI/title; normalized interleave so public volume never
-        # drowns institutional docs.
         seen, dedup = set(), []
         for p in papers:
             key = (p.get("doi") or p["title"].lower()[:80])
@@ -163,7 +161,8 @@ def run_browse(task_id: str, body: BrowseBody):
 
         db = SessionLocal()
         try:
-            db.add(SearchLog(tenant_id=settings.tenant_id, query=body.query[:500],
+            db.add(SearchLog(tenant_id=settings.tenant_id, user_id=user_id,
+                             query=body.query[:500],
                              scope=body.scope, n_results=len(merged)))
             db.commit()
         finally:
@@ -172,19 +171,24 @@ def run_browse(task_id: str, body: BrowseBody):
         if body.manuscript_id:
             db = SessionLocal()
             try:
-                for p in merged[:5]:
-                    db.add(EvidenceItem(
-                        manuscript_id=body.manuscript_id,
-                        claim=f"Browse: '{body.query}' -> {p['title'][:150]}",
-                        kind="browse",
-                        source_type=("university_paper" if p["source_scope"] == "university"
-                                     else "public_paper"),
-                        source_ref={"corpus_id": p["corpus_id"], "title": p["title"],
-                                    "url": p.get("url"), "year": p.get("year"),
-                                    "source_scope": p["source_scope"]},
-                        confidence=0.9, status="verified",
-                    ))
-                db.commit()
+                # Only attach evidence to a manuscript this user actually owns.
+                ms = (db.query(Manuscript)
+                      .filter_by(id=body.manuscript_id, tenant_id=settings.tenant_id,
+                                user_id=user_id).first())
+                if ms:
+                    for p in merged[:5]:
+                        db.add(EvidenceItem(
+                            manuscript_id=body.manuscript_id,
+                            claim=f"Browse: '{body.query}' -> {p['title'][:150]}",
+                            kind="browse",
+                            source_type=("university_paper" if p["source_scope"] == "university"
+                                         else "public_paper"),
+                            source_ref={"corpus_id": p["corpus_id"], "title": p["title"],
+                                        "url": p.get("url"), "year": p.get("year"),
+                                        "source_scope": p["source_scope"]},
+                            confidence=0.9, status="verified",
+                        ))
+                    db.commit()
             finally:
                 db.close()
     except Exception as e:
@@ -192,17 +196,18 @@ def run_browse(task_id: str, body: BrowseBody):
 
 
 @router.post("/browse")
-def browse(body: BrowseBody, background: BackgroundTasks):
+def browse(body: BrowseBody, background: BackgroundTasks,
+           current_user: dict = Depends(get_current_user)):
     if body.scope not in ("public", "university", "mine", "combined"):
         raise HTTPException(400, "invalid scope")
-    task_id = tasks.create("browse")
-    background.add_task(run_browse, task_id, body)
+    task_id = tasks.create("browse", current_user["user_id"])
+    background.add_task(run_browse, task_id, body, current_user["user_id"])
     return {"task_id": task_id}
 
 
 @router.get("/tasks/{task_id}")
-def task_status(task_id: str):
-    t = tasks.get(task_id)
+def task_status(task_id: str, current_user: dict = Depends(get_current_user)):
+    t = tasks.get_for_user(task_id, current_user["user_id"])
     if not t:
         raise HTTPException(404, "task not found")
     return t

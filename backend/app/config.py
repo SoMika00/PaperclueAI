@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     s2_api_key: str = ""
     claude_model_fast: str = "claude-sonnet-4-5"
     claude_model_smart: str = "claude-sonnet-4-5"
+    supabase_url: str = ""
+    supabase_service_role_key: str = ""
     database_url: str = "postgresql+psycopg2://paperclue:paperclue@postgres:5432/paperclue"
     qdrant_url: str = "http://qdrant:6333"
     storage_dir: str = "/data/pdfs"

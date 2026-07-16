@@ -16,7 +16,7 @@ const PdfViewer = dynamic(() => import("@/components/PdfViewer"), {
 export default function ReviewPage() {
   return (
     <div className="h-full flex">
-      <section className="w-[340px] shrink-0 border-r border-line bg-paper overflow-y-auto panel-scroll">
+      <section className="w-[340px] shrink-0 border-r border-line dark:border-dark-line bg-paper dark:bg-dark-surface overflow-y-auto panel-scroll">
         <Suspense fallback={<Spinner className="h-5 w-5 m-4 text-brand" />}>
           <ReviewPanel />
         </Suspense>

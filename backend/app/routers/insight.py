@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
+from ..auth import get_current_user
 from ..db import get_db
 from ..models import EvidenceItem, Section
 from ..serializers import evidence_out
@@ -34,8 +35,8 @@ MANUSCRIPT SECTIONS:
 
 
 @router.post("/insight/{ms_id}")
-def build_insight(ms_id: str, db=Depends(get_db)):
-    ms = get_ms(db, ms_id)
+def build_insight(ms_id: str, db=Depends(get_db), current_user: dict = Depends(get_current_user)):
+    ms = get_ms(db, ms_id, current_user["user_id"])
     if ms.insight:
         return {"insight": ms.insight, "cached": True}
 
@@ -49,7 +50,6 @@ def build_insight(ms_id: str, db=Depends(get_db)):
     ms.insight = brief
     db.commit()
 
-    # Feed the Evidence Ledger
     def add_evidence(item: dict, label: str):
         if not isinstance(item, dict) or not item.get("claim"):
             return
@@ -79,11 +79,12 @@ class ChatBody(BaseModel):
 
 
 @router.post("/insight/{ms_id}/chat")
-async def chat(ms_id: str, body: ChatBody, db=Depends(get_db)):
+async def chat(ms_id: str, body: ChatBody, db=Depends(get_db),
+               current_user: dict = Depends(get_current_user)):
     """SSE stream. Grounded on the manuscript's private Qdrant collection only."""
-    ms = get_ms(db, ms_id)
+    ms = get_ms(db, ms_id, current_user["user_id"])
     hits = embeddings.search(ms.qdrant_collection, body.question, limit=6)
-    if not hits:  # index still building or failed -> lexical fallback
+    if not hits:
         hits = lexical.search(db, ms.id, body.question, limit=6)
     context = "\n\n".join(
         f"[p.{h['page']} - {h['section']}] {h['text']}" for h in hits
@@ -127,9 +128,10 @@ class ExplainBody(BaseModel):
 
 
 @router.post("/insight/{ms_id}/explain")
-def explain_selection(ms_id: str, body: ExplainBody, db=Depends(get_db)):
+def explain_selection(ms_id: str, body: ExplainBody, db=Depends(get_db),
+                       current_user: dict = Depends(get_current_user)):
     """PDF -> feature: contextual action on selected text."""
-    ms = get_ms(db, ms_id)
+    ms = get_ms(db, ms_id, current_user["user_id"])
     hits = embeddings.search(ms.qdrant_collection, body.text, limit=3)
     if not hits:
         hits = lexical.search(db, ms.id, body.text, limit=3)

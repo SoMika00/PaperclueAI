@@ -5,10 +5,24 @@
 :root {
   color-scheme: light;
 }
+.dark {
+  color-scheme: dark;
+}
 
 body {
-  @apply bg-ivory text-ink font-sans antialiased;
+  @apply bg-ivory text-ink font-sans antialiased dark:bg-dark-bg dark:text-dark-ink transition-colors duration-200;
 }
+
+/* Global dark-mode compatibility layer: catches text-ink / text-inkmut / bg-paper /
+   bg-surface2 / border-line wherever they are used across the app, so pages do not
+   need dark: variants added one file at a time. */
+.dark .text-ink { color: theme("colors.dark.ink") !important; }
+.dark .text-inkmut { color: theme("colors.dark.inkmut") !important; }
+.dark .bg-paper { background-color: theme("colors.dark.surface") !important; }
+.dark .bg-surface2 { background-color: theme("colors.dark.surface2") !important; }
+.dark .border-line { border-color: theme("colors.dark.line") !important; }
+.dark .text-ink\/80, .dark .text-ink\/85, .dark .text-ink\/60 { color: theme("colors.dark.ink") !important; }
+.dark .border-ink\/5, .dark .border-ink\/10 { border-color: theme("colors.dark.line") !important; }
 
 h1, h2, h3, .font-display {
   @apply font-serif;
@@ -24,7 +38,7 @@ h1, h2, h3, .font-display {
 .badge-ai { @apply bg-aigray-soft text-aigray border border-aigray/40; }
 
 .card {
-  @apply bg-paper rounded-lg border border-line shadow-card;
+  @apply bg-paper rounded-lg border border-line shadow-card dark:bg-dark-surface dark:border-dark-line;
 }
 .card-hover {
   @apply transition-all duration-200 hover:shadow-lift hover:-translate-y-px;
@@ -34,8 +48,8 @@ h1, h2, h3, .font-display {
   @apply inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
 }
 .btn-primary { @apply bg-brand text-white hover:bg-brand-deep; }
-.btn-ghost { @apply text-inkmut hover:bg-surface2 hover:text-ink; }
-.btn-outline { @apply border border-line text-ink hover:bg-surface2; }
+.btn-ghost { @apply text-inkmut hover:bg-surface2 hover:text-ink dark:text-dark-inkmut dark:hover:bg-dark-surface2 dark:hover:text-dark-ink; }
+.btn-outline { @apply border border-line text-ink hover:bg-surface2 dark:border-dark-line dark:text-dark-ink dark:hover:bg-dark-surface2; }
 .btn-danger { @apply border border-danger/40 text-danger hover:bg-danger/10; }
 
 /* Section separators instead of card soup */

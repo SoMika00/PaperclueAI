@@ -6,11 +6,13 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
 from .. import tasks
+from ..auth import get_current_user
 from ..config import settings
 from ..db import SessionLocal, get_db
 from ..models import Manuscript, MindMap, Reference, SavedPaper
 from ..services import claude, s2
 from .browse import _search_university
+from .manuscripts import get_ms
 
 router = APIRouter()
 
@@ -23,6 +25,13 @@ class CreateBody(BaseModel):
     manuscript_id: str | None = None
     paper_ids: list[str] | None = None  # SavedPaper ids
     title: str | None = None
+
+
+def _get_map(db, map_id: str, user_id: str) -> MindMap:
+    m = db.get(MindMap, map_id)
+    if not m or m.tenant_id != settings.tenant_id or m.user_id != user_id:
+        raise HTTPException(404, "map not found")
+    return m
 
 
 def _mindmap_out(m: MindMap, with_graph: bool = True) -> dict:
@@ -56,7 +65,6 @@ def _paper_node(p: dict, why: str | None = None) -> dict:
 
 
 def _cluster_and_explain(seed_label: str, papers: list[dict]) -> dict:
-    """One Claude call: clusters + one-line 'why this paper is here' each."""
     listing = "\n".join(
         f"- id={p['corpus_id']} :: {p['title']} ({p.get('year')}) :: "
         f"{(p.get('tldr') or p.get('abstract') or '')[:200]}"
@@ -91,7 +99,7 @@ def _retrieve_public(query: str, limit: int, seed_ids: list[str] | None = None) 
         except Exception:
             papers = []
     if len(papers) < limit // 2:
-        for q in (query[:250], query[:90]):  # retry with a shorter query
+        for q in (query[:250], query[:90]):
             try:
                 extra = s2.search(q, limit=limit)
                 known = {p["corpus_id"] for p in papers}
@@ -123,7 +131,7 @@ def run_generate(task_id: str, map_id: str):
 
         elif m.seed_type == "manuscript":
             ms = db.get(Manuscript, seed.get("manuscript_id"))
-            if not ms:
+            if not ms or ms.user_id != m.user_id:
                 tasks.fail(task_id, "manuscript not found")
                 return
             center = {"id": "center", "type": "center", "source_scope": "manuscript",
@@ -136,8 +144,6 @@ def run_generate(task_id: str, map_id: str):
                         .filter_by(manuscript_id=ms.id, status="verified")
                         .limit(15).all())
             cited_ids = {r.corpus_id for r in verified if r.corpus_id}
-            # The manuscript's own (verified) citations become nodes too, so
-            # solid 'cites' edges exist and gap analysis is discriminating.
             for r in verified[:6]:
                 meta = r.resolved_meta or {}
                 if not r.corpus_id:
@@ -243,7 +249,9 @@ def run_generate(task_id: str, map_id: str):
 
 
 @router.post("/mindmaps")
-def create_mindmap(body: CreateBody, background: BackgroundTasks, db=Depends(get_db)):
+def create_mindmap(body: CreateBody, background: BackgroundTasks, db=Depends(get_db),
+                    current_user: dict = Depends(get_current_user)):
+    user_id = current_user["user_id"]
     if body.seed_type not in ("question", "manuscript", "collection"):
         raise HTTPException(400, "seed_type must be question|manuscript|collection")
     title = body.title
@@ -254,9 +262,8 @@ def create_mindmap(body: CreateBody, background: BackgroundTasks, db=Depends(get
         seed_ref = {"question": body.question}
         title = title or body.question[:120]
     elif body.seed_type == "manuscript":
-        ms = db.get(Manuscript, body.manuscript_id or "")
-        if not ms or ms.tenant_id != settings.tenant_id:
-            raise HTTPException(404, "manuscript not found")
+        # Strict ownership check: never build a map from someone else's manuscript.
+        ms = get_ms(db, body.manuscript_id or "", user_id)
         seed_ref = {"manuscript_id": ms.id}
         title = title or f"Around: {ms.title[:100]}"
     else:
@@ -265,28 +272,30 @@ def create_mindmap(body: CreateBody, background: BackgroundTasks, db=Depends(get
         seed_ref = {"paper_ids": body.paper_ids[:30]}
         title = title or f"Collection map ({len(body.paper_ids)} papers)"
 
-    m = MindMap(tenant_id=settings.tenant_id, title=title,
+    m = MindMap(tenant_id=settings.tenant_id, user_id=user_id, title=title,
                 seed_type=body.seed_type, seed_ref=seed_ref)
     db.add(m)
     db.commit()
-    task_id = tasks.create("mindmap")
+    task_id = tasks.create("mindmap", user_id)
     background.add_task(run_generate, task_id, m.id)
     return {"id": m.id, "task_id": task_id}
 
 
 @router.get("/mindmaps")
-def list_mindmaps(manuscript_id: str | None = None, db=Depends(get_db)):
+def list_mindmaps(manuscript_id: str | None = None, db=Depends(get_db),
+                   current_user: dict = Depends(get_current_user)):
     """Saved maps only — creating a map never clutters the list; keeping it
     is the user's choice. Unsaved drafts older than a day are purged."""
     from datetime import datetime, timedelta, timezone
+    user_id = current_user["user_id"]
     cutoff = datetime.now(timezone.utc) - timedelta(days=1)
     (db.query(MindMap)
-     .filter(MindMap.tenant_id == settings.tenant_id,
+     .filter(MindMap.tenant_id == settings.tenant_id, MindMap.user_id == user_id,
              MindMap.saved.is_(False), MindMap.created_at < cutoff)
      .delete(synchronize_session=False))
     db.commit()
 
-    q = db.query(MindMap).filter_by(tenant_id=settings.tenant_id)
+    q = db.query(MindMap).filter_by(tenant_id=settings.tenant_id, user_id=user_id)
     if manuscript_id:
         rows = [r for r in q.order_by(MindMap.created_at.desc()).limit(50).all()
                 if (r.seed_ref or {}).get("manuscript_id") == manuscript_id]
@@ -301,31 +310,27 @@ class SavedBody(BaseModel):
 
 
 @router.patch("/mindmaps/{map_id}")
-def save_mindmap(map_id: str, body: SavedBody, db=Depends(get_db)):
-    m = db.get(MindMap, map_id)
-    if not m or m.tenant_id != settings.tenant_id:
-        raise HTTPException(404, "map not found")
+def save_mindmap(map_id: str, body: SavedBody, db=Depends(get_db),
+                  current_user: dict = Depends(get_current_user)):
+    m = _get_map(db, map_id, current_user["user_id"])
     m.saved = body.saved
     db.commit()
     return _mindmap_out(m, with_graph=False)
 
 
 @router.delete("/mindmaps/{map_id}")
-def delete_mindmap(map_id: str, db=Depends(get_db)):
-    m = db.get(MindMap, map_id)
-    if not m or m.tenant_id != settings.tenant_id:
-        raise HTTPException(404, "map not found")
+def delete_mindmap(map_id: str, db=Depends(get_db),
+                    current_user: dict = Depends(get_current_user)):
+    m = _get_map(db, map_id, current_user["user_id"])
     db.delete(m)
     db.commit()
     return {"deleted": map_id}
 
 
 @router.get("/mindmaps/{map_id}")
-def get_mindmap(map_id: str, db=Depends(get_db)):
-    m = db.get(MindMap, map_id)
-    if not m or m.tenant_id != settings.tenant_id:
-        raise HTTPException(404, "map not found")
-    return _mindmap_out(m)
+def get_mindmap(map_id: str, db=Depends(get_db),
+                 current_user: dict = Depends(get_current_user)):
+    return _mindmap_out(_get_map(db, map_id, current_user["user_id"]))
 
 
 class ExpandBody(BaseModel):
@@ -333,10 +338,11 @@ class ExpandBody(BaseModel):
 
 
 @router.post("/mindmaps/{map_id}/expand")
-def expand_node(map_id: str, body: ExpandBody, db=Depends(get_db)):
+def expand_node(map_id: str, body: ExpandBody, db=Depends(get_db),
+                 current_user: dict = Depends(get_current_user)):
     """Lazy expansion: fetch neighbors of one paper node, merge into the graph."""
-    m = db.get(MindMap, map_id)
-    if not m or m.tenant_id != settings.tenant_id or not m.graph:
+    m = _get_map(db, map_id, current_user["user_id"])
+    if not m.graph:
         raise HTTPException(404, "map not found")
     graph = dict(m.graph)
     known = {n["id"] for n in graph["nodes"]}
