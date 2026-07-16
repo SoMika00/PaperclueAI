@@ -11,6 +11,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { BASE, api, pollTask } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 import { useWorkspace } from "@/lib/ws";
 import { Spinner, TaskProgress } from "../ui";
 
@@ -40,6 +41,7 @@ const CHECK_ICON = {
 };
 
 export default function FormatPanel() {
+  const { t } = useLocale();
   const { ms, refreshEvidence } = useWorkspace();
   const [journals, setJournals] = useState<Journal[]>([]);
   const [journal, setJournal] = useState<string>("scientific-reports");
@@ -54,18 +56,18 @@ export default function FormatPanel() {
   const run = useCallback(async () => {
     setError(null);
     setResult(null);
-    setTask({ step: "Loading journal profile…", progress: 5 });
+    setTask({ step: t("loading_journal_profile"), progress: 5 });
     try {
       const { task_id } = await api<{ task_id: string }>(
         `/format/${ms.id}?journal=${journal}`,
         { method: "POST" }
       );
-      const t = await pollTask<FormatResult>(task_id, (u) =>
+      const taskRes = await pollTask<FormatResult>(task_id, (u) =>
         setTask({ step: u.step, progress: u.progress })
       );
-      if (t.status === "error") setError(t.error || "Formatting failed");
+      if (taskRes.status === "error") setError(taskRes.error || t("formatting_failed"));
       else {
-        setResult(t.result);
+        setResult(taskRes.result);
         refreshEvidence();
       }
     } catch (e: any) {
@@ -83,16 +85,13 @@ export default function FormatPanel() {
       <div>
         <div className="flex items-center gap-2">
           <FileOutput className="h-4 w-4 text-brand-deep" />
-          <h2 className="font-serif font-semibold">Journal Formatting</h2>
+          <h2 className="font-serif font-semibold">{t("journal_formatting_title")}</h2>
         </div>
         <p className="text-[11px] text-inkmut mt-0.5">
-          Check compliance against the target journal&apos;s real guidelines, preview the
-          rewrite, export DOCX.
+          {t("journal_formatting_subtitle")}
         </p>
         <div className="mt-2 rounded-lg bg-surface2 border border-line px-2.5 py-1.5 text-[11px] text-inkmut">
-          <strong className="text-ink">PDF detected.</strong> You can run a full
-          compliance review and export a restructured DOCX. Upload a DOCX/LaTeX
-          source to apply formatting changes in place (coming soon).
+          <strong className="text-ink">{t("pdf_detected_bold")}</strong> {t("pdf_detected_rest")}
         </div>
       </div>
 
@@ -113,14 +112,14 @@ export default function FormatPanel() {
         </select>
         <button onClick={run} disabled={!!task} className="btn btn-primary">
           {task ? <Spinner className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-          Check
+          {t("check_button")}
         </button>
       </div>
 
       {selected && !result && !task && (
         <div className="card p-3">
           <div className="text-[11px] font-semibold text-inkmut uppercase tracking-wide">
-            {selected.name} — submission rules
+            {selected.name} — {t("submission_rules_label")}
           </div>
           <ul className="mt-1.5 flex flex-col gap-1">
             {selected.rules.map((r) => (
@@ -140,7 +139,7 @@ export default function FormatPanel() {
           <div className="card p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-semibold font-serif">
-                Compliance — {result.journal}
+                {t("compliance_label")} — {result.journal}
               </span>
               <span
                 className={`badge border ${
@@ -149,7 +148,7 @@ export default function FormatPanel() {
                     : "bg-warn/10 text-warn border-warn/30"
                 }`}
               >
-                {passCount}/{result.checklist.length} pass
+                {passCount}/{result.checklist.length} {t("pass_label")}
               </span>
             </div>
             <div className="flex flex-col gap-2 mt-2">
@@ -168,7 +167,7 @@ export default function FormatPanel() {
           {result.rewrite?.abstract_after && (
             <div className="card p-3">
               <div className="text-[11px] font-semibold text-inkmut uppercase tracking-wide mb-2">
-                Abstract — before / after
+                {t("abstract_before_after")}
               </div>
               <div className="rounded-lg bg-danger/5 border border-danger/10 p-2.5 text-[11px] leading-snug text-ink/60">
                 {result.rewrite.abstract_before?.slice(0, 600)}
@@ -182,7 +181,7 @@ export default function FormatPanel() {
           {(result.rewrite?.restructure_plan || []).length > 0 && (
             <div className="card p-3">
               <div className="text-[11px] font-semibold text-inkmut uppercase tracking-wide mb-1.5">
-                Restructure plan
+                {t("restructure_plan_label")}
               </div>
               {result.rewrite.restructure_plan!.map((r, i) => (
                 <div key={i} className="text-xs leading-snug py-1 border-b border-ink/5 last:border-0">
@@ -198,7 +197,7 @@ export default function FormatPanel() {
           {(result.rewrite?.added_statements || []).length > 0 && (
             <div className="card p-3 bg-brand-soft/50 border-brand/20">
               <div className="text-[11px] font-semibold text-brand-deep uppercase tracking-wide mb-1">
-                Added statements (drafts)
+                {t("added_statements_label")}
               </div>
               {result.rewrite.added_statements!.map((s, i) => (
                 <p key={i} className="text-[11px] text-ink/80 leading-snug mb-1">
@@ -212,7 +211,7 @@ export default function FormatPanel() {
             href={`${BASE}/format/${ms.id}/export?journal=${result.journal_id}`}
             className="btn btn-primary self-start"
           >
-            <Download className="h-3.5 w-3.5" /> Export DOCX ({result.journal})
+            <Download className="h-3.5 w-3.5" /> {t("export_docx_button")} ({result.journal})
           </a>
         </div>
       )}

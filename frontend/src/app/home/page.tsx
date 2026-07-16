@@ -19,6 +19,7 @@ import GlobalShell from "@/components/GlobalShell";
 import UploadModal from "@/components/UploadModal";
 import HeroMap from "@/components/HeroMap";
 import { Spinner } from "@/components/ui";
+import { useLocale } from "@/lib/i18n";
 
 function timeAgo(iso: string | null): string {
   if (!iso) return "";
@@ -31,6 +32,7 @@ function timeAgo(iso: string | null): string {
 
 export default function HomePage() {
   const router = useRouter();
+  const { t } = useLocale();
   const [mss, setMss] = useState<Manuscript[] | null>(null);
   const [maps, setMaps] = useState<MindMapRecord[]>([]);
   const [searches, setSearches] = useState<SearchLogItem[]>([]);
@@ -84,8 +86,7 @@ export default function HomePage() {
           <div>
             <h1 className="font-serif text-2xl font-semibold">PaperClue</h1>
             <p className="text-sm text-inkmut mt-0.5 max-w-md">
-              Understand your research. Discover what is missing. Prepare your
-              work for publication — every step traced to its source.
+              {t("home_tagline")}
             </p>
           </div>
           <div className="hidden lg:block shrink-0">
@@ -100,23 +101,23 @@ export default function HomePage() {
             className="card card-hover p-4 text-left hover:border-brand group"
           >
             <FileUp className="h-5 w-5 text-brand" />
-            <div className="font-semibold mt-2 text-sm">Upload manuscript</div>
+            <div className="font-semibold mt-2 text-sm">{t("action_upload_title")}</div>
             <div className="text-xs text-inkmut mt-0.5">
-              Parse, index and open the workspace
+              {t("action_upload_desc")}
             </div>
           </button>
           <Link href="/discover" className="card card-hover p-4 hover:border-brand">
             <FileSearch className="h-5 w-5 text-brand" />
-            <div className="font-semibold mt-2 text-sm">Explore literature</div>
+            <div className="font-semibold mt-2 text-sm">{t("action_explore_title")}</div>
             <div className="text-xs text-inkmut mt-0.5">
-              Search public + university corpora
+              {t("action_explore_desc")}
             </div>
           </Link>
           <Link href="/mind-maps" className="card card-hover p-4 hover:border-brand">
             <Network className="h-5 w-5 text-brand" />
-            <div className="font-semibold mt-2 text-sm">Create research map</div>
+            <div className="font-semibold mt-2 text-sm">{t("action_map_title")}</div>
             <div className="text-xs text-inkmut mt-0.5">
-              From a question, manuscript or collection
+              {t("action_map_desc")}
             </div>
           </Link>
         </div>
@@ -124,14 +125,14 @@ export default function HomePage() {
         {error && <div className="card p-4 text-sm text-danger">API unreachable — {error}</div>}
         {mss === null && !error && (
           <div className="flex items-center gap-2 text-inkmut text-sm">
-            <Spinner /> Loading…
+            <Spinner /> {t("loading")}
           </div>
         )}
 
         {/* Continue working */}
         {main && (
           <section>
-            <h2 className="section-title mb-2">Continue working</h2>
+            <h2 className="section-title mb-2">{t("continue_working")}</h2>
             <div className="card p-5">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
@@ -143,12 +144,12 @@ export default function HomePage() {
                     last activity {timeAgo(main.updated_at)}
                   </div>
                 </div>
-                <span className="badge badge-manuscript shrink-0">Private</span>
+                <span className="badge badge-manuscript shrink-0">{t("badge_private")}</span>
               </div>
 
               <div className="mt-4">
                 <div className="flex items-center justify-between text-xs mb-1">
-                  <span className="text-inkmut">Submission readiness</span>
+                  <span className="text-inkmut">{t("submission_readiness")}</span>
                   <span className="font-semibold text-ink">{main.readiness}/100</span>
                 </div>
                 <div className="h-2 rounded-full bg-surface2 overflow-hidden">
@@ -161,28 +162,28 @@ export default function HomePage() {
 
               <div className="flex flex-wrap gap-1.5 mt-3 text-[11px]">
                 <span className={`badge ${main.has_insight ? "badge-manuscript" : "badge-ai"}`}>
-                  Insight {main.has_insight ? "✓" : "pending"}
+                  {t("insight_label")} {main.has_insight ? "✓" : t("pending")}
                 </span>
                 {d.review_done ? (
                   <span className={`badge ${d.open_issues === 0 ? "badge-manuscript" : "badge-university"}`}>
-                    {d.open_issues} open finding{d.open_issues !== 1 ? "s" : ""}
+                    {d.open_issues} {d.open_issues !== 1 ? t("open_finding_plural") : t("open_finding")}
                   </span>
                 ) : (
-                  <span className="badge badge-ai">Review pending</span>
+                  <span className="badge badge-ai">{t("review_pending")}</span>
                 )}
                 {d.refs_total ? (
                   <span className={`badge ${d.refs_verified === d.refs_total ? "badge-manuscript" : "badge-university"}`}>
-                    {d.refs_verified}/{d.refs_total} references verified
+                    {d.refs_verified}/{d.refs_total} {t("references_verified_label")}
                   </span>
                 ) : null}
               </div>
 
               <div className="flex gap-2 mt-4">
                 <Link href={`/manuscripts/${main.id}/overview`} className="btn btn-primary">
-                  Continue working
+                  {t("continue_working")}
                 </Link>
                 <Link href={`/manuscripts/${main.id}/review?run=1`} className="btn btn-outline">
-                  Run review
+                  {t("run_review")}
                 </Link>
               </div>
             </div>
@@ -191,11 +192,11 @@ export default function HomePage() {
 
         {/* Recent work: three groups */}
         <section>
-          <h2 className="section-title mb-2">Recent work</h2>
+          <h2 className="section-title mb-2">{t("recent_work")}</h2>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="card p-4">
               <div className="flex items-center gap-1.5 text-xs font-semibold mb-2">
-                <FileText className="h-3.5 w-3.5 text-manuscript" /> Manuscripts
+                <FileText className="h-3.5 w-3.5 text-manuscript" /> {t("manuscripts_label")}
               </div>
               <div className="flex flex-col divide-y divide-line/60">
                 {(mss || []).slice(0, 4).map((m) => (
@@ -223,14 +224,14 @@ export default function HomePage() {
                   </div>
                 ))}
                 {(mss || []).length === 0 && (
-                  <div className="py-2 text-xs text-inkmut">No manuscripts yet.</div>
+                  <div className="py-2 text-xs text-inkmut">{t("no_manuscripts")}</div>
                 )}
               </div>
             </div>
 
             <div className="card p-4">
               <div className="flex items-center gap-1.5 text-xs font-semibold mb-2">
-                <Search className="h-3.5 w-3.5 text-brand" /> Literature searches
+                <Search className="h-3.5 w-3.5 text-brand" /> {t("literature_searches")}
               </div>
               <div className="flex flex-col divide-y divide-line/60">
                 {searches.slice(0, 4).map((s) => (
@@ -246,14 +247,14 @@ export default function HomePage() {
                   </Link>
                 ))}
                 {searches.length === 0 && (
-                  <div className="py-2 text-xs text-inkmut">No searches yet.</div>
+                  <div className="py-2 text-xs text-inkmut">{t("no_searches")}</div>
                 )}
               </div>
             </div>
 
             <div className="card p-4">
               <div className="flex items-center gap-1.5 text-xs font-semibold mb-2">
-                <Network className="h-3.5 w-3.5 text-pub" /> Mind maps
+                <Network className="h-3.5 w-3.5 text-pub" /> {t("mind_maps_label")}
               </div>
               <div className="flex flex-col divide-y divide-line/60">
                 {maps.slice(0, 4).map((m) => (
@@ -269,7 +270,7 @@ export default function HomePage() {
                   </Link>
                 ))}
                 {maps.length === 0 && (
-                  <div className="py-2 text-xs text-inkmut">No maps yet.</div>
+                  <div className="py-2 text-xs text-inkmut">{t("no_maps")}</div>
                 )}
               </div>
             </div>
@@ -279,7 +280,7 @@ export default function HomePage() {
         {/* Activity */}
         {activity.length > 0 && (
           <section>
-            <h2 className="section-title mb-2">Recent activity</h2>
+            <h2 className="section-title mb-2">{t("recent_activity")}</h2>
             <div className="card px-4 divide-y divide-line/60">
               {activity.map((a, i) => (
                 <div key={i} className="py-2.5 flex items-center gap-2.5 text-[13px]">

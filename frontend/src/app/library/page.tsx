@@ -8,8 +8,10 @@ import { api } from "@/lib/api";
 import type { SavedPaper } from "@/lib/types";
 import GlobalShell from "@/components/GlobalShell";
 import { ScopeBadge, Spinner } from "@/components/ui";
+import { useLocale } from "@/lib/i18n";
 
 export default function LibraryPage() {
+  const { t } = useLocale();
   const [papers, setPapers] = useState<SavedPaper[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,10 +32,9 @@ export default function LibraryPage() {
   return (
     <GlobalShell>
       <div className="max-w-3xl mx-auto px-8 py-8">
-        <h1 className="font-serif text-2xl font-semibold">Library</h1>
+        <h1 className="font-serif text-2xl font-semibold">{t("library_title")}</h1>
         <p className="text-sm text-inkmut mt-0.5 mb-6">
-          Papers you added to your research — open one for its summary, citations
-          and map actions.
+          {t("library_subtitle")}
         </p>
 
         {error && <div className="card p-3 text-xs text-danger mb-4">{error}</div>}
@@ -42,8 +43,7 @@ export default function LibraryPage() {
           <div className="text-center py-16 text-inkmut">
             <Bookmark className="h-8 w-8 mx-auto mb-3 opacity-40" />
             <div className="text-sm">
-              Nothing saved yet — use <strong>Add to my research</strong> in Discover,
-              on a map node or on a university paper.
+              {t("library_empty")} <strong>{t("library_empty_bold")}</strong> {t("library_empty_end")}
             </div>
           </div>
         )}

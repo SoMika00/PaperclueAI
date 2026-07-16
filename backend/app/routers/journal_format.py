@@ -9,6 +9,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
 from .. import tasks
+from ..auth import get_current_user
 from ..config import settings
 from ..db import SessionLocal, get_db
 from ..models import EvidenceItem, Section
@@ -17,7 +18,6 @@ from .manuscripts import get_ms
 
 router = APIRouter()
 
-# XML (and therefore DOCX) rejects control characters that survive PDF extraction.
 _CTRL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 
@@ -121,18 +121,20 @@ def run_format(task_id: str, ms_id: str, journal_id: str):
 
 
 @router.post("/format/{ms_id}")
-def start_format(ms_id: str, journal: str, background: BackgroundTasks, db=Depends(get_db)):
-    get_ms(db, ms_id)
+def start_format(ms_id: str, journal: str, background: BackgroundTasks, db=Depends(get_db),
+                  current_user: dict = Depends(get_current_user)):
+    get_ms(db, ms_id, current_user["user_id"])
     if journal not in JOURNALS:
         raise HTTPException(400, f"journal must be one of {list(JOURNALS)}")
-    task_id = tasks.create("format")
+    task_id = tasks.create("format", current_user["user_id"])
     background.add_task(run_format, task_id, ms_id, journal)
     return {"task_id": task_id}
 
 
 @router.get("/format/{ms_id}/export")
-def export_docx(ms_id: str, journal: str = "scientific-reports", db=Depends(get_db)):
-    ms = get_ms(db, ms_id)
+def export_docx(ms_id: str, journal: str = "scientific-reports", db=Depends(get_db),
+                 current_user: dict = Depends(get_current_user)):
+    ms = get_ms(db, ms_id, current_user["user_id"])
     j = JOURNALS.get(journal, JOURNALS["scientific-reports"])
     sections = {s.name: s.text for s in
                 db.query(Section).filter_by(manuscript_id=ms_id).all()}

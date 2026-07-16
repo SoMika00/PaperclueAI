@@ -1,0 +1,9 @@
+services:
+  web:
+    ports:
+      - "3000:3000"
+  api:
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: "postgresql+psycopg2://postgres.dhcbvcpfwpvximourqbd:*%jkU4mtfw*PcgN&V%7X!9V#J##aQM0E89J6Rzf#pQTsb4r0XaBM79zS8E!CHn^M@aws-0-ap-northeast-1.pooler.supabase.com:5432/postgres"

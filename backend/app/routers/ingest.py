@@ -8,6 +8,7 @@ import httpx
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile
 from pydantic import BaseModel
 
+from ..auth import get_current_user
 from ..config import settings
 from ..db import SessionLocal, get_db
 from ..models import Manuscript, Reference, Section, Version
@@ -137,12 +138,15 @@ def _download_pdf(url: str, dest: str):
 
 
 @router.post("/import")
-def import_paper(body: ImportBody, background: BackgroundTasks, db=Depends(get_db)):
+def import_paper(body: ImportBody, background: BackgroundTasks, db=Depends(get_db),
+                  current_user: dict = Depends(get_current_user)):
     """Open any known paper in Focus: resolve its open-access PDF, download it
     and run the normal ingestion pipeline. The document joins My Research with
     its origin recorded."""
     from ..models import SavedPaper, UniversityPaper
     from ..services import s2
+
+    user_id = current_user["user_id"]
 
     if body.kind == "library":
         row = db.get(SavedPaper, body.id)
@@ -157,9 +161,10 @@ def import_paper(body: ImportBody, background: BackgroundTasks, db=Depends(get_d
     else:
         raise HTTPException(400, "kind must be library|university")
 
-    # Already imported? Reopen the existing focus document.
+    # Already imported? Reopen the existing focus document, but only if it's
+    # this user's own copy — never hand back another user's manuscript id.
     existing = (db.query(Manuscript)
-                .filter_by(tenant_id=settings.tenant_id)
+                .filter_by(tenant_id=settings.tenant_id, user_id=user_id)
                 .filter(Manuscript.origin.isnot(None)).all())
     for m in existing:
         if (m.origin or {}).get("corpus_id") == corpus_id and m.status != "error":
@@ -182,7 +187,8 @@ def import_paper(body: ImportBody, background: BackgroundTasks, db=Depends(get_d
 
     os.makedirs(settings.storage_dir, exist_ok=True)
     ms = Manuscript(
-        tenant_id=settings.tenant_id, file_path="", title=(title or "Imported paper")[:200],
+        tenant_id=settings.tenant_id, user_id=user_id, file_path="",
+        title=(title or "Imported paper")[:200],
         origin={"corpus_id": corpus_id, "from": origin_from},
         ingest_steps={st: "pending" for st in STEPS},
     )
@@ -209,18 +215,27 @@ def import_paper(body: ImportBody, background: BackgroundTasks, db=Depends(get_d
 
 
 @router.post("/ingest")
-async def ingest(file: UploadFile, background: BackgroundTasks, db=Depends(get_db)):
+async def ingest(file: UploadFile, background: BackgroundTasks, db=Depends(get_db),
+                  current_user: dict = Depends(get_current_user)):
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(400, "Only PDF files are supported")
+
+    data = await file.read()
+    if len(data) > MAX_PDF_BYTES:
+        raise HTTPException(413, "PDF larger than 30 MB")
+    if not data[:5].startswith(b"%PDF"):
+        raise HTTPException(422, "This does not look like a valid PDF file")
+
     os.makedirs(settings.storage_dir, exist_ok=True)
-    ms = Manuscript(tenant_id=settings.tenant_id, file_path="",
+    ms = Manuscript(tenant_id=settings.tenant_id, user_id=current_user["user_id"],
+                    file_path="",
                     title=re.sub(r"\.pdf$", "", file.filename, flags=re.I)[:200],
                     ingest_steps={s: "pending" for s in STEPS})
     db.add(ms)
     db.commit()
     path = os.path.join(settings.storage_dir, f"{ms.id}.pdf")
     with open(path, "wb") as f:
-        f.write(await file.read())
+        f.write(data)
     ms.file_path = path
     db.commit()
     background.add_task(run_pipeline, ms.id)

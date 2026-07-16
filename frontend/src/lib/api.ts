@@ -1,20 +1,29 @@
 import type { Task } from "./types";
+import { supabase } from "./supabase";
 
 export const BASE = "/paperclue/api";
 
+async function authHeaders(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
 export async function api<T = any>(path: string, init?: RequestInit): Promise<T> {
+  const auth = await authHeaders();
   const res = await fetch(`${BASE}${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...(init?.headers || {}) },
+    headers: { "Content-Type": "application/json", ...auth, ...(init?.headers || {}) },
   });
   if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
   return res.json();
 }
 
 export async function upload(file: File) {
+  const auth = await authHeaders();
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch(`${BASE}/ingest`, { method: "POST", body: form });
+  const res = await fetch(`${BASE}/ingest`, { method: "POST", body: form, headers: auth });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
@@ -43,9 +52,10 @@ export async function sseStream(
     onError?: (e: string) => void;
   }
 ) {
+  const auth = await authHeaders();
   const res = await fetch(`${BASE}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...auth },
     body: JSON.stringify(body),
   });
   if (!res.ok || !res.body) {

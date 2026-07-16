@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from .db import Base, engine
-from .routers import (browse, ingest, insight, journal_format, library,
+from .routers import (admin, browse, ingest, insight, journal_format, library,
                       manuscripts, mindmap, mindmaps, review)
 
 
@@ -23,6 +23,24 @@ def _migrate():
         ))
         conn.execute(text(
             "ALTER TABLE manuscripts ADD COLUMN IF NOT EXISTS origin JSON"
+        ))
+        conn.execute(text(
+            "ALTER TABLE manuscripts ADD COLUMN IF NOT EXISTS user_id VARCHAR"
+        ))
+        conn.execute(text(
+            "ALTER TABLE mindmaps ADD COLUMN IF NOT EXISTS user_id VARCHAR"
+        ))
+        conn.execute(text(
+            "ALTER TABLE saved_papers ADD COLUMN IF NOT EXISTS user_id VARCHAR"
+        ))
+        conn.execute(text(
+            "ALTER TABLE search_logs ADD COLUMN IF NOT EXISTS user_id VARCHAR"
+        ))
+        conn.execute(text(
+            "ALTER TABLE saved_papers ADD COLUMN IF NOT EXISTS user_id VARCHAR"
+        ))
+        conn.execute(text(
+            "ALTER TABLE search_logs ADD COLUMN IF NOT EXISTS user_id VARCHAR"
         ))
 
 
@@ -55,7 +73,7 @@ app.add_middleware(
 )
 
 for r in (ingest, manuscripts, insight, browse, review, mindmap, mindmaps,
-          library, journal_format):
+          library, journal_format, admin):
     app.include_router(r.router, prefix="/api")
 
 

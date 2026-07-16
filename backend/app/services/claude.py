@@ -11,14 +11,16 @@ _aclient = AsyncAnthropic(api_key=settings.anthropic_api_key)
 
 
 def complete(prompt: str, system: str = "", model: str | None = None,
-             max_tokens: int = 4096, temperature: float = 0.2) -> str:
-    msg = _client.messages.create(
+             max_tokens: int = 4096, temperature: float | None = None) -> str:
+    kwargs = dict(
         model=model or settings.claude_model_fast,
         max_tokens=max_tokens,
-        temperature=temperature,
         system=system or "You are PaperClue, a rigorous academic research assistant.",
         messages=[{"role": "user", "content": prompt}],
     )
+    if temperature is not None:
+        kwargs["temperature"] = temperature
+    msg = _client.messages.create(**kwargs)
     return "".join(b.text for b in msg.content if b.type == "text")
 
 

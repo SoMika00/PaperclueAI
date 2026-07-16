@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { api, pollTask } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 import type { Issue, Reference } from "@/lib/types";
 import { useWorkspace } from "@/lib/ws";
 import { ConfidenceBar, Spinner, TaskProgress } from "../ui";
@@ -27,14 +28,15 @@ const SEV_CLS: Record<string, string> = {
   minor: "bg-surface2 text-inkmut border-line",
 };
 
-const REF_STATUS: Record<string, { label: string; cls: string }> = {
-  verified: { label: "✓ verified", cls: "text-manuscript" },
-  suspect: { label: "⚠ metadata mismatch", cls: "text-warn" },
-  not_found: { label: "✗ not found", cls: "text-danger" },
-  unverified: { label: "· unchecked", cls: "text-inkmut" },
+const REF_STATUS_KEY: Record<string, { labelKey: string; cls: string }> = {
+  verified: { labelKey: "ref_verified", cls: "text-manuscript" },
+  suspect: { labelKey: "ref_suspect", cls: "text-warn" },
+  not_found: { labelKey: "ref_not_found", cls: "text-danger" },
+  unverified: { labelKey: "ref_unchecked", cls: "text-inkmut" },
 };
 
 export default function ReviewPanel() {
+  const { t } = useLocale();
   const { ms, requestHighlight, refreshEvidence, refreshMs, setDrawerOpen } =
     useWorkspace();
   const params = useSearchParams();
@@ -69,15 +71,15 @@ export default function ReviewPanel() {
   const runReview = useCallback(async () => {
     setError(null);
     setSelectedId(null);
-    setTask({ step: "Starting review…", progress: 3 });
+    setTask({ step: t("starting_review"), progress: 3 });
     try {
       const { task_id } = await api<{ task_id: string }>(`/review/${ms.id}`, {
         method: "POST",
       });
-      const t = await pollTask(task_id, (u) =>
+      const taskRes = await pollTask(task_id, (u) =>
         setTask({ step: u.step, progress: u.progress })
       );
-      if (t.status === "error") setError(t.error || "Review failed");
+      if (taskRes.status === "error") setError(taskRes.error || t("review_failed"));
       await load();
       refreshEvidence();
       refreshMs();
@@ -104,8 +106,8 @@ export default function ReviewPanel() {
       const { task_id } = await api<{ task_id: string }>(`/verify/${ms.id}`, {
         method: "POST",
       });
-      const t = await pollTask(task_id, undefined, 2500);
-      if (t.status === "error") setError(t.error || "Verification failed");
+      const taskRes = await pollTask(task_id, undefined, 2500);
+      if (taskRes.status === "error") setError(taskRes.error || t("verification_failed"));
       await load();
       refreshEvidence();
       refreshMs();
@@ -166,7 +168,7 @@ export default function ReviewPanel() {
           }}
           className="flex items-center gap-1 text-xs text-inkmut hover:text-ink self-start"
         >
-          <ChevronLeft className="h-3.5 w-3.5" /> All issues
+          <ChevronLeft className="h-3.5 w-3.5" /> {t("all_issues_back")}
         </button>
 
         <div>
@@ -183,12 +185,12 @@ export default function ReviewPanel() {
             {selected.title}
           </h3>
           <div className="text-xs text-inkmut mt-1">
-            Location: {selected.section || "—"} · page {selected.page || "?"}
+            {t("location_label")}: {selected.section || "—"} · page {selected.page || "?"}
           </div>
         </div>
 
         <div>
-          <div className="section-title">Why it matters</div>
+          <div className="section-title">{t("why_it_matters")}</div>
           <p className="text-[13px] leading-snug mt-1">{selected.description}</p>
         </div>
 
@@ -198,12 +200,12 @@ export default function ReviewPanel() {
             className="text-left rounded-lg bg-warn/5 border border-warn/30 px-3 py-2 text-xs italic text-ink hover:border-warn transition-colors"
           >
             “{selected.quote.slice(0, 180)}”
-            <span className="not-italic text-warn block mt-0.5">→ highlight in PDF</span>
+            <span className="not-italic text-warn block mt-0.5">{t("highlight_arrow_pdf")}</span>
           </button>
         )}
 
         <div>
-          <div className="section-title">Suggested action</div>
+          <div className="section-title">{t("suggested_action")}</div>
           {editing ? (
             <textarea
               value={editText}
@@ -230,20 +232,20 @@ export default function ReviewPanel() {
               onClick={() => requestHighlight(selected.page, selected.quote, "review")}
               className="btn btn-outline text-xs"
             >
-              <FileText className="h-3.5 w-3.5" /> Highlight in PDF
+              <FileText className="h-3.5 w-3.5" /> {t("highlight_in_pdf")}
             </button>
             <button
               onClick={() => setDrawerOpen(true)}
               className="btn btn-outline text-xs"
             >
-              View source
+              {t("view_source")}
             </button>
             {editing ? (
               <button
                 onClick={() => act(selected, "accept", editText)}
                 className="btn btn-primary text-xs"
               >
-                <Check className="h-3.5 w-3.5" /> Accept edited fix
+                <Check className="h-3.5 w-3.5" /> {t("accept_edited_fix")}
               </button>
             ) : (
               <>
@@ -251,7 +253,7 @@ export default function ReviewPanel() {
                   onClick={() => act(selected, "accept")}
                   className="btn btn-primary text-xs"
                 >
-                  <Check className="h-3.5 w-3.5" /> Accept
+                  <Check className="h-3.5 w-3.5" /> {t("accept_label")}
                 </button>
                 <button
                   onClick={() => {
@@ -260,7 +262,7 @@ export default function ReviewPanel() {
                   }}
                   className="btn btn-outline text-xs"
                 >
-                  <Pencil className="h-3.5 w-3.5" /> Edit
+                  <Pencil className="h-3.5 w-3.5" /> {t("edit_label")}
                 </button>
               </>
             )}
@@ -268,12 +270,12 @@ export default function ReviewPanel() {
               onClick={() => act(selected, "reject")}
               className="btn btn-danger text-xs"
             >
-              <X className="h-3.5 w-3.5" /> Dismiss
+              <X className="h-3.5 w-3.5" /> {t("dismiss_label")}
             </button>
           </div>
         ) : (
           <div className="text-xs font-medium text-inkmut">
-            {selected.status === "accepted" ? "✓ Fix accepted" : "Dismissed"}
+            {selected.status === "accepted" ? t("fix_accepted") : t("dismissed_label")}
           </div>
         )}
       </div>
@@ -286,17 +288,17 @@ export default function ReviewPanel() {
       <div>
         <div className="flex items-center gap-2">
           <ClipboardCheck className="h-4 w-4 text-brand" />
-          <h2 className="font-serif font-semibold">Review</h2>
+          <h2 className="font-serif font-semibold">{t("review_title")}</h2>
         </div>
         <p className="text-[11px] text-inkmut mt-0.5">
-          Anchored, evidenced issues. Accepting a fix moves the readiness score.
+          {t("review_subtitle")}
         </p>
       </div>
 
       {!task && (
         <button onClick={runReview} className="btn btn-primary self-start">
           <Play className="h-3.5 w-3.5" />
-          {issues.length ? "Re-run review" : "Run peer review"}
+          {issues.length ? t("rerun_review") : t("run_peer_review")}
         </button>
       )}
       {task && <TaskProgress step={task.step} progress={task.progress} />}
@@ -313,7 +315,7 @@ export default function ReviewPanel() {
                 : "border-transparent text-inkmut hover:text-ink"
             }`}
           >
-            {v === "citations" ? `Citations (${refs.length})` : `Issues (${open.length})`}
+            {v === "citations" ? `${t("tab_citations_count")} (${refs.length})` : `${t("tab_issues_count")} (${open.length})`}
           </button>
         ))}
       </div>
@@ -341,7 +343,7 @@ export default function ReviewPanel() {
                 }`}
               >
                 <div className="text-base font-bold leading-none">{resolved.length}</div>
-                <div className="text-[10px] mt-0.5">Resolved</div>
+                <div className="text-[10px] mt-0.5">{t("resolved_label")}</div>
               </button>
             </div>
           )}
@@ -365,12 +367,12 @@ export default function ReviewPanel() {
             ))}
             {issues.length === 0 && !task && (
               <div className="text-xs text-inkmut py-6 text-center">
-                No review yet — run it to get actionable, anchored issues.
+                {t("no_review_yet")}
               </div>
             )}
             {issues.length > 0 && listed.length === 0 && (
               <div className="text-xs text-inkmut py-4 text-center">
-                Nothing in this group.
+                {t("nothing_in_group")}
               </div>
             )}
           </div>
@@ -385,22 +387,21 @@ export default function ReviewPanel() {
             ) : (
               <BadgeCheck className="h-3.5 w-3.5" />
             )}
-            Verify all against public corpus
+            {t("verify_all_button")}
           </button>
           <p className="text-[10px] text-inkmut -mt-1">
-            Each reference is resolved against Semantic Scholar — the only place your
-            manuscript crosses the public corpus.
+            {t("verify_explainer")}
           </p>
           <div className="flex flex-col divide-y divide-line/70">
             {refs.map((r) => {
-              const st = REF_STATUS[r.status] || REF_STATUS.unverified;
+              const stKey = REF_STATUS_KEY[r.status] || REF_STATUS_KEY.unverified;
               return (
                 <div key={r.id} className="py-2">
                   <div className="text-xs leading-snug">
                     {r.title || r.raw?.slice(0, 120)}
                   </div>
                   <div className="flex items-center gap-2 mt-0.5 text-[11px]">
-                    <span className={`font-semibold ${st.cls}`}>{st.label}</span>
+                    <span className={`font-semibold ${stKey.cls}`}>{t(stKey.labelKey as any)}</span>
                     {r.year && <span className="text-inkmut">{r.year}</span>}
                     {r.resolved_meta?.url && (
                       <a
@@ -409,13 +410,13 @@ export default function ReviewPanel() {
                         rel="noopener noreferrer"
                         className="text-pub underline ml-auto"
                       >
-                        open source
+                        {t("open_source_link")}
                       </a>
                     )}
                   </div>
                   {r.status === "suspect" && r.resolved_meta && (
                     <div className="text-[10px] text-warn mt-0.5">
-                      Closest match: {r.resolved_meta.title?.slice(0, 90)} (
+                      {t("closest_match")} {r.resolved_meta.title?.slice(0, 90)} (
                       {r.resolved_meta.year})
                     </div>
                   )}
@@ -424,7 +425,7 @@ export default function ReviewPanel() {
             })}
             {refs.length === 0 && (
               <div className="text-xs text-inkmut py-4 text-center">
-                No references extracted from this manuscript.
+                {t("no_refs_extracted_full")}
               </div>
             )}
           </div>

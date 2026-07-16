@@ -14,12 +14,13 @@ import IngestStepper from "@/components/IngestStepper";
 import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { ReadinessGauge, Spinner } from "@/components/ui";
+import { useLocale } from "@/lib/i18n";
 
-const SCORE_PARTS: { key: string; label: string; max: number; doneKey?: string }[] = [
-  { key: "base", label: "Document processed", max: 15 },
-  { key: "insight", label: "Understanding coverage", max: 15, doneKey: "insight_done" },
-  { key: "citations", label: "Citation integrity", max: 30, doneKey: "citations_checked" },
-  { key: "review", label: "Review findings addressed", max: 40, doneKey: "review_done" },
+const SCORE_PARTS: { key: string; labelKey: string; max: number; doneKey?: string }[] = [
+  { key: "base", labelKey: "score_document_processed", max: 15 },
+  { key: "insight", labelKey: "score_understanding", max: 15, doneKey: "insight_done" },
+  { key: "citations", labelKey: "score_citation_integrity", max: 30, doneKey: "citations_checked" },
+  { key: "review", labelKey: "score_review_findings", max: 40, doneKey: "review_done" },
 ];
 
 function timeAgo(iso: string | null): string {
@@ -32,15 +33,15 @@ function timeAgo(iso: string | null): string {
 }
 
 function ScorePopover({ ms }: { ms: Manuscript }) {
+  const { t } = useLocale();
   const d: any = ms.readiness_detail || {};
   return (
     <div className="absolute right-0 top-12 z-50 card p-4 w-72 shadow-drawer">
       <div className="font-semibold text-sm mb-1">
-        Submission readiness — {ms.readiness}/100
+        {t("submission_readiness_score")} — {ms.readiness}/100
       </div>
       <p className="text-[11px] text-inkmut mb-2.5">
-        Earned by doing the work — nothing credited in advance. Indicators of
-        submission preparation, not of scientific quality.
+        {t("readiness_explainer")}
       </p>
       <div className="flex flex-col gap-1.5">
         {SCORE_PARTS.map((p) => {
@@ -48,7 +49,7 @@ function ScorePopover({ ms }: { ms: Manuscript }) {
           const notDone = p.doneKey && !d[p.doneKey];
           return (
             <div key={p.key} className="flex items-center gap-2 text-[11px]">
-              <span className="w-36 text-inkmut">{p.label}</span>
+              <span className="w-36 text-inkmut">{t(p.labelKey as any)}</span>
               <span className="flex-1 h-1.5 rounded-full bg-surface2 overflow-hidden">
                 <span
                   className="block h-full rounded-full bg-brand transition-all duration-500"
@@ -56,7 +57,7 @@ function ScorePopover({ ms }: { ms: Manuscript }) {
                 />
               </span>
               <span className="w-16 text-right font-medium">
-                {notDone ? "not run" : `${Math.round(v)}/${p.max}`}
+                {notDone ? t("not_run") : `${Math.round(v)}/${p.max}`}
               </span>
             </div>
           );
@@ -70,6 +71,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   const { ms, refreshMs, evidence, drawerOpen, setDrawerOpen, readinessDelta } =
     useWorkspace();
   const router = useRouter();
+  const { t } = useLocale();
   const [versions, setVersions] = useState<Version[]>([]);
   const [shared, setShared] = useState(false);
   const [showScore, setShowScore] = useState(false);
@@ -87,9 +89,9 @@ function Shell({ children }: { children: React.ReactNode }) {
 
   const d: any = ms.readiness_detail || {};
   const statusBits = [
-    ms.has_insight ? "Insight complete" : null,
-    d.review_done ? `${d.open_issues} open issue${d.open_issues !== 1 ? "s" : ""}` : null,
-    d.citations_checked ? `${d.refs_verified}/${d.refs_total} references verified` : null,
+    ms.has_insight ? t("insight_complete") : null,
+    d.review_done ? `${d.open_issues} ${d.open_issues !== 1 ? t("open_issue_plural") : t("open_issue_singular")}` : null,
+    d.citations_checked ? `${d.refs_verified}/${d.refs_total} ${t("references_verified_label")}` : null,
   ].filter(Boolean);
 
   return (
@@ -98,17 +100,17 @@ function Shell({ children }: { children: React.ReactNode }) {
       <div className="flex-1 min-h-0 flex overflow-hidden">
       <Sidebar focus={{ msId: ms.id, title: ms.title }} />
       <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
-        <header className="border-b border-line bg-paper px-4 py-2 shrink-0 flex items-center gap-4">
+        <header className="border-b border-line dark:border-dark-line bg-paper dark:bg-dark-surface px-4 py-2 shrink-0 flex items-center gap-4">
           <div className="min-w-0 flex-1">
             <div className="font-serif font-semibold truncate leading-tight text-[15px]">
               {ms.title}
             </div>
-            <div className="text-[11px] text-inkmut truncate">
-              Private manuscript · Version {versions[0]?.number ?? 1} · Saved{" "}
+            <div className="text-[11px] text-inkmut dark:text-dark-inkmut truncate">
+              {t("private_manuscript")} · {t("version_label")} {versions[0]?.number ?? 1} · {t("saved_label")}{" "}
               {timeAgo(ms.updated_at)}
               {ms.index_status === "indexing" && (
                 <span className="ml-2 inline-flex items-center gap-1 text-brand-deep">
-                  <Spinner className="h-2.5 w-2.5" /> Indexing for semantic search…
+                  <Spinner className="h-2.5 w-2.5" /> {t("indexing_semantic")}
                 </span>
               )}
               {statusBits.length > 0 && (
@@ -128,26 +130,26 @@ function Shell({ children }: { children: React.ReactNode }) {
               }}
               className="btn btn-ghost"
             >
-              <Share2 className="h-3.5 w-3.5" /> {shared ? "Copied" : "Share"}
+              <Share2 className="h-3.5 w-3.5" /> {shared ? t("copied_label") : t("share_label")}
             </button>
             <a
               href={`${BASE}/format/${ms.id}/export?journal=scientific-reports`}
               className="btn btn-ghost"
             >
-              <Download className="h-3.5 w-3.5" /> Export
+              <Download className="h-3.5 w-3.5" /> {t("export_label")}
             </a>
             <button
               onClick={() => router.push(`/manuscripts/${ms.id}/review?run=1`)}
               className="btn btn-primary"
             >
-              <Play className="h-3.5 w-3.5" /> Run review
+              <Play className="h-3.5 w-3.5" /> {t("run_review_button")}
             </button>
             <button
               onClick={() => setDrawerOpen(!drawerOpen)}
               className={`btn ${drawerOpen ? "btn-primary" : "btn-outline"}`}
               title="Evidence Ledger"
             >
-              <ScrollText className="h-3.5 w-3.5" /> Evidence {evidence.length}
+              <ScrollText className="h-3.5 w-3.5" /> {t("evidence_label")} {evidence.length}
             </button>
             <button
               onClick={() => setShowScore(!showScore)}

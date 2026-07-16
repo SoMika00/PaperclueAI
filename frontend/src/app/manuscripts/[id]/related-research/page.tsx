@@ -9,8 +9,10 @@ import { Lightbulb, Network, Sparkles } from "lucide-react";
 import LiteratureSearch from "@/components/LiteratureSearch";
 import { Spinner } from "@/components/ui";
 import { useWorkspace } from "@/lib/ws";
+import { useLocale } from "@/lib/i18n";
 
 export default function RelatedResearchPage() {
+  const { t } = useLocale();
   const { ms, refreshEvidence } = useWorkspace();
   const [prefill, setPrefill] = useState<string | null>(null);
 
@@ -38,24 +40,23 @@ export default function RelatedResearchPage() {
       <div className="max-w-3xl mx-auto px-8 py-8">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="font-serif text-xl font-semibold">Related Research</h1>
+            <h1 className="font-serif text-xl font-semibold">{t("related_research_title")}</h1>
             <p className="text-sm text-inkmut mt-0.5">
-              Search the literature around this manuscript — results feed its
-              Evidence Ledger.
+              {t("related_research_subtitle")}
             </p>
           </div>
           <Link
             href={`/manuscripts/${ms.id}/mind-map`}
             className="btn btn-primary shrink-0"
           >
-            <Network className="h-4 w-4" /> Generate research map
+            <Network className="h-4 w-4" /> {t("generate_research_map")}
           </Link>
         </div>
 
         {suggestions.length > 0 && (
           <div className="mt-4 mb-1">
             <div className="section-title mb-1.5">
-              Suggested from your manuscript
+              {t("suggested_from_manuscript")}
             </div>
             <div className="flex flex-wrap gap-1.5">
               {suggestions.map((s, i) => (
@@ -86,7 +87,7 @@ export default function RelatedResearchPage() {
             <LiteratureSearch
               manuscriptId={ms.id}
               prefill={prefill}
-              placeholder="e.g. baselines for open-domain question answering…"
+              placeholder={t("related_search_placeholder")}
             />
           </Suspense>
         </div>

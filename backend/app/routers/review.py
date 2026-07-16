@@ -4,6 +4,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
 from .. import tasks
+from ..auth import get_current_user
 from ..config import settings
 from ..db import SessionLocal, get_db
 from ..models import EvidenceItem, Issue, Manuscript, Reference, Section, Version
@@ -148,9 +149,10 @@ def verify_refs(db, ms: Manuscript) -> list[dict]:
 
 
 @router.post("/review/{ms_id}")
-def start_review(ms_id: str, background: BackgroundTasks, db=Depends(get_db)):
-    get_ms(db, ms_id)
-    task_id = tasks.create("review")
+def start_review(ms_id: str, background: BackgroundTasks, db=Depends(get_db),
+                  current_user: dict = Depends(get_current_user)):
+    get_ms(db, ms_id, current_user["user_id"])
+    task_id = tasks.create("review", current_user["user_id"])
     background.add_task(run_review, task_id, ms_id)
     return {"task_id": task_id}
 
@@ -178,9 +180,10 @@ def run_verify(task_id: str, ms_id: str):
 
 
 @router.post("/verify/{ms_id}")
-def verify(ms_id: str, background: BackgroundTasks, db=Depends(get_db)):
-    get_ms(db, ms_id)
-    task_id = tasks.create("verify")
+def verify(ms_id: str, background: BackgroundTasks, db=Depends(get_db),
+           current_user: dict = Depends(get_current_user)):
+    get_ms(db, ms_id, current_user["user_id"])
+    task_id = tasks.create("verify", current_user["user_id"])
     background.add_task(run_verify, task_id, ms_id)
     return {"task_id": task_id}
 
@@ -191,11 +194,12 @@ class IssueAction(BaseModel):
 
 
 @router.patch("/review-issues/{issue_id}")
-def act_on_issue(issue_id: str, body: IssueAction, db=Depends(get_db)):
+def act_on_issue(issue_id: str, body: IssueAction, db=Depends(get_db),
+                  current_user: dict = Depends(get_current_user)):
     issue = db.get(Issue, issue_id)
     if not issue:
         raise HTTPException(404, "issue not found")
-    ms = get_ms(db, issue.manuscript_id)
+    ms = get_ms(db, issue.manuscript_id, current_user["user_id"])
     if body.action not in ("accept", "reject"):
         raise HTTPException(400, "action must be accept|reject")
     issue.status = "accepted" if body.action == "accept" else "rejected"

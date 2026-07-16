@@ -8,10 +8,12 @@ import { api } from "@/lib/api";
 import type { MindMapRecord } from "@/lib/types";
 import { useWorkspace } from "@/lib/ws";
 import { EmptyState, Spinner } from "@/components/ui";
+import { useLocale } from "@/lib/i18n";
 
 const MindMapCanvas = dynamic(() => import("@/components/MindMapCanvas"), { ssr: false });
 
 export default function ManuscriptMapPage() {
+  const { t } = useLocale();
   const { ms } = useWorkspace();
   const [map, setMap] = useState<MindMapRecord | null>(null);
   const [checked, setChecked] = useState(false);
@@ -92,12 +94,12 @@ export default function ManuscriptMapPage() {
       <div className="h-full grid place-items-center">
         <EmptyState
           icon={<Network className="h-10 w-10" />}
-          title="Position this manuscript in the research landscape"
-          sub="PaperClue seeds the map with your verified citations, related public work and university neighbors — then reveals research families and the clusters you don't cite yet."
+          title={t("position_manuscript_title")}
+          sub={t("position_manuscript_sub")}
         >
           {error && <div className="text-xs text-danger mb-2">{error}</div>}
           <button onClick={generate} className="btn btn-primary mt-2">
-            <Network className="h-4 w-4" /> Generate research map
+            <Network className="h-4 w-4" /> {t("generate_research_map")}
           </button>
         </EmptyState>
       </div>
@@ -110,7 +112,7 @@ export default function ManuscriptMapPage() {
           <div className="flex flex-col items-center gap-2">
             <Spinner className="h-6 w-6 text-brand" />
             <span className="text-sm">
-              Positioning your manuscript in the research landscape…
+              {t("positioning_manuscript")}
             </span>
           </div>
         </div>
@@ -120,7 +122,7 @@ export default function ManuscriptMapPage() {
           <div className="card p-4 text-sm text-danger flex items-center gap-3">
             {map.error}
             <button onClick={generate} className="btn btn-outline text-xs">
-              <RefreshCw className="h-3 w-3" /> Retry
+              <RefreshCw className="h-3 w-3" /> {t("retry_button")}
             </button>
           </div>
         </div>
@@ -139,21 +141,21 @@ export default function ManuscriptMapPage() {
             >
               {map.saved ? (
                 <>
-                  <BookmarkCheck className="h-3.5 w-3.5 text-manuscript" /> Saved
+                  <BookmarkCheck className="h-3.5 w-3.5 text-manuscript" /> {t("saved_button")}
                 </>
               ) : (
                 <>
-                  <Bookmark className="h-3.5 w-3.5" /> Save map
+                  <Bookmark className="h-3.5 w-3.5" /> {t("save_map_button")}
                 </>
               )}
             </button>
-            <button onClick={generate} className="btn btn-outline bg-paper text-xs" title="Rebuild">
-              <RefreshCw className="h-3 w-3" /> Rebuild
+            <button onClick={generate} className="btn btn-outline bg-paper text-xs" title={t("rebuild_button")}>
+              <RefreshCw className="h-3 w-3" /> {t("rebuild_button")}
             </button>
             <button
               onClick={remove}
               className="btn btn-ghost bg-paper hover:text-danger"
-              title="Delete this map"
+              title={t("delete_map_title")}
             >
               <Trash2 className="h-3.5 w-3.5" />
             </button>

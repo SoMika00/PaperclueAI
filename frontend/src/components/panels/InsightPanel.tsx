@@ -13,6 +13,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { api, sseStream } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 import type { AnchoredClaim, InsightBrief } from "@/lib/types";
 import { useWorkspace } from "@/lib/ws";
 import { Spinner } from "../ui";
@@ -24,6 +25,13 @@ interface ChatMsg {
 }
 
 const TABS = ["Overview", "Claims", "Methods", "Limitations", "Chat"] as const;
+const TAB_LABEL_KEY: Record<string, string> = {
+  Overview: "tab_overview",
+  Claims: "tab_claims",
+  Methods: "tab_methods",
+  Limitations: "tab_limitations",
+  Chat: "tab_chat",
+};
 type Tab = (typeof TABS)[number];
 
 function Block({
@@ -33,6 +41,7 @@ function Block({
   label: string;
   item: AnchoredClaim | undefined;
 }) {
+  const { t } = useLocale();
   const { requestHighlight, setDrawerOpen } = useWorkspace();
   if (!item?.claim) return null;
   return (
@@ -49,13 +58,13 @@ function Block({
           onClick={() => requestHighlight(item.page, item.quote)}
           className="btn btn-outline text-[11px] py-0.5 px-2"
         >
-          <FileText className="h-3 w-3" /> Open in PDF
+          <FileText className="h-3 w-3" /> {t("open_in_pdf")}
         </button>
         <button
           onClick={() => setDrawerOpen(true)}
           className="btn btn-ghost text-[11px] py-0.5 px-2"
         >
-          <ScrollText className="h-3 w-3" /> View evidence
+          <ScrollText className="h-3 w-3" /> {t("view_evidence")}
         </button>
       </div>
     </div>
@@ -63,6 +72,7 @@ function Block({
 }
 
 export default function InsightPanel() {
+  const { t } = useLocale();
   const { ms, requestHighlight, refreshEvidence, refreshMs } = useWorkspace();
   const [brief, setBrief] = useState<InsightBrief | null>((ms.insight as any) || null);
   const [loading, setLoading] = useState(false);
@@ -85,7 +95,7 @@ export default function InsightPanel() {
       refreshEvidence();
       refreshMs();
     } catch (e: any) {
-      setError(e.message?.slice(0, 200) || "Insight failed");
+      setError(e.message?.slice(0, 200) || t("insight_failed"));
     } finally {
       setLoading(false);
     }
@@ -145,22 +155,22 @@ export default function InsightPanel() {
       <div className="px-4 pt-4 pb-0">
         <div className="flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-brand" />
-          <h2 className="font-serif font-semibold">Paper Insight</h2>
+          <h2 className="font-serif font-semibold">{t("paper_insight_title")}</h2>
           {loading && <Spinner className="h-3.5 w-3.5 text-brand" />}
         </div>
         <div className="flex gap-0.5 mt-3 border-b border-line -mx-4 px-3 overflow-x-auto">
-          {TABS.map((t) => (
+          {TABS.map((tabItem) => (
             <button
-              key={t}
-              onClick={() => setTab(t)}
+              key={tabItem}
+              onClick={() => setTab(tabItem)}
               className={`px-2.5 py-1.5 text-xs font-medium border-b-2 -mb-px whitespace-nowrap transition-colors ${
-                tab === t
+                tab === tabItem
                   ? "border-brand text-brand-deep"
                   : "border-transparent text-inkmut hover:text-ink"
               }`}
             >
-              {t}
-              {t === "Chat" && <MessageSquare className="h-3 w-3 inline ml-1 -mt-0.5" />}
+              {t(TAB_LABEL_KEY[tabItem] as any)}
+              {tabItem === "Chat" && <MessageSquare className="h-3 w-3 inline ml-1 -mt-0.5" />}
             </button>
           ))}
         </div>
@@ -173,25 +183,25 @@ export default function InsightPanel() {
             <div>
               {error}
               <button onClick={build} className="block underline mt-1">
-                Retry
+                {t("retry_label")}
               </button>
             </div>
           </div>
         )}
         {loading && !brief && (
           <div className="mt-4 text-sm text-inkmut flex items-center gap-2">
-            <Spinner /> Reading your manuscript section by section…
+            <Spinner /> {t("reading_manuscript")}
           </div>
         )}
 
         {brief && tab === "Overview" && (
           <div>
-            <Block label="Main contribution" item={brief.contribution} />
-            <Block label="Problem addressed" item={brief.problem} />
+            <Block label={t("main_contribution")} item={brief.contribution} />
+            <Block label={t("problem_addressed")} item={brief.problem} />
             {(brief.keywords || []).length > 0 && (
               <div className="py-3 border-b border-line/70">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-inkmut">
-                  Key concepts
+                  {t("key_concepts")}
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-1.5">
                   {brief.keywords.map((k) => (
@@ -208,7 +218,7 @@ export default function InsightPanel() {
             {(brief.gap_hints || []).length > 0 && (
               <div className="py-3">
                 <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-uni">
-                  <Lightbulb className="h-3.5 w-3.5" /> Research gaps (non-blocking)
+                  <Lightbulb className="h-3.5 w-3.5" /> {t("research_gaps_nonblocking")}
                 </div>
                 <ul className="mt-1.5 flex flex-col gap-1">
                   {brief.gap_hints.map((g, i) => (
@@ -224,18 +234,18 @@ export default function InsightPanel() {
 
         {brief && tab === "Claims" && (
           <div>
-            <Block label="Contribution" item={brief.contribution} />
+            <Block label={t("contribution_label")} item={brief.contribution} />
             {(brief.key_results || []).map((r, i) => (
-              <Block key={i} label={`Key result ${i + 1}`} item={r} />
+              <Block key={i} label={`${t("key_result_label")} ${i + 1}`} item={r} />
             ))}
           </div>
         )}
 
         {brief && tab === "Methods" && (
           <div>
-            <Block label="Method" item={brief.method} />
+            <Block label={t("method_label")} item={brief.method} />
             <div className="py-3 text-xs text-inkmut">
-              Ask the chat for details — answers cite the exact pages.
+              {t("ask_chat_details")}
             </div>
           </div>
         )}
@@ -243,12 +253,12 @@ export default function InsightPanel() {
         {brief && tab === "Limitations" && (
           <div>
             {(brief.limitations || []).map((l, i) => (
-              <Block key={i} label={`Limitation ${i + 1}`} item={l} />
+              <Block key={i} label={`${t("limitation_label")} ${i + 1}`} item={l} />
             ))}
             {(brief.gap_hints || []).length > 0 && (
               <div className="py-3">
                 <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-uni">
-                  <Lightbulb className="h-3.5 w-3.5" /> Research gaps
+                  <Lightbulb className="h-3.5 w-3.5" /> {t("research_gaps")}
                 </div>
                 <ul className="mt-1.5 flex flex-col gap-1">
                   {brief.gap_hints.map((g, i) => (
@@ -266,14 +276,14 @@ export default function InsightPanel() {
           <div className="flex flex-col gap-2 pt-3">
             {messages.length === 0 && (
               <div className="text-[11px] text-inkmut">
-                Grounded on your manuscript only — answers cite pages. Try{" "}
+                {t("chat_grounded_note")}{" "}
                 <button
                   className="underline"
                   onClick={() =>
-                    setQuestion("What is the main contribution of this paper?")
+                    setQuestion(t("chat_example_question"))
                   }
                 >
-                  “What is the main contribution?”
+                  “{t("chat_example_question")}”
                 </button>
               </div>
             )}
@@ -288,7 +298,7 @@ export default function InsightPanel() {
               >
                 {m.content || (
                   <span className="inline-flex items-center gap-1.5 text-inkmut">
-                    <Spinner className="h-3 w-3" /> thinking…
+                    <Spinner className="h-3 w-3" /> {t("thinking_label")}
                   </span>
                 )}
                 {m.sources && m.sources.length > 0 && (
@@ -317,7 +327,7 @@ export default function InsightPanel() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && ask()}
-            placeholder="Ask your manuscript…"
+            placeholder={t("ask_manuscript_placeholder")}
             className="flex-1 rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-brand"
           />
           <button

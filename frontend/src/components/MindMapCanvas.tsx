@@ -23,6 +23,7 @@ import {
   X,
 } from "lucide-react";
 import { api } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 import type { MapEdge, MapGap, MapNode } from "@/lib/types";
 import { ScopeBadge, Spinner } from "./ui";
 
@@ -34,6 +35,7 @@ const SCOPE_COLOR: Record<string, string> = {
 };
 
 function CenterNode({ data }: NodeProps) {
+  const { t } = useLocale();
   const color = SCOPE_COLOR[data.source_scope] || "#2563EB";
   return (
     <div
@@ -42,7 +44,7 @@ function CenterNode({ data }: NodeProps) {
     >
       <Handle type="source" position={Position.Top} className="opacity-0" />
       <div className="text-[10px] font-bold uppercase tracking-wide" style={{ color }}>
-        {data.source_scope === "manuscript" ? "Your manuscript" : "Research seed"}
+        {data.source_scope === "manuscript" ? t("your_manuscript_node") : t("research_seed_node")}
       </div>
       <div className="font-serif text-[13px] font-semibold leading-snug mt-1 text-ink">
         {data.label}
@@ -159,11 +161,11 @@ function layout(
   return { nodes: out, edges };
 }
 
-const RELATION_LABEL: Record<string, string> = {
-  cites: "Cited by your manuscript",
-  similar_topic: "Similar topic",
-  citation: "Cited by your manuscript",
-  thematic: "Similar topic",
+const RELATION_LABEL_KEY: Record<string, string> = {
+  cites: "edge_cited_manuscript",
+  similar_topic: "edge_similar_topic",
+  citation: "edge_cited_manuscript",
+  thematic: "edge_similar_topic",
 };
 
 export default function MindMapCanvas({
@@ -175,6 +177,7 @@ export default function MindMapCanvas({
   graph: { nodes: MapNode[]; edges: MapEdge[]; gaps: MapGap[] };
   onGraphChange?: (g: { nodes: MapNode[]; edges: MapEdge[]; gaps: MapGap[] }) => void;
 }) {
+  const { t } = useLocale();
   const [selected, setSelected] = useState<MapNode | null>(null);
   const [spotlight, setSpotlight] = useState<Set<string> | null>(null);
   const [expanding, setExpanding] = useState(false);
@@ -207,7 +210,8 @@ export default function MindMapCanvas({
   const relationFor = useCallback(
     (nodeId: string) => {
       const e = graph.edges.find((e) => e.target === nodeId);
-      return e ? RELATION_LABEL[e.relation_type] || e.relation_type : "";
+      const key = e ? RELATION_LABEL_KEY[e.relation_type] : null;
+      return key ? t(key as any) : (e ? e.relation_type : "");
     },
     [graph.edges]
   );
@@ -224,7 +228,7 @@ export default function MindMapCanvas({
       onGraphChange?.({ gaps: graph.gaps, ...res.graph });
       setNotice(res.added ? `${res.added} related papers added.` : "No new neighbors found.");
     } catch (e: any) {
-      setNotice(e.message?.slice(0, 140) || "Expansion failed");
+      setNotice(e.message?.slice(0, 140) || t("expansion_failed"));
     } finally {
       setExpanding(false);
     }
@@ -306,9 +310,9 @@ export default function MindMapCanvas({
           <span className="w-px h-4 bg-line mx-0.5" />
           {(
             [
-              ["public", "Public", "#3155C6"],
-              ["university", "University", "#D68A19"],
-              ["manuscript", "Manuscript", "#15956A"],
+              ["public", t("scope_public"), "#3155C6"],
+              ["university", t("scope_university"), "#D68A19"],
+              ["manuscript", t("scope_manuscript"), "#15956A"],
             ] as const
           ).map(([k, label, color]) => (
             <button
@@ -327,20 +331,20 @@ export default function MindMapCanvas({
           ))}
         </div>
         <div className="rounded-full bg-ink/80 text-white px-3 py-1 text-[11px]">
-          {stats.papers} papers · {stats.families} research families ·{" "}
-          {stats.cited} cited{stats.gaps > 0 ? ` · ${stats.gaps} potential gap${stats.gaps > 1 ? "s" : ""}` : ""}
+          {stats.papers} {t("stats_papers")} · {stats.families} {t("stats_research_families")} ·{" "}
+          {stats.cited} {t("stats_cited")}{stats.gaps > 0 ? ` · ${stats.gaps} ${stats.gaps > 1 ? t("stats_potential_gaps") : t("stats_potential_gap")}` : ""}
         </div>
       </div>
 
       {/* Gap Finder */}
       {graph.gaps?.length > 0 && (
-        <div className="absolute bottom-4 left-4 card p-3.5 max-w-sm bg-uni-soft border-uni/50 z-10">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-uni">
-            <Lightbulb className="h-4 w-4" /> Potential literature gap
+        <div className="absolute bottom-4 left-4 card p-3.5 max-w-sm bg-uni-soft dark:bg-dark-surface2 border-uni/50 dark:border-dark-line z-10">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-uni dark:text-warn">
+            <Lightbulb className="h-4 w-4" /> {t("potential_gap_title")}
           </div>
           {graph.gaps.map((g) => (
             <div key={g.cluster} className="mt-2">
-              <p className="text-xs text-ink leading-snug">{g.message}</p>
+              <p className="text-xs text-ink dark:text-dark-ink leading-snug">{g.message}</p>
               <div className="flex gap-2 mt-1.5">
                 <button
                   onClick={() =>
@@ -350,9 +354,9 @@ export default function MindMapCanvas({
                         : new Set(g.paper_ids)
                     )
                   }
-                  className="btn btn-outline text-[11px] py-0.5 px-2 bg-paper"
+                  className="btn btn-outline text-[11px] py-0.5 px-2 bg-paper dark:bg-dark-surface dark:text-dark-ink dark:border-dark-line"
                 >
-                  Inspect cluster
+                  {t("inspect_cluster")}
                 </button>
                 <button
                   onClick={async () => {
@@ -360,11 +364,11 @@ export default function MindMapCanvas({
                       const n = graph.nodes.find((x) => x.id === id);
                       if (n) await save(n);
                     }
-                    setNotice(`${Math.min(g.count, 5)} papers saved to your library ("Saved papers").`);
+                    setNotice(`${Math.min(g.count, 5)} ${t("papers_saved_notice")}`);
                   }}
-                  className="btn btn-outline text-[11px] py-0.5 px-2 bg-paper"
+                  className="btn btn-outline text-[11px] py-0.5 px-2 bg-paper dark:bg-dark-surface dark:text-dark-ink dark:border-dark-line"
                 >
-                  Add references
+                  {t("add_references")}
                 </button>
               </div>
             </div>

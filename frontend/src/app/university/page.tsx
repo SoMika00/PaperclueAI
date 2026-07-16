@@ -7,6 +7,7 @@ import { GraduationCap, Search } from "lucide-react";
 import { api } from "@/lib/api";
 import GlobalShell from "@/components/GlobalShell";
 import { ScopeBadge, Spinner } from "@/components/ui";
+import { useLocale } from "@/lib/i18n";
 
 interface UniPaper {
   id: string;
@@ -20,6 +21,7 @@ interface UniPaper {
 }
 
 export default function UniversityPage() {
+  const { t } = useLocale();
   const [papers, setPapers] = useState<UniPaper[] | null>(null);
   const [q, setQ] = useState("");
 
@@ -39,11 +41,10 @@ export default function UniversityPage() {
       <div className="max-w-3xl mx-auto px-8 py-8">
         <div className="flex items-center gap-2">
           <GraduationCap className="h-5 w-5 text-uni" />
-          <h1 className="font-serif text-2xl font-semibold">University Repository</h1>
+          <h1 className="font-serif text-2xl font-semibold">{t("university_title")}</h1>
         </div>
         <p className="text-sm text-inkmut mt-0.5 mb-5">
-          Institutional papers, private to your tenant — searchable here and in the
-          Literature Explorer, never sent to public engines.
+          {t("university_subtitle")}
         </p>
 
         <div className="relative mb-6 max-w-md">
@@ -51,14 +52,14 @@ export default function UniversityPage() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search title, abstract or topic (semantic)…"
+            placeholder={t("university_search_placeholder")}
             className="w-full rounded-lg border border-line bg-paper pl-9 pr-3 py-2 text-sm outline-none focus:border-brand"
           />
         </div>
 
         {papers === null && <Spinner className="h-5 w-5 text-brand" />}
         {papers !== null && papers.length === 0 && (
-          <div className="text-sm text-inkmut py-8">No papers in the repository yet.</div>
+          <div className="text-sm text-inkmut py-8">{t("university_empty")}</div>
         )}
 
         {collections.map((c) => (

@@ -16,12 +16,9 @@ import {
 import { api, pollTask } from "@/lib/api";
 import type { BrowsePaper } from "@/lib/types";
 import { ScopeBadge, Spinner, TaskProgress } from "./ui";
+import { useLocale } from "@/lib/i18n";
 
-const SCOPES = [
-  { id: "combined", label: "All" },
-  { id: "public", label: "Public" },
-  { id: "university", label: "University" },
-] as const;
+const SCOPE_IDS = ["combined", "public", "university"] as const;
 
 function linkCitations(md: string): string {
   return md.replace(/\[(\d+(?:\s*,\s*\d+)*)\]/g, (_, nums: string) =>
@@ -36,7 +33,7 @@ function linkCitations(md: string): string {
 export default function LiteratureSearch({
   manuscriptId,
   prefill,
-  placeholder = "Search papers, methods, datasets or research questions…",
+  placeholder,
 }: {
   manuscriptId?: string;
   /** "query#nonce" — setting it fills the box and runs the search */
@@ -45,8 +42,14 @@ export default function LiteratureSearch({
 }) {
   const router = useRouter();
   const params = useSearchParams();
+  const { t } = useLocale();
+  const SCOPES = [
+    { id: "combined" as const, label: t("scope_all") },
+    { id: "public" as const, label: t("scope_public") },
+    { id: "university" as const, label: t("scope_university") },
+  ];
   const [query, setQuery] = useState(params.get("q") || "");
-  const [scope, setScope] = useState<(typeof SCOPES)[number]["id"]>("combined");
+  const [scope, setScope] = useState<(typeof SCOPE_IDS)[number]>("combined");
   const [yearFrom, setYearFrom] = useState<string>("");
   const [view, setView] = useState<"papers" | "synthesis">("papers");
   const [task, setTask] = useState<{ step: string; progress: number } | null>(null);
@@ -182,12 +185,12 @@ export default function LiteratureSearch({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && run()}
-              placeholder={placeholder}
+              placeholder={placeholder || t("search_placeholder")}
               className="w-full rounded-lg border border-line bg-paper pl-9 pr-3 py-2.5 text-sm outline-none focus:border-brand"
             />
           </div>
           <button onClick={() => run()} disabled={!!task || !query.trim()} className="btn btn-primary">
-            {task ? <Spinner className="h-4 w-4" /> : "Search"}
+            {task ? <Spinner className="h-4 w-4" /> : t("search_button")}
           </button>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -211,13 +214,13 @@ export default function LiteratureSearch({
             onChange={(e) => setYearFrom(e.target.value)}
             className="rounded-lg border border-line bg-paper px-2 py-1 text-xs text-inkmut"
           >
-            <option value="">Any year</option>
+            <option value="">{t("any_year")}</option>
             <option value="2024">2024 +</option>
             <option value="2022">2022 +</option>
             <option value="2020">2020 +</option>
           </select>
           <span className="text-[11px] text-inkmut ml-auto">
-            Every citation is linked to an inspectable source.
+            {t("provenance_note")}
           </span>
         </div>
       </div>
@@ -238,7 +241,7 @@ export default function LiteratureSearch({
                 view === v ? "border-brand text-brand-deep" : "border-transparent text-inkmut hover:text-ink"
               }`}
             >
-              {v === "papers" ? "Results" : "Evidence synthesis"}
+              {v === "papers" ? t("results_tab") : t("synthesis_tab")}
             </button>
           ))}
           <button
@@ -247,7 +250,7 @@ export default function LiteratureSearch({
             className="btn btn-outline ml-auto mb-1 text-xs"
           >
             {creatingMap ? <Spinner className="h-3.5 w-3.5" /> : <Network className="h-3.5 w-3.5" />}
-            Create map from this search
+            {t("create_map_from_search")}
           </button>
         </div>
       )}
@@ -279,7 +282,7 @@ export default function LiteratureSearch({
               </div>
               {p.rank_explanation && (
                 <div className="text-[11px] text-brand-deep mt-1">
-                  Why it matches: {p.rank_explanation}
+                  {t("why_it_matches")} {p.rank_explanation}
                 </div>
               )}
               {(p.tldr || p.abstract) && (
@@ -295,11 +298,11 @@ export default function LiteratureSearch({
                 >
                   {saved.has(p.corpus_id) ? (
                     <>
-                      <BookmarkCheck className="h-3 w-3 text-manuscript" /> In your library
+                      <BookmarkCheck className="h-3 w-3 text-manuscript" /> {t("in_your_library")}
                     </>
                   ) : (
                     <>
-                      <Bookmark className="h-3 w-3" /> Add to my research
+                      <Bookmark className="h-3 w-3" /> {t("add_to_research")}
                     </>
                   )}
                 </button>
@@ -310,7 +313,7 @@ export default function LiteratureSearch({
                     rel="noopener noreferrer"
                     className="btn btn-outline text-[11px] py-0.5 px-2"
                   >
-                    <ExternalLink className="h-3 w-3" /> Open
+                    <ExternalLink className="h-3 w-3" /> {t("open_link")}
                   </a>
                 )}
                 {p.open_access_pdf_url && (
@@ -328,8 +331,7 @@ export default function LiteratureSearch({
           ))}
           {papers.length === 0 && !task && (
             <div className="text-center text-sm text-inkmut py-12">
-              Search across the public literature and your university corpus —
-              results carry their provenance badge.
+              {t("search_empty_state")}
             </div>
           )}
         </div>
@@ -364,7 +366,7 @@ export default function LiteratureSearch({
             </ReactMarkdown>
           ) : (
             <div className="text-sm text-inkmut py-8">
-              The synthesis is generated from the retrieved sources — run a search first.
+              {t("synthesis_empty_state")}
             </div>
           )}
         </article>
