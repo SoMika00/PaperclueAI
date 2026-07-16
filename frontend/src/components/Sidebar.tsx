@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import {
   Bookmark,
   ClipboardCheck,
+  Database,
   FileOutput,
   FileSearch,
   FileText,
@@ -27,6 +28,7 @@ const GLOBAL = [
   { href: "/mind-maps", key: "nav_mindmaps" as const, icon: Network },
   { href: "/library", key: "nav_library" as const, icon: Bookmark },
   { href: "/university", key: "nav_university" as const, icon: GraduationCap },
+  { href: "/settings/connections", key: "nav_connections" as const, icon: Database },
 ];
 
 const FOCUS = [

@@ -13,6 +13,18 @@ class Settings(BaseSettings):
     storage_dir: str = "/data/pdfs"
     tenant_id: str = "demo-university"
     embed_model: str = "BAAI/bge-small-en-v1.5"
+    source_database_type: str = "postgres"
+    source_database_url: str = ""
+    source_database_host: str = ""
+    source_database_port: str = ""
+    source_database_name: str = ""
+    source_database_user: str = ""
+    source_database_password: str = ""
+    source_database_ssl_mode: str = "prefer"
+    source_database_ssl_ca: str = ""
+    source_database_ssl_cert: str = ""
+    source_database_ssl_key: str = ""
+    source_database_trust_server_certificate: str = "false"
 
     class Config:
         env_file = ".env"

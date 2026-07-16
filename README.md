@@ -150,6 +150,31 @@ MIRROR Caddy can reverse-proxy it. Without that stack:
 Note: the Caddyfile is bind-mounted as a single file — after editing it,
 `docker restart mirror-caddy` (an in-container reload still sees the old inode).
 
+## Secure source database connection
+
+The backend now supports a configurable source database layer for connecting to external databases in a secure way. It accepts either a full URL or per-parameter environment settings and supports PostgreSQL, MySQL, SQLite and Microsoft SQL Server.
+
+Recommended environment variables:
+
+```bash
+SOURCE_DATABASE_TYPE=postgres
+SOURCE_DATABASE_URL=postgresql+psycopg2://user:password@host:5432/dbname?sslmode=verify-full&sslrootcert=/certs/ca.pem
+# or, for explicit parameters:
+SOURCE_DATABASE_HOST=db.internal
+SOURCE_DATABASE_PORT=5432
+SOURCE_DATABASE_NAME=analytics
+SOURCE_DATABASE_USER=reporter
+SOURCE_DATABASE_PASSWORD=super-secret
+SOURCE_DATABASE_SSL_MODE=verify-full
+SOURCE_DATABASE_SSL_CA=/certs/ca.pem
+```
+
+Two endpoints are available for inspection:
+- GET /api/connections/config
+- GET /api/connections/health
+
+These endpoints verify the connection configuration without exposing secrets.
+
 ## API surface
 
 | Method | Endpoint | Role |

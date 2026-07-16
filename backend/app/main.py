@@ -6,8 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from .db import Base, engine
-from .routers import (admin, browse, ingest, insight, journal_format, library,
-                      manuscripts, mindmap, mindmaps, review)
+from .routers import (admin, browse, connection, ingest, insight,
+                      journal_format, library, manuscripts, mindmap,
+                      mindmaps, review)
 
 
 def _migrate():
@@ -73,7 +74,7 @@ app.add_middleware(
 )
 
 for r in (ingest, manuscripts, insight, browse, review, mindmap, mindmaps,
-          library, journal_format, admin):
+          library, journal_format, admin, connection):
     app.include_router(r.router, prefix="/api")
 
 
