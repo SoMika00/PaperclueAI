@@ -173,3 +173,28 @@ class SearchLog(Base):
     scope = Column(String, default="combined")
     n_results = Column(Integer, default=0)
     created_at = Column(DateTime(timezone=True), default=now)
+
+
+class DatabaseConnection(Base):
+    __tablename__ = "database_connections"
+    id = Column(String, primary_key=True, default=uid)
+    institution_id = Column(String, nullable=False, index=True)
+    created_by = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    database_type = Column(String, nullable=False)  # postgres | mysql | sqlite | mssql
+    uses_url = Column(Boolean, default=False)
+    database_host = Column(String, default="")
+    database_port = Column(String, default="")
+    database_name = Column(String, default="")
+    database_user = Column(String, default="")
+    secret_encrypted = Column(Text, default="")  # Fernet ciphertext: password OR full URL
+    ssl_mode = Column(String, default="")
+    ssl_ca = Column(Text, default="")
+    ssl_cert = Column(Text, default="")
+    ssl_key = Column(Text, default="")
+    trust_server_certificate = Column(String, default="false")
+    status = Column(String, default="untested")  # untested | ok | error
+    last_error = Column(Text, default="")
+    last_tested_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=now)
+    updated_at = Column(DateTime(timezone=True), default=now, onupdate=now)

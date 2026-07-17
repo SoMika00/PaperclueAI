@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import {
   Bookmark,
   ClipboardCheck,
+  Database,
   FileOutput,
   FileSearch,
   FileText,
@@ -48,7 +49,10 @@ export default function Sidebar({
   const { profile } = useAuth();
   const { t } = useLocale();
   const items = profile?.role === "institution_admin"
-    ? [...GLOBAL, { href: "/admin", key: "nav_institution" as const, icon: ShieldCheck }]
+    ? [
+        { href: "/admin", key: "nav_institution" as const, icon: ShieldCheck },
+        { href: "/settings/connections", key: "nav_connections" as const, icon: Database },
+      ]
     : GLOBAL;
   return (
     <nav className="w-52 shrink-0 border-r border-line bg-paper flex flex-col py-3 overflow-y-auto panel-scroll dark:bg-dark-surface dark:border-dark-line">
