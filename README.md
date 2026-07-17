@@ -3,8 +3,8 @@
 Understand your research. Discover what is missing. Prepare your work for
 publication — **every AI claim traced back to an inspectable source**.
 
-Live demo: **https://mymirror.fr/paperclue** (auto-connected to the demo user
-*Dr. Test Researcher — Demo University*; the account menu top-right lets you
+Live demo: **https://mymirror.fr/paperclue** (you need to connect with a demo user
+*with a demo user*; the account menu top-right lets you
 sign out/in).
 
 ---
