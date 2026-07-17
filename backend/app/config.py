@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     source_database_ssl_cert: str = ""
     source_database_ssl_key: str = ""
     source_database_trust_server_certificate: str = "false"
+    connection_encryption_key: str = ""
 
     class Config:
         env_file = ".env"

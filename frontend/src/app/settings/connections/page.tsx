@@ -1,24 +1,28 @@
 "use client";
-/* Data Source Connection: configure and test a SOURCE_DATABASE_* connection.
-   Nothing here is persisted server-side — the panel only calls a stateless
-   test endpoint and lets you copy the resulting .env snippet, since writing
-   secrets to disk from a web form needs its own auth story. */
+/* Data Source Connection: configure, test and save a SOURCE_DATABASE_*
+   connection. Saved connections are persisted server-side (encrypted at
+   rest) and listed below — institution admins only. */
 import { useCallback, useEffect, useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
-  Clipboard,
-  ClipboardCheck,
   Database,
   Play,
+  RefreshCw,
+  Save,
+  ShieldCheck,
+  Trash2,
 } from "lucide-react";
 import { api } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
+import { useLocale } from "@/lib/i18n";
 import GlobalShell from "@/components/GlobalShell";
 import { Spinner } from "@/components/ui";
 
 type DbType = "postgres" | "mysql" | "sqlite" | "mssql";
 
 interface FormState {
+  name: string;
   database_type: DbType;
   database_url: string;
   database_host: string;
@@ -33,6 +37,20 @@ interface FormState {
   database_trust_server_certificate: string;
 }
 
+interface SavedConnection {
+  id: string;
+  name: string;
+  database_type: string;
+  uses_url: boolean;
+  database_host: string | null;
+  database_name: string | null;
+  database_user: string | null;
+  status: "ok" | "error" | "untested";
+  last_error: string | null;
+  last_tested_at: string | null;
+  created_at: string;
+}
+
 const DEFAULT_PORTS: Record<DbType, string> = {
   postgres: "5432",
   mysql: "3306",
@@ -41,6 +59,7 @@ const DEFAULT_PORTS: Record<DbType, string> = {
 };
 
 const INITIAL: FormState = {
+  name: "",
   database_type: "postgres",
   database_url: "",
   database_host: "",
@@ -54,14 +73,6 @@ const INITIAL: FormState = {
   database_ssl_key: "",
   database_trust_server_certificate: "false",
 };
-
-interface CurrentConfig {
-  configured: boolean;
-  database_type?: string;
-  database_host?: string | null;
-  database_name?: string | null;
-  secure?: boolean;
-}
 
 const inputCls =
   "w-full rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-brand disabled:opacity-50";
@@ -82,51 +93,47 @@ function Field({
   );
 }
 
-function envSnippet(f: FormState): string {
-  if (f.database_url.trim()) {
-    return `SOURCE_DATABASE_TYPE=${f.database_type}\nSOURCE_DATABASE_URL=${f.database_url}`;
+function parseApiError(e: any): string {
+  const raw = (e.message || "").replace(/^\d+:\s*/, "");
+  let message = raw;
+  try {
+    message = JSON.parse(raw).detail || raw;
+  } catch {
+    /* not JSON, use raw text */
   }
-  const lines = [
-    `SOURCE_DATABASE_TYPE=${f.database_type}`,
-    `SOURCE_DATABASE_HOST=${f.database_host}`,
-    `SOURCE_DATABASE_PORT=${f.database_port}`,
-    `SOURCE_DATABASE_NAME=${f.database_name}`,
-    `SOURCE_DATABASE_USER=${f.database_user}`,
-    `SOURCE_DATABASE_PASSWORD=${f.database_password}`,
-    `SOURCE_DATABASE_SSL_MODE=${f.database_ssl_mode}`,
-  ];
-  if (f.database_ssl_ca) lines.push(`SOURCE_DATABASE_SSL_CA=${f.database_ssl_ca}`);
-  if (f.database_ssl_cert) lines.push(`SOURCE_DATABASE_SSL_CERT=${f.database_ssl_cert}`);
-  if (f.database_ssl_key) lines.push(`SOURCE_DATABASE_SSL_KEY=${f.database_ssl_key}`);
-  if (f.database_type === "mssql") {
-    lines.push(`SOURCE_DATABASE_TRUST_SERVER_CERTIFICATE=${f.database_trust_server_certificate}`);
-  }
-  return lines.join("\n");
+  return message.slice(0, 300) || "Something went wrong";
+}
+
+function statusBadge(status: SavedConnection["status"]) {
+  if (status === "ok") return { cls: "bg-manuscript-soft border-manuscript/30 text-manuscript", key: "connections_status_ok" as const };
+  if (status === "error") return { cls: "bg-danger/5 border-danger/20 text-danger", key: "connections_status_error" as const };
+  return { cls: "bg-surface2 border-line text-inkmut", key: "connections_status_untested" as const };
 }
 
 export default function ConnectionsSettingsPage() {
-  const [current, setCurrent] = useState<CurrentConfig | null>(null);
-  const [currentError, setCurrentError] = useState<string | null>(null);
-  const [checkingCurrent, setCheckingCurrent] = useState(true);
+  const { profile, ready } = useAuth();
+  const { t } = useLocale();
 
   const [form, setForm] = useState<FormState>(INITIAL);
   const [useUrl, setUseUrl] = useState(false);
   const [testing, setTesting] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
-  const [copied, setCopied] = useState(false);
 
-  const loadCurrent = useCallback(() => {
-    setCheckingCurrent(true);
-    setCurrentError(null);
-    api<CurrentConfig>("/connections/config")
-      .then(setCurrent)
-      .catch((e) => setCurrentError(e.message?.slice(0, 200)))
-      .finally(() => setCheckingCurrent(false));
+  const [saved, setSaved] = useState<SavedConnection[] | null>(null);
+  const [savedError, setSavedError] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const loadSaved = useCallback(() => {
+    setSavedError(null);
+    api<SavedConnection[]>("/connections")
+      .then(setSaved)
+      .catch((e) => setSavedError(parseApiError(e)));
   }, []);
 
   useEffect(() => {
-    loadCurrent();
-  }, [loadCurrent]);
+    loadSaved();
+  }, [loadSaved]);
 
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) =>
     setForm((f) => ({ ...f, [key]: value }));
@@ -154,24 +161,71 @@ export default function ConnectionsSettingsPage() {
         message: `Connected to ${res.database_type}${res.database_host ? ` @ ${res.database_host}` : ""}.`,
       });
     } catch (e: any) {
-      const raw = (e.message || "").replace(/^\d+:\s*/, "");
-      let message = raw;
-      try {
-        message = JSON.parse(raw).detail || raw;
-      } catch {
-        /* not JSON, use raw text */
-      }
-      setResult({ ok: false, message: message.slice(0, 300) || "Connection failed" });
+      setResult({ ok: false, message: parseApiError(e) });
     } finally {
       setTesting(false);
     }
   }, [form, useUrl]);
 
-  const copySnippet = async () => {
-    await navigator.clipboard.writeText(envSnippet(form));
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  };
+  const saveConnection = useCallback(async () => {
+    setSaving(true);
+    setResult(null);
+    try {
+      const body = useUrl
+        ? { name: form.name, database_type: form.database_type, database_url: form.database_url }
+        : form;
+      await api("/connections", { method: "POST", body: JSON.stringify(body) });
+      setForm(INITIAL);
+      setUseUrl(false);
+      loadSaved();
+    } catch (e: any) {
+      setResult({ ok: false, message: parseApiError(e) });
+    } finally {
+      setSaving(false);
+    }
+  }, [form, useUrl, loadSaved]);
+
+  const retestConnection = useCallback(
+    async (id: string) => {
+      setBusyId(id);
+      try {
+        await api(`/connections/${id}/test`, { method: "POST" });
+        loadSaved();
+      } catch {
+        /* row-level error surfaces via its own status/last_error on refresh */
+      } finally {
+        setBusyId(null);
+      }
+    },
+    [loadSaved]
+  );
+
+  const deleteConnection = useCallback(
+    async (id: string) => {
+      if (!window.confirm(t("connections_delete_confirm"))) return;
+      setBusyId(id);
+      try {
+        await api(`/connections/${id}`, { method: "DELETE" });
+        loadSaved();
+      } catch (e: any) {
+        setSavedError(parseApiError(e));
+      } finally {
+        setBusyId(null);
+      }
+    },
+    [loadSaved, t]
+  );
+
+  if (ready && profile && profile.role !== "institution_admin") {
+    return (
+      <GlobalShell>
+        <div className="max-w-3xl mx-auto px-8 py-16 text-center text-inkmut">
+          <ShieldCheck className="h-8 w-8 mx-auto mb-3 opacity-40" />
+          {t("admin_only")}
+        </div>
+      </GlobalShell>
+    );
+  }
 
   return (
     <GlobalShell>
@@ -182,45 +236,80 @@ export default function ConnectionsSettingsPage() {
             <h1 className="font-serif font-semibold text-lg">Data Source Connection</h1>
           </div>
           <p className="text-[11px] text-inkmut mt-0.5">
-            Configure and test the <code className="text-ink/70">SOURCE_DATABASE_*</code> connection used to
-            reach an external database. Values entered here are only used for a live test — nothing is saved
-            server-side. Copy the generated snippet into your <code className="text-ink/70">.env</code> file
-            and restart the API to apply it.
+            Test and save connections to external databases. Saved connections are encrypted at rest and
+            listed below.
           </p>
         </div>
 
-        {/* Current server-side status */}
+        {/* Saved connections */}
         <div className="card p-3.5">
           <div className="flex items-center justify-between">
-            <span className={labelCls}>Currently configured</span>
-            <button onClick={loadCurrent} className="btn btn-ghost text-[11px] px-2 py-1">
+            <span className={labelCls}>{t("connections_saved_title")}</span>
+            <button onClick={loadSaved} className="btn btn-ghost text-[11px] px-2 py-1">
               Refresh
             </button>
           </div>
-          {checkingCurrent && (
-            <div className="flex items-center gap-2 text-xs text-inkmut mt-2">
-              <Spinner className="h-3.5 w-3.5" /> Checking…
-            </div>
-          )}
-          {!checkingCurrent && current?.configured && (
-            <div className="flex items-center gap-2 text-sm mt-2">
-              <CheckCircle2 className="h-4 w-4 text-manuscript shrink-0" />
-              <span>
-                <strong className="font-medium">{current.database_type}</strong>
-                {current.database_host && ` @ ${current.database_host}`}
-                {current.database_name && `/${current.database_name}`}
-              </span>
-            </div>
-          )}
-          {!checkingCurrent && current && !current.configured && (
-            <div className="flex items-center gap-2 text-xs text-inkmut mt-2">
-              <AlertTriangle className="h-3.5 w-3.5 shrink-0" /> No SOURCE_DATABASE_* configured yet — use the
-              form below to test one, then add it to your .env.
-            </div>
-          )}
-          {!checkingCurrent && currentError && (
+          {savedError && (
             <div className="flex items-center gap-2 text-xs text-danger mt-2">
-              <AlertTriangle className="h-3.5 w-3.5 shrink-0" /> {currentError}
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" /> {savedError}
+            </div>
+          )}
+          {saved === null && !savedError && (
+            <div className="flex items-center gap-2 text-xs text-inkmut mt-2">
+              <Spinner className="h-3.5 w-3.5" /> Loading…
+            </div>
+          )}
+          {saved && saved.length === 0 && (
+            <div className="flex items-center gap-2 text-xs text-inkmut mt-2">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0" /> {t("connections_empty")}
+            </div>
+          )}
+          {saved && saved.length > 0 && (
+            <div className="flex flex-col gap-2 mt-2">
+              {saved.map((c) => {
+                const badge = statusBadge(c.status);
+                return (
+                  <div
+                    key={c.id}
+                    className="flex items-center justify-between gap-3 rounded-lg border border-line px-3 py-2"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium truncate">{c.name}</span>
+                        <span className={`shrink-0 rounded-full border px-2 py-0.5 text-[10px] ${badge.cls}`}>
+                          {t(badge.key)}
+                        </span>
+                      </div>
+                      <div className="text-[11px] text-inkmut truncate">
+                        {c.database_type}
+                        {c.uses_url ? " · via URL" : `${c.database_host ? ` @ ${c.database_host}` : ""}${c.database_name ? `/${c.database_name}` : ""}`}
+                        {c.last_tested_at && ` · ${t("connections_last_tested")}: ${new Date(c.last_tested_at).toLocaleString()}`}
+                      </div>
+                      {c.status === "error" && c.last_error && (
+                        <div className="text-[11px] text-danger truncate">{c.last_error}</div>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => retestConnection(c.id)}
+                        disabled={busyId === c.id}
+                        title={t("connections_retest")}
+                        className="btn btn-ghost p-1.5"
+                      >
+                        {busyId === c.id ? <Spinner className="h-3.5 w-3.5" /> : <RefreshCw className="h-3.5 w-3.5" />}
+                      </button>
+                      <button
+                        onClick={() => deleteConnection(c.id)}
+                        disabled={busyId === c.id}
+                        title="Delete"
+                        className="btn btn-ghost p-1.5 text-danger"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -234,6 +323,15 @@ export default function ConnectionsSettingsPage() {
               Use a connection URL instead
             </label>
           </div>
+
+          <Field label={t("connections_name_label")}>
+            <input
+              value={form.name}
+              onChange={(e) => set("name", e.target.value)}
+              placeholder="Production Postgres"
+              className={inputCls}
+            />
+          </Field>
 
           <Field label="Database type">
             <select
@@ -381,13 +479,13 @@ export default function ConnectionsSettingsPage() {
           )}
 
           <div className="flex items-center gap-2 pt-1">
-            <button onClick={runTest} disabled={testing} className="btn btn-primary">
+            <button onClick={runTest} disabled={testing} className="btn btn-outline">
               {testing ? <Spinner className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
               Test connection
             </button>
-            <button onClick={copySnippet} className="btn btn-outline">
-              {copied ? <ClipboardCheck className="h-3.5 w-3.5" /> : <Clipboard className="h-3.5 w-3.5" />}
-              {copied ? "Copied" : "Copy .env snippet"}
+            <button onClick={saveConnection} disabled={saving || !form.name.trim()} className="btn btn-primary">
+              {saving ? <Spinner className="h-3.5 w-3.5" /> : <Save className="h-3.5 w-3.5" />}
+              {t("connections_save")}
             </button>
           </div>
 
