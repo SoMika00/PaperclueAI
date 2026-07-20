@@ -1,13 +1,13 @@
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     container_name: paperclue-postgres
     environment:
       POSTGRES_USER: paperclue
       POSTGRES_PASSWORD: paperclue
       POSTGRES_DB: paperclue
     volumes:
-      - pg_data:/var/lib/postgresql/data
+      - pg_data_pg18:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U paperclue"]
       interval: 5s
@@ -16,10 +16,10 @@ services:
     restart: unless-stopped
 
   qdrant:
-    image: qdrant/qdrant:v1.12.5
+    image: qdrant/qdrant:v1.18.3
     container_name: paperclue-qdrant
     volumes:
-      - qdrant_data:/qdrant/storage
+      - qdrant_data_v118:/qdrant/storage
     restart: unless-stopped
 
   api:
@@ -28,7 +28,6 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql+psycopg2://paperclue:paperclue@postgres:5432/paperclue
       QDRANT_URL: http://qdrant:6333
       STORAGE_DIR: /data/pdfs
     volumes:
@@ -42,7 +41,11 @@ services:
     restart: unless-stopped
 
   web:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
     container_name: paperclue-web
     environment:
       API_URL: http://api:8000
@@ -62,7 +65,13 @@ networks:
     name: mirror_default
 
 volumes:
-  pg_data:
-  qdrant_data:
+  pg_data_pg18:
+  qdrant_data_v118:
   pdf_data:
   embed_cache:
+  # pg_data (postgres:16) and qdrant_data (qdrant:v1.12.5) are the pre-upgrade
+  # volumes, kept as an offline backup — not mounted by any service anymore.
+  pg_data:
+    external: false
+  qdrant_data:
+    external: false

@@ -71,16 +71,16 @@ public corpus.
 
 | Layer | Choice | Why |
 |---|---|---|
-| Frontend | Next.js 14 (App Router, TS, `basePath /paperclue`) | SSR + streaming, single deployable |
-| UI | Tailwind (custom tokens), lucide icons | high-contrast, no generic-AI look |
+| Frontend | Next.js 16 (App Router, React 19, TS 6, `basePath /paperclue`) | SSR + streaming, single deployable |
+| UI | Tailwind 4 (custom tokens via `@config` bridge), lucide icons | high-contrast, no generic-AI look |
 | PDF | react-pdf / pdf.js + custom highlight layer | quote-anchored, bidirectional |
 | Graph | React Flow | custom nodes, radial cluster layout |
-| Backend | FastAPI (Python 3.11, async) | I/O-bound pipelines, SSE |
+| Backend | FastAPI (Python 3.12, async) | I/O-bound pipelines, SSE |
 | LLM | Anthropic Claude (Sonnet) | brief/review/synthesis/cluster labels |
 | Public grounding | Semantic Scholar Graph + Recommendations API | real papers, citation graph |
 | Embeddings | FastEmbed (local, `BAAI/bge-small-en-v1.5`, 384d) | free, no external dependency |
-| Vector DB | Qdrant | one collection per manuscript / tenant |
-| Metadata | PostgreSQL 16 | manuscripts, refs, issues, versions, maps |
+| Vector DB | Qdrant 1.18 | one collection per manuscript / tenant |
+| Metadata | PostgreSQL 18 | manuscripts, refs, issues, versions, maps — local container by default, or Supabase/any Postgres via `DATABASE_URL` |
 | Jobs | FastAPI BackgroundTasks + in-process task registry | demo scale; poll `/tasks/{id}` |
 | Hosting | Docker Compose behind the MIRROR Caddy | route `/paperclue*` → `paperclue-web:3000` |
 
@@ -138,14 +138,65 @@ PaperclueAI/
 ## Run it
 
 ```bash
-cp .env.example .env    # set ANTHROPIC_API_KEY (S2_API_KEY optional but recommended)
+cp .env.example .env    # set ANTHROPIC_API_KEY + NEXT_PUBLIC_SUPABASE_* (see below)
 docker compose up -d --build
 # → web on :3000 under basePath /paperclue, api on :8000
 ```
 
+Required in `.env` before the first build:
+- `ANTHROPIC_API_KEY` — backend generation (insight/review/format/browse).
+- `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the frontend
+  auth gate (`SignInGate` in `frontend/src/lib/auth.tsx`) always requires a
+  Supabase project. Next.js inlines `NEXT_PUBLIC_*` vars **at image build
+  time**, not at container start, so `docker-compose.yml` passes them as
+  `build.args` to the `web` service — changing them means a rebuild
+  (`docker compose up -d --build web`), a restart alone won't pick them up.
+  Use the **anon** key here, never the service role key.
+- `DATABASE_URL` — optional. Leave blank to use the local `postgres` container
+  (`paperclue`/`paperclue`, already wired in `docker-compose.yml`). Point it at
+  Supabase (or any Postgres) to use that instead. If the password contains
+  special characters (`# % & ! ^ …`), percent-encode it — an unescaped `#` is
+  read as a URI fragment and silently truncates the connection string.
+- `SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` — backend-side Supabase access
+  (profile lookups, service-role operations). Backend-only, never exposed to
+  the browser.
+
 The `web` container also joins the external `mirror_default` network so the
 MIRROR Caddy can reverse-proxy it. Without that stack:
 `docker network create mirror_default`.
+
+### Version notes
+
+- **Next.js 16 defaults to Turbopack**, which ignores the `webpack()` config in
+  `next.config.mjs` (needed for the pdf.js `canvas` alias). `frontend/package.json`
+  therefore runs `next build`/`next dev` with an explicit `--webpack` flag —
+  don't drop it without re-verifying the PDF viewer.
+- **TypeScript 7.0 + Next.js 16.3.0-preview.6.** TS 7's npm package dropped
+  `lib/typescript.js` (the JS Compiler API) in favor of a native Go binary, so
+  stable Next.js 16.2.10 — which reads `tsconfig.json` through that JS API —
+  can't find any `@/*` alias and fails every route with `Module not found`.
+  The fix (`experimental.useTypeScriptCli` in `next.config.mjs`, delegating to
+  the native `tsc` binary) only exists on Next's `preview`/`canary` channels
+  as of July 2026, not yet in a stable release — hence pinning `next` to
+  `16.3.0-preview.6` instead of the `latest` tag. This is a real tradeoff:
+  preview builds carry no semver guarantee. If the preview channel causes
+  issues, the fallback is `next@16.2.10` + `typescript@6.0.3` (no experimental
+  flag needed) — verified working in an earlier pass. Move both back to
+  `latest` once `useTypeScriptCli` (or native TS 7 support) ships stable.
+- **Tailwind is on v4** via the compatibility bridge (`@import "tailwindcss";`
+  + `@config "../../tailwind.config.ts";` in `globals.css`, `@tailwindcss/postcss`
+  in `postcss.config.mjs`) — the JS config file and `@apply`/`theme()` calls
+  across the codebase keep working unchanged. `autoprefixer` was dropped;
+  v4 handles vendor prefixing itself.
+- **Postgres (16→18) and Qdrant (1.12→1.18) are major version bumps that break
+  on-disk compatibility** — an in-place image swap makes the old data
+  unreadable (Qdrant panics on load; Postgres refuses to start). If you're
+  upgrading a deployment with real data, dump/restore (Postgres:
+  `pg_dump -F custom` → `pg_restore`) rather than just changing the image tag,
+  and expect to rebuild Qdrant collections via re-ingestion. The volume names
+  in `docker-compose.yml` (`pg_data_pg18`, `qdrant_data_v118`) are new on
+  purpose, so the pre-upgrade `pg_data`/`qdrant_data` volumes survive untouched
+  as an offline backup.
 
 Note: the Caddyfile is bind-mounted as a single file — after editing it,
 `docker restart mirror-caddy` (an in-container reload still sees the old inode).

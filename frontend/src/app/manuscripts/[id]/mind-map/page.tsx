@@ -18,7 +18,7 @@ export default function ManuscriptMapPage() {
   const [map, setMap] = useState<MindMapRecord | null>(null);
   const [checked, setChecked] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const stopped = useRef(false);
 
   const poll = useCallback(async (id: string) => {

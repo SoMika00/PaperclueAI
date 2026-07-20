@@ -5,29 +5,35 @@
   "scripts": {
     "copy-worker": "cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs public/",
     "predev": "npm run copy-worker",
-    "dev": "next dev -p 3000",
+    "dev": "next dev -p 3000 --webpack",
     "prebuild": "npm run copy-worker",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start -p 3000"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.7",
-    "lucide-react": "0.469.0",
-    "next": "14.2.21",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-markdown": "9.0.1",
-    "react-pdf": "9.1.1",
+    "lucide-react": "1.25.0",
+    "next": "16.3.0-preview.6",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "react-markdown": "10.1.0",
+    "react-pdf": "10.4.1",
     "reactflow": "11.11.4",
-    "remark-gfm": "4.0.0"
+    "remark-gfm": "4.0.1"
   },
   "devDependencies": {
-    "@types/node": "22.10.2",
-    "@types/react": "18.3.18",
-    "@types/react-dom": "18.3.5",
-    "autoprefixer": "10.4.20",
-    "postcss": "8.4.49",
-    "tailwindcss": "3.4.17",
-    "typescript": "5.7.2"
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "26.1.1",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "postcss": "8.5.20",
+    "tailwindcss": "4.3.3",
+    "typescript": "7.0.2"
+  },
+  "overrides": {
+    "postcss": "8.5.20",
+    "next": {
+      "postcss": "8.5.20"
+    }
   }
 }

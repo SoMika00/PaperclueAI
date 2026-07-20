@@ -16,6 +16,9 @@ const nextConfig = {
     config.resolve.alias.canvas = false;
     return config;
   },
+  experimental: {
+    useTypeScriptCli: true,
+  },
 };
 
 export default nextConfig;
