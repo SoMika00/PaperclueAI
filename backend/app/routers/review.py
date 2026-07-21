@@ -117,11 +117,11 @@ def run_review(task_id: str, ms_id: str):
         db.close()
 
 
-def verify_refs(db, ms: Manuscript) -> list[dict]:
+def verify_refs(db, ms: Manuscript, limit: int = 25) -> list[dict]:
     """The ONLY corpus crossing: manuscript refs resolved against public S2."""
     refs = db.query(Reference).filter_by(manuscript_id=ms.id).all()
     results = []
-    for ref in refs[:25]:
+    for ref in refs[:limit]:
         if not ref.title or ref.status == "verified":
             if ref.status == "verified":
                 results.append({"id": ref.id, "title": ref.title, "status": "verified"})

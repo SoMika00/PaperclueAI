@@ -2,6 +2,8 @@
 manuscript, or a collection of saved papers. Each node carries a "why this
 paper is here" explanation; edge color encodes provenance, style encodes the
 relation. Gap analysis runs in manuscript mode."""
+import re
+
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
@@ -9,14 +11,23 @@ from .. import tasks
 from ..auth import get_current_user
 from ..config import settings
 from ..db import SessionLocal, get_db
-from ..models import Manuscript, MindMap, Reference, SavedPaper
+from ..models import Manuscript, MindMap, Reference, SavedPaper, Section
 from ..services import claude, s2
 from .browse import _search_university
 from .manuscripts import get_ms
 
 router = APIRouter()
 
-MAX_FIRST_RENDER = 20
+MAX_FIRST_RENDER = 26
+
+
+def _clean_for_search(text: str) -> str:
+    """Raw PDF-extracted text carries line-wrap artifacts (a hyphenated
+    word split across a newline, e.g. "Gen-\\neration") that garble a
+    search-engine query into something matching nothing. Rejoin those,
+    then collapse all remaining whitespace/newlines to single spaces."""
+    text = re.sub(r"-\s*\n\s*", "", text)
+    return re.sub(r"\s+", " ", text).strip()
 
 
 class CreateBody(BaseModel):
@@ -123,9 +134,9 @@ def run_generate(task_id: str, map_id: str):
         tasks.update(task_id, step="Retrieving papers (public + university)", progress=15)
         if m.seed_type == "question":
             q = seed.get("question", m.title)
-            papers = _retrieve_public(q, 14)
+            papers = _retrieve_public(q, 18)
             try:
-                papers += _search_university(q[:250], limit=5)
+                papers += _search_university(q[:250], limit=6)
             except Exception:
                 pass
 
@@ -140,11 +151,47 @@ def run_generate(task_id: str, map_id: str):
             q = ms.title
             if insight.get("keywords"):
                 q = f"{ms.title} {' '.join(insight['keywords'][:5])}"
+            else:
+                # No insight brief yet (fresh upload or Focus import) — a
+                # bare title search is often too narrow to find anything.
+                # Fold in the abstract so the query carries real content.
+                abstract_section = (db.query(Section)
+                                     .filter_by(manuscript_id=ms.id)
+                                     .filter(Section.name.ilike('%abstract%'))
+                                     .first())
+                if abstract_section and abstract_section.text:
+                    # A short enrichment (roughly one sentence) sharpens the
+                    # query without drowning the title in paragraph-length
+                    # text, which full-text search engines match poorly.
+                    first_sentence = _clean_for_search(abstract_section.text)[:160]
+                    q = f"{ms.title} {first_sentence}"
+
             verified = (db.query(Reference)
                         .filter_by(manuscript_id=ms.id, status="verified")
                         .limit(15).all())
+
+            # A fresh manuscript has no verified citations yet, so there are
+            # no real seed_ids for S2 recommendations and the map falls back
+            # to a bare search — this is the main cause of sparse maps.
+            # Opportunistically resolve a few references now (same
+            # resolution Review uses) so first-time maps have real anchors
+            # too, without requiring the user to run Review first.
+            if not verified:
+                try:
+                    from .review import verify_refs
+                    # Capped well below Review's full pass (25) — this is an
+                    # opportunistic enrichment for the map, not a full
+                    # citation check, so keep the added S2 load small.
+                    verify_refs(db, ms, limit=8)
+                    db.commit()
+                    verified = (db.query(Reference)
+                                .filter_by(manuscript_id=ms.id, status="verified")
+                                .limit(15).all())
+                except Exception:
+                    pass
+
             cited_ids = {r.corpus_id for r in verified if r.corpus_id}
-            for r in verified[:6]:
+            for r in verified[:8]:
                 meta = r.resolved_meta or {}
                 if not r.corpus_id:
                     continue
@@ -158,9 +205,9 @@ def run_generate(task_id: str, map_id: str):
                     "authors": r.authors or [], "doi": None,
                     "url": meta.get("url"), "source_scope": "public",
                 })
-            papers += _retrieve_public(q, 10, seed_ids=list(cited_ids)[:10])
+            papers += _retrieve_public(q, 16, seed_ids=list(cited_ids)[:12])
             try:
-                papers += _search_university(q[:250], limit=5)
+                papers += _search_university(q[:250], limit=6)
             except Exception:
                 pass
 
