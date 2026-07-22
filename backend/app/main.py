@@ -8,8 +8,8 @@ from sqlalchemy import text
 from .auth import deny_institution_admins
 from .db import Base, engine
 from .routers import (admin, browse, connection, ingest, insight,
-                      journal_format, library, manuscripts, mindmap,
-                      mindmaps, review)
+                      journal_format, library, manuscripts, mindmaps,
+                      paper_tools, review)
 
 
 def _migrate():
@@ -31,12 +31,6 @@ def _migrate():
         ))
         conn.execute(text(
             "ALTER TABLE mindmaps ADD COLUMN IF NOT EXISTS user_id VARCHAR"
-        ))
-        conn.execute(text(
-            "ALTER TABLE saved_papers ADD COLUMN IF NOT EXISTS user_id VARCHAR"
-        ))
-        conn.execute(text(
-            "ALTER TABLE search_logs ADD COLUMN IF NOT EXISTS user_id VARCHAR"
         ))
         conn.execute(text(
             "ALTER TABLE saved_papers ADD COLUMN IF NOT EXISTS user_id VARCHAR"
@@ -74,7 +68,7 @@ app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
 )
 
-for r in (ingest, manuscripts, insight, browse, review, mindmap, mindmaps,
+for r in (ingest, manuscripts, insight, browse, review, mindmaps, paper_tools,
           library, journal_format):
     app.include_router(r.router, prefix="/api", dependencies=[Depends(deny_institution_admins)])
 
