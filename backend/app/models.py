@@ -164,6 +164,22 @@ class SavedPaper(Base):
     created_at = Column(DateTime(timezone=True), default=now)
 
 
+class PaperArtifact(Base):
+    """Cached output of a paper-intelligence tool (summarize, key concepts,
+    explanation, research gap, figures, tables, journal ranking) keyed by the
+    S2 corpus_id + tool kind. A suggested mind-map paper is not an ingested
+    manuscript, so these tools run on its metadata / open-access PDF; caching
+    the result keeps repeat clicks instant and spares Claude / S2 / the PDF."""
+    __tablename__ = "paper_artifacts"
+    id = Column(String, primary_key=True, default=uid)
+    tenant_id = Column(String, nullable=False, index=True)
+    corpus_id = Column(String, nullable=False, index=True)
+    # summary | key_concepts | explanation | research_gap | figures | tables | journal_ranking
+    kind = Column(String, nullable=False)
+    payload = Column(JSON)
+    created_at = Column(DateTime(timezone=True), default=now)
+
+
 class SearchLog(Base):
     __tablename__ = "search_logs"
     id = Column(String, primary_key=True, default=uid)
