@@ -1,97 +1,138 @@
-"use client";
-/* University Repository: the tenant's private corpus. Read-only; never leaves
-   the tenant. */
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { GraduationCap, Search } from "lucide-react";
-import { api } from "@/lib/api";
-import GlobalShell from "@/components/GlobalShell";
-import { ScopeBadge, Spinner } from "@/components/ui";
-import { useLocale } from "@/lib/i18n";
+'use client'
 
-interface UniPaper {
-  id: string;
-  title: string;
-  abstract: string;
-  authors: string[];
-  year: number | null;
-  venue: string;
-  doi: string | null;
-  collection: string;
-}
+import { useEffect, useMemo, useRef, useState } from 'react'
+import Link from 'next/link'
+import { AppShell } from '@/components/AppShell'
+import { ProvenanceBadge } from '@/components/Provenance'
+import { api } from '@/lib/api'
+import type { UniversityPaper } from '@/lib/backend-types'
+import { useRequireAccount } from '@/lib/use-account'
 
 export default function UniversityPage() {
-  const { t } = useLocale();
-  const [papers, setPapers] = useState<UniPaper[] | null>(null);
-  const [q, setQ] = useState("");
+  const blocked = useRequireAccount()
+  const [papers, setPapers] = useState<UniversityPaper[] | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
+  const [searching, setSearching] = useState(false)
+  const debounce = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function load(q?: string) {
+    api<UniversityPaper[]>(`/university${q ? `?q=${encodeURIComponent(q)}` : ''}`)
+      .then(setPapers)
+      .catch(() =>
+        setError('The research backend is unreachable right now — try again in a few minutes.')
+      )
+      .finally(() => setSearching(false))
+  }
 
   useEffect(() => {
-    const t = setTimeout(() => {
-      api<UniPaper[]>(`/university${q ? `?q=${encodeURIComponent(q)}` : ""}`)
-        .then(setPapers)
-        .catch(() => setPapers([]));
-    }, 250);
-    return () => clearTimeout(t);
-  }, [q]);
+    if (blocked) return
+    load()
+  }, [blocked])
 
-  const collections = Array.from(new Set((papers || []).map((p) => p.collection)));
+  function onSearch(v: string) {
+    setQuery(v)
+    if (debounce.current) clearTimeout(debounce.current)
+    setSearching(true)
+    debounce.current = setTimeout(() => load(v.trim() || undefined), 400)
+  }
+
+  // Group papers by lab/collection, preserving order.
+  const grouped = useMemo(() => {
+    const groups: Record<string, UniversityPaper[]> = {}
+    for (const p of papers ?? []) {
+      const key = p.collection || 'Repository'
+      ;(groups[key] = groups[key] ?? []).push(p)
+    }
+    return Object.entries(groups)
+  }, [papers])
+
+  if (blocked) {
+    return (
+      <AppShell crumb="University">
+        <div className="px-8 py-16 text-center text-sm text-muted">
+          Checking your account&hellip;
+        </div>
+      </AppShell>
+    )
+  }
 
   return (
-    <GlobalShell>
-      <div className="max-w-3xl mx-auto px-8 py-8">
-        <div className="flex items-center gap-2">
-          <GraduationCap className="h-5 w-5 text-uni" />
-          <h1 className="font-serif text-2xl font-semibold">{t("university_title")}</h1>
-        </div>
-        <p className="text-sm text-inkmut mt-0.5 mb-5">
-          {t("university_subtitle")}
-        </p>
-
-        <div className="relative mb-6 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-inkmut" />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder={t("university_search_placeholder")}
-            className="w-full rounded-lg border border-line bg-paper pl-9 pr-3 py-2 text-sm outline-none focus:border-brand"
-          />
+    <AppShell crumb="University">
+      <div className="max-w-[880px] mx-auto px-8 pt-9 pb-16">
+        <div className="mb-5">
+          <div className="text-[22px] font-bold tracking-[-0.3px] text-ink">
+            University repository
+          </div>
+          <div className="text-[13px] text-muted">
+            Institutional papers, private to your tenant — searchable here and in Discover,
+            never sent to public engines
+          </div>
         </div>
 
-        {papers === null && <Spinner className="h-5 w-5 text-brand" />}
-        {papers !== null && papers.length === 0 && (
-          <div className="text-sm text-inkmut py-8">{t("university_empty")}</div>
+        <input
+          value={query}
+          onChange={(e) => onSearch(e.target.value)}
+          placeholder="Search title, abstract or topic (semantic)…"
+          className="w-full border border-border rounded-[10px] px-4 py-3 text-sm text-ink bg-white outline-none focus:border-accent transition-colors mb-6"
+        />
+
+        {error && (
+          <div className="text-sm text-node-coral bg-node-coral-bg border border-node-coral/20 rounded-xl px-4 py-3 mb-6">
+            {error}
+          </div>
         )}
 
-        {collections.map((c) => (
-          <section key={c} className="mb-6">
-            <h2 className="section-title mb-1">{c}</h2>
-            <div className="flex flex-col divide-y divide-line/70">
-              {(papers || [])
-                .filter((p) => p.collection === c)
-                .map((p) => (
-                  <Link key={p.id} href={`/university/${p.id}`} className="block py-3 -mx-2 px-2 rounded hover:bg-surface2/60 transition-colors">
-                    <div className="flex items-center gap-2">
-                      <ScopeBadge scope="university" />
-                      {p.year && <span className="text-[11px] text-inkmut">{p.year}</span>}
-                      {p.venue && (
-                        <span className="text-[11px] text-inkmut truncate">{p.venue}</span>
+        {(papers === null || searching) && !error && (
+          <div className="text-[13px] text-muted-light">
+            {searching ? 'Searching…' : 'Loading…'}
+          </div>
+        )}
+        {papers?.length === 0 && !searching && (
+          <div className="text-[13px] text-muted-light">No papers match that search.</div>
+        )}
+
+        {grouped.map(([lab, items]) => (
+          <div key={lab} className="mb-8">
+            <div className="text-[11px] font-semibold tracking-[1.4px] text-muted-light mb-3">
+              {lab.toUpperCase()}
+            </div>
+            <div className="space-y-3">
+              {items.map((p) => (
+                <Link
+                  key={p.id}
+                  href={`/university/${p.id}`}
+                  className="block bg-white border border-border rounded-[14px] p-4 hover:border-accent transition-colors"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <ProvenanceBadge scope="university" />
+                        <span className="text-xs text-muted">
+                          {[p.year, p.venue].filter(Boolean).join(' · ')}
+                        </span>
+                      </div>
+                      <div className="text-[14px] font-semibold text-ink leading-snug">
+                        {p.title}
+                      </div>
+                      {p.authors?.length > 0 && (
+                        <div className="text-xs text-muted mt-1">
+                          {p.authors.slice(0, 4).join(', ')}
+                        </div>
+                      )}
+                      {p.abstract && (
+                        <p className="text-[12.5px] text-[#3c465c] mt-2 leading-relaxed line-clamp-2">
+                          {p.abstract}
+                        </p>
                       )}
                     </div>
-                    <div className="font-medium text-[14px] leading-snug mt-1">{p.title}</div>
-                    <div className="text-xs text-inkmut mt-0.5">
-                      {(p.authors || []).slice(0, 5).join(", ")}
-                    </div>
-                    {p.abstract && (
-                      <p className="text-xs text-inkmut leading-snug mt-1 line-clamp-2">
-                        {p.abstract}
-                      </p>
-                    )}
-                  </Link>
-                ))}
+                  </div>
+                </Link>
+              ))}
             </div>
-          </section>
+          </div>
         ))}
       </div>
-    </GlobalShell>
-  );
+    </AppShell>
+  )
 }

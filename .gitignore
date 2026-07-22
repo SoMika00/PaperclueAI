@@ -1,10 +1,32 @@
+# Monorepo root ignores. The Next app has its own frontend/.gitignore.
+
+# secrets — never commit real keys (the backend reads these at runtime).
+# Ignore every .env variant, then re-allow the *.example / *.local.example
+# templates (negations must come after the ignore rules to win).
 .env
-node_modules/
-.next/
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+!.env.local.example
+!**/.env.local.example
+
+# python / backend
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# supabase local link/state (project ref, pooler url)
+supabase/.temp/
+supabase/.branches/
+
+# misc
 .DS_Store
-.env.local
-.env.*.local
-.env.local
-.env.*.local
+*.pem
+.claude/

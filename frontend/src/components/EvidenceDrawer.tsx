@@ -1,190 +1,112 @@
-"use client";
-/* Evidence Ledger drawer: contextual, closed by default, resizable.
-   Groups proofs by kind; each shows a graded support status. Clicking a
-   manuscript-span proof highlights the PDF; a paper proof opens the source. */
-import { useCallback, useRef, useState } from "react";
-import {
-  AlertTriangle,
-  BookMarked,
-  CheckCircle2,
-  CircleDot,
-  ExternalLink,
-  HelpCircle,
-  X,
-} from "lucide-react";
-import type { EvidenceItem } from "@/lib/types";
-import { useWorkspace } from "@/lib/ws";
-import { ScopeBadge } from "./ui";
+'use client'
 
-const KIND_LABEL: Record<string, string> = {
-  insight: "Insights",
-  review: "Review issues",
-  citation: "Citation checks",
-  browse: "Literature claims",
-  format: "Journal compliance",
-};
+/**
+ * Evidence Ledger: every proof the features produce (insight anchors,
+ * review issues, citation resolutions, format checks, browse hits),
+ * aggregated in a drawer. Clicking a manuscript-anchored proof highlights
+ * the PDF.
+ */
+import { useWorkspace } from '@/lib/workspace'
+import type { EvidenceItem } from '@/lib/backend-types'
 
-/* Graded support statuses (never a binary "true"). */
-function supportOf(e: EvidenceItem): { label: string; icon: React.ReactNode; cls: string } {
-  if (e.status === "conflict")
-    return {
-      label: "Conflict",
-      icon: <AlertTriangle className="h-3.5 w-3.5" />,
-      cls: "text-danger",
-    };
-  if (e.status === "unverified")
-    return {
-      label: "Unresolved",
-      icon: <HelpCircle className="h-3.5 w-3.5" />,
-      cls: "text-aigray",
-    };
-  if (e.confidence >= 0.85)
-    return {
-      label: "Direct support",
-      icon: <CheckCircle2 className="h-3.5 w-3.5" />,
-      cls: "text-manuscript",
-    };
-  if (e.confidence >= 0.7)
-    return {
-      label: "Partial support",
-      icon: <CircleDot className="h-3.5 w-3.5" />,
-      cls: "text-brand-deep",
-    };
-  return {
-    label: "Contextual support",
-    icon: <CircleDot className="h-3.5 w-3.5" />,
-    cls: "text-inkmut",
-  };
+const KIND_STYLE: Record<string, { color: string; tint: string }> = {
+  insight: { color: '#6c4de6', tint: '#ede6ff' },
+  review: { color: '#e0951a', tint: '#fff2d6' },
+  citation: { color: '#3d7dff', tint: '#e6f0ff' },
+  format: { color: '#0f9b8e', tint: '#e0f7f4' },
+  browse: { color: '#ff5a7a', tint: '#ffe6ec' },
 }
 
-export default function EvidenceDrawer() {
-  const { evidence, requestHighlight, setDrawerOpen } = useWorkspace();
-  const [filter, setFilter] = useState<string>("all");
-  const [width, setWidth] = useState(360);
-  const dragging = useRef(false);
+const STATUS_LABEL: Record<string, string> = {
+  verified: 'verified',
+  unverified: 'unverified',
+  conflict: 'conflict',
+}
 
-  const startDrag = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    dragging.current = true;
-    const onMove = (ev: MouseEvent) => {
-      if (dragging.current)
-        setWidth(Math.min(Math.max(window.innerWidth - ev.clientX, 280), 620));
-    };
-    const onUp = () => {
-      dragging.current = false;
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("mouseup", onUp);
-    };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-  }, []);
+export function EvidenceDrawer() {
+  const { evidence, drawerOpen, setDrawerOpen, requestHighlight } = useWorkspace()
 
-  const kinds = ["all", ...Array.from(new Set(evidence.map((e) => e.kind)))];
-  const items = filter === "all" ? evidence : evidence.filter((e) => e.kind === filter);
+  if (!drawerOpen) return null
 
-  const open = (e: EvidenceItem) => {
-    const ref = e.source_ref || {};
-    if (e.source_type === "manuscript_span") {
-      requestHighlight(ref.page, ref.quote, e.kind === "review" ? "review" : "insight");
-    } else if (ref.url) {
-      window.open(ref.url, "_blank", "noopener");
+  function open(e: EvidenceItem) {
+    const ref = e.source_ref as { page?: number; quote?: string; url?: string } | null
+    if (e.source_type === 'manuscript_span' && ref?.page && ref?.quote) {
+      requestHighlight(ref.page, ref.quote, e.kind === 'review' ? 'review' : 'insight')
+      setDrawerOpen(false)
+    } else if (ref?.url) {
+      window.open(ref.url, '_blank', 'noreferrer')
     }
-  };
+  }
 
   return (
-    <aside
-      className="absolute right-0 top-0 bottom-0 z-30 bg-paper border-l border-line shadow-drawer flex drawer-enter"
-      style={{ width }}
-    >
+    <div className="fixed inset-0 z-40" onClick={() => setDrawerOpen(false)}>
+      <div className="absolute inset-0 bg-[rgba(20,33,61,0.35)]" />
       <div
-        onMouseDown={startDrag}
-        className="w-1.5 shrink-0 cursor-col-resize hover:bg-brand/40 transition-colors"
-        title="Drag to resize"
-      />
-      <div className="flex-1 min-w-0 flex flex-col">
-        <div className="px-4 pt-3.5 pb-2 border-b border-line">
-          <div className="flex items-center gap-2">
-            <BookMarked className="h-4 w-4 text-brand" />
-            <span className="font-serif font-semibold">Evidence Ledger</span>
-            <span className="text-[11px] text-inkmut">{evidence.length}</span>
-            <button
-              onClick={() => setDrawerOpen(false)}
-              className="ml-auto text-inkmut hover:text-ink"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-          <div className="flex gap-1 mt-2 flex-wrap">
-            {kinds.map((k) => (
-              <button
-                key={k}
-                onClick={() => setFilter(k)}
-                className={`rounded-full px-2 py-0.5 text-[11px] font-medium border transition-colors ${
-                  filter === k
-                    ? "bg-brand text-white border-brand"
-                    : "border-line text-inkmut hover:bg-surface2"
-                }`}
-              >
-                {k === "all" ? "All" : KIND_LABEL[k] || k}
-              </button>
-            ))}
-          </div>
+        className="absolute right-0 top-0 bottom-0 w-full max-w-[420px] bg-white shadow-[-8px_0_32px_rgba(20,33,61,0.15)] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-border">
+          <span className="text-[15px] font-bold text-ink flex-1">Evidence ledger</span>
+          <span className="text-xs text-muted">{evidence.length} proofs</span>
+          <button
+            onClick={() => setDrawerOpen(false)}
+            className="text-muted hover:text-ink text-[18px] leading-none"
+            aria-label="Close"
+          >
+            ×
+          </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto panel-scroll px-3 py-2 flex flex-col divide-y divide-line/60">
-          {items.length === 0 && (
-            <div className="text-center text-xs text-inkmut py-10 px-4">
-              No evidence yet — run Insight, a Review or a literature search.
-            </div>
+        <div className="flex-1 overflow-y-auto">
+          {evidence.length === 0 && (
+            <p className="text-[13px] text-muted-light text-center py-10 px-6">
+              No evidence yet — run Insight, Review, or a related-research search and every
+              proof lands here.
+            </p>
           )}
-          {items.map((e) => {
-            const ref = e.source_ref || {};
-            const isSpan = e.source_type === "manuscript_span";
-            const support = supportOf(e);
+          {evidence.map((e) => {
+            const style = KIND_STYLE[e.kind] ?? KIND_STYLE.insight
+            const ref = e.source_ref as { page?: number; quote?: string } | null
             return (
               <button
                 key={e.id}
                 onClick={() => open(e)}
-                className="text-left py-2.5 px-1 hover:bg-surface2/60 rounded transition-colors group"
+                className="w-full text-left px-5 py-3 border-b border-[#f2f2f4] hover:bg-background transition-colors"
               >
-                <div className="flex items-center gap-1.5">
-                  <span className={support.cls}>{support.icon}</span>
-                  <span className={`text-[10px] font-semibold ${support.cls}`}>
-                    {support.label}
+                <div className="flex items-center gap-2 mb-1">
+                  <span
+                    className="text-[10px] font-bold uppercase rounded-full px-2 py-0.5"
+                    style={{ color: style.color, background: style.tint }}
+                  >
+                    {e.kind}
                   </span>
-                  <span className="text-[10px] text-inkmut">
-                    · {KIND_LABEL[e.kind] || e.kind}
+                  <span
+                    className={`text-[10.5px] font-medium ${
+                      e.status === 'verified'
+                        ? 'text-node-teal'
+                        : e.status === 'conflict'
+                        ? 'text-node-coral'
+                        : 'text-muted-light'
+                    }`}
+                  >
+                    {STATUS_LABEL[e.status] ?? e.status}
                   </span>
-                  <span className="ml-auto">
-                    {isSpan ? (
-                      <ScopeBadge scope="manuscript" />
-                    ) : (
-                      <ScopeBadge
-                        scope={e.source_type === "university_paper" ? "university" : "public"}
-                      />
-                    )}
-                  </span>
-                </div>
-                <p className="text-xs leading-snug mt-1 text-ink line-clamp-3">{e.claim}</p>
-                <div className="flex items-center gap-1 mt-1 text-[11px] text-brand-deep opacity-70 group-hover:opacity-100">
-                  {isSpan ? (
-                    <>
-                      {ref.page ? `p.${ref.page}` : ""}
-                      {ref.section ? ` · ${ref.section}` : ""}
-                      {ref.quote ? " → highlight in PDF" : ""}
-                    </>
-                  ) : (
-                    <>
-                      <ExternalLink className="h-3 w-3" />
-                      {(ref.title || "").slice(0, 60) || "Open source paper"}
-                    </>
+                  <span className="flex-1" />
+                  {typeof e.confidence === 'number' && (
+                    <span className="text-[10.5px] text-muted-light">
+                      {Math.round(e.confidence * 100)}%
+                    </span>
                   )}
                 </div>
+                <p className="text-[12.5px] text-[#3c465c] leading-snug line-clamp-3">{e.claim}</p>
+                {ref?.page && (
+                  <span className="text-[11px] text-muted-light">p.{ref.page} ↗</span>
+                )}
               </button>
-            );
+            )
           })}
         </div>
       </div>
-    </aside>
-  );
+    </div>
+  )
 }

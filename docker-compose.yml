@@ -22,6 +22,9 @@ services:
       - qdrant_data:/qdrant/storage
     restart: unless-stopped
 
+  # FastAPI research backend. The Next.js frontend runs separately via
+  # `npm run dev` in ./frontend and proxies to this over BACKEND_API_URL
+  # (see frontend/next.config.ts) — it is not containerised here.
   api:
     build: ./backend
     container_name: paperclue-api
@@ -39,26 +42,6 @@ services:
       qdrant:
         condition: service_started
     restart: unless-stopped
-
-  web:
-    build: ./frontend
-    container_name: paperclue-web
-    environment:
-      API_URL: http://api:8000
-      HOSTNAME: 0.0.0.0
-    depends_on:
-      - api
-    networks:
-      - default
-      - edge
-    restart: unless-stopped
-
-networks:
-  # Shared with the MIRROR stack so mirror-caddy can reverse-proxy
-  # mymirror.fr/paperclue -> paperclue-web:3000 without touching the mirror app.
-  edge:
-    external: true
-    name: mirror_default
 
 volumes:
   pg_data:

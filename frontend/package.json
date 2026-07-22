@@ -1,33 +1,37 @@
 {
-  "name": "paperclue-web",
-  "version": "1.0.0",
+  "name": "paperclue-frontend",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "copy-worker": "cp node_modules/pdfjs-dist/build/pdf.worker.min.mjs public/",
-    "predev": "npm run copy-worker",
-    "dev": "next dev -p 3000",
-    "prebuild": "npm run copy-worker",
+    "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 3000"
+    "start": "next start",
+    "lint": "eslint",
+    "copy-worker": "node -e \"const f=require('fs');const src=['node_modules/react-pdf/node_modules/pdfjs-dist/build/pdf.worker.min.mjs','node_modules/pdfjs-dist/build/pdf.worker.min.mjs'].find(p=>f.existsSync(p));f.copyFileSync(src,'public/pdf.worker.min.mjs')\"",
+    "predev": "npm run copy-worker",
+    "prebuild": "npm run copy-worker"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.110.7",
-    "lucide-react": "0.469.0",
-    "next": "14.2.21",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-markdown": "9.0.1",
-    "react-pdf": "9.1.1",
-    "reactflow": "11.11.4",
-    "remark-gfm": "4.0.0"
+    "@supabase/ssr": "^0.12.1",
+    "@supabase/supabase-js": "^2.110.3",
+    "lucide-react": "^1.24.0",
+    "mammoth": "^1.12.0",
+    "next": "16.2.10",
+    "pdfjs-dist": "^6.1.200",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-markdown": "^10.1.0",
+    "react-pdf": "^10.4.1",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
-    "@types/node": "22.10.2",
-    "@types/react": "18.3.18",
-    "@types/react-dom": "18.3.5",
-    "autoprefixer": "10.4.20",
-    "postcss": "8.4.49",
-    "tailwindcss": "3.4.17",
-    "typescript": "5.7.2"
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

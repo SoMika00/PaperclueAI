@@ -1,226 +1,169 @@
-"use client";
-/* Manuscript Space: the SAME left menu as everywhere (global items constant,
-   manuscript features as the Focus submenu) + compact document header.
-   Evidence Ledger stays a drawer. */
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Download, Play, ScrollText, Share2 } from "lucide-react";
-import { BASE, api } from "@/lib/api";
-import type { Manuscript, Version } from "@/lib/types";
-import { WorkspaceProvider, useWorkspace } from "@/lib/ws";
-import EvidenceDrawer from "@/components/EvidenceDrawer";
-import IngestStepper from "@/components/IngestStepper";
-import Sidebar from "@/components/Sidebar";
-import TopBar from "@/components/TopBar";
-import { ReadinessGauge, Spinner } from "@/components/ui";
-import { useLocale } from "@/lib/i18n";
+'use client'
 
-const SCORE_PARTS: { key: string; labelKey: string; max: number; doneKey?: string }[] = [
-  { key: "base", labelKey: "score_document_processed", max: 15 },
-  { key: "insight", labelKey: "score_understanding", max: 15, doneKey: "insight_done" },
-  { key: "citations", labelKey: "score_citation_integrity", max: 30, doneKey: "citations_checked" },
-  { key: "review", labelKey: "score_review_findings", max: 40, doneKey: "review_done" },
-];
+import { use, useEffect, useState } from 'react'
+import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
+import { AppShell } from '@/components/AppShell'
+import { EvidenceDrawer } from '@/components/EvidenceDrawer'
+import { ReadinessGauge } from '@/components/ReadinessGauge'
+import { api, pollTask } from '@/lib/api'
+import type { Version } from '@/lib/backend-types'
+import { useI18n, type TKey } from '@/lib/i18n'
+import { useRequireAccount } from '@/lib/use-account'
+import { WorkspaceProvider, useWorkspace } from '@/lib/workspace'
 
-function timeAgo(iso: string | null): string {
-  if (!iso) return "";
-  const s = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (s < 90) return "just now";
-  if (s < 3600) return `${Math.round(s / 60)} min ago`;
-  if (s < 86400) return `${Math.round(s / 3600)} h ago`;
-  return `${Math.round(s / 86400)} d ago`;
+const TABS: { seg: string; labelKey: TKey }[] = [
+  { seg: '', labelKey: 'tab_overview' },
+  { seg: 'insight', labelKey: 'tab_insight' },
+  { seg: 'related-research', labelKey: 'tab_related' },
+  { seg: 'mind-map', labelKey: 'tab_mindmap' },
+  { seg: 'review', labelKey: 'tab_review' },
+  { seg: 'journal', labelKey: 'tab_journal' },
+  { seg: 'versions', labelKey: 'tab_versions' },
+]
+
+function timeAgo(iso?: string): string {
+  if (!iso) return ''
+  const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000)
+  if (mins < 1) return 'just now'
+  if (mins < 60) return `${mins} min ago`
+  const hrs = Math.round(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  return `${Math.round(hrs / 24)}d ago`
 }
 
-function ScorePopover({ ms }: { ms: Manuscript }) {
-  const { t } = useLocale();
-  const d: any = ms.readiness_detail || {};
+function TitleBar({ id }: { id: string }) {
+  const router = useRouter()
+  const { ms, refresh, evidence, setDrawerOpen } = useWorkspace()
+  const [versionCount, setVersionCount] = useState<number | null>(null)
+  const [runningReview, setRunningReview] = useState(false)
+
+  useEffect(() => {
+    api<Version[]>(`/manuscripts/${id}/versions`)
+      .then((v) => setVersionCount(v.length || 1))
+      .catch(() => setVersionCount(1))
+  }, [id])
+
+  async function runReview() {
+    setRunningReview(true)
+    try {
+      const { task_id } = await api<{ task_id: string }>(`/review/${id}`, { method: 'POST' })
+      await pollTask(task_id)
+      await refresh()
+      router.push(`/manuscripts/${id}/review`)
+    } catch {
+      router.push(`/manuscripts/${id}/review`)
+    } finally {
+      setRunningReview(false)
+    }
+  }
+
+  if (!ms) return null
+
+  const statusLine = [
+    'Private manuscript',
+    versionCount ? `Version ${versionCount}` : null,
+    `Saved ${timeAgo(ms.updated_at)}`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
   return (
-    <div className="absolute right-0 top-12 z-50 card p-4 w-72 shadow-drawer">
-      <div className="font-semibold text-sm mb-1">
-        {t("submission_readiness_score")} — {ms.readiness}/100
+    <div className="border-b border-border bg-white">
+      <div className="max-w-[1360px] mx-auto px-8 py-3.5 flex items-center gap-4">
+        <div className="min-w-0 flex-1">
+          <div className="text-[15px] font-semibold text-ink truncate">{ms.title}</div>
+          <div className="text-xs text-muted mt-0.5">
+            {statusLine}
+            {ms.has_insight && ' | Insight complete'}
+          </div>
+        </div>
+        <button
+          onClick={() => setDrawerOpen(true)}
+          className="text-[12.5px] font-medium text-muted hover:text-ink whitespace-nowrap transition-colors"
+        >
+          Evidence {evidence.length}
+        </button>
+        <Link
+          href={`/manuscripts/${id}/journal`}
+          className="text-[13px] font-semibold text-ink hover:text-accent whitespace-nowrap transition-colors"
+        >
+          Export
+        </Link>
+        <button
+          onClick={runReview}
+          disabled={runningReview}
+          className="bg-ink hover:bg-ink-light disabled:opacity-50 text-white text-[13px] font-semibold rounded-[9px] px-4 py-2 whitespace-nowrap transition-colors"
+        >
+          {runningReview ? 'Running…' : 'Run review'}
+        </button>
+        <ReadinessGauge value={ms.readiness} />
       </div>
-      <p className="text-[11px] text-inkmut mb-2.5">
-        {t("readiness_explainer")}
-      </p>
-      <div className="flex flex-col gap-1.5">
-        {SCORE_PARTS.map((p) => {
-          const v = Number(d[p.key] ?? 0);
-          const notDone = p.doneKey && !d[p.doneKey];
-          return (
-            <div key={p.key} className="flex items-center gap-2 text-[11px]">
-              <span className="w-36 text-inkmut">{t(p.labelKey as any)}</span>
-              <span className="flex-1 h-1.5 rounded-full bg-surface2 overflow-hidden">
+    </div>
+  )
+}
+
+function WorkspaceChrome({ id, children }: { id: string; children: React.ReactNode }) {
+  const pathname = usePathname()
+  const { ms } = useWorkspace()
+  const { t } = useI18n()
+  const base = `/manuscripts/${id}`
+
+  return (
+    <AppShell crumb={ms?.title ?? 'Manuscript'}>
+      <TitleBar id={id} />
+      <div className="bg-white border-b border-border sticky top-0 z-10">
+        <div className="max-w-[1360px] mx-auto px-8 flex items-center gap-1 overflow-x-auto">
+          {TABS.map((tab) => {
+            const href = tab.seg ? `${base}/${tab.seg}` : base
+            const active = pathname === href
+            return (
+              <Link
+                key={tab.seg}
+                href={href}
+                className={`relative px-3.5 py-3 text-[13px] font-medium whitespace-nowrap transition-colors ${
+                  active ? 'text-ink' : 'text-muted hover:text-ink'
+                }`}
+              >
+                {t(tab.labelKey)}
                 <span
-                  className="block h-full rounded-full bg-brand transition-all duration-500"
-                  style={{ width: `${(v / p.max) * 100}%` }}
+                  className="absolute left-3 right-3 bottom-0 h-[3px] rounded-t-[2px] bg-accent"
+                  style={{ opacity: active ? 1 : 0 }}
                 />
-              </span>
-              <span className="w-16 text-right font-medium">
-                {notDone ? t("not_run") : `${Math.round(v)}/${p.max}`}
-              </span>
-            </div>
-          );
-        })}
+              </Link>
+            )
+          })}
+        </div>
       </div>
-    </div>
-  );
+      {children}
+      <EvidenceDrawer />
+    </AppShell>
+  )
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
-  const { ms, refreshMs, evidence, drawerOpen, setDrawerOpen, readinessDelta } =
-    useWorkspace();
-  const router = useRouter();
-  const { t } = useLocale();
-  const [versions, setVersions] = useState<Version[]>([]);
-  const [shared, setShared] = useState(false);
-  const [showScore, setShowScore] = useState(false);
+export default function ManuscriptLayout({
+  params,
+  children,
+}: {
+  params: Promise<{ id: string }>
+  children: React.ReactNode
+}) {
+  const { id } = use(params)
+  const blocked = useRequireAccount()
 
-  useEffect(() => {
-    api<Version[]>(`/manuscripts/${ms.id}/versions`).then(setVersions).catch(() => {});
-  }, [ms.id, ms.readiness]);
-
-  // Keep polling lightly while the semantic index builds in the background.
-  useEffect(() => {
-    if (ms.index_status !== "indexing") return;
-    const t = setInterval(refreshMs, 4000);
-    return () => clearInterval(t);
-  }, [ms.index_status, refreshMs]);
-
-  const d: any = ms.readiness_detail || {};
-  const statusBits = [
-    ms.has_insight ? t("insight_complete") : null,
-    d.review_done ? `${d.open_issues} ${d.open_issues !== 1 ? t("open_issue_plural") : t("open_issue_singular")}` : null,
-    d.citations_checked ? `${d.refs_verified}/${d.refs_total} ${t("references_verified_label")}` : null,
-  ].filter(Boolean);
+  if (blocked) {
+    return (
+      <AppShell crumb="Manuscript">
+        <div className="px-8 py-16 text-center text-sm text-muted">
+          Checking your account&hellip;
+        </div>
+      </AppShell>
+    )
+  }
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden">
-      <TopBar />
-      <div className="flex-1 min-h-0 flex overflow-hidden">
-      <Sidebar focus={{ msId: ms.id, title: ms.title }} />
-      <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
-        <header className="border-b border-line dark:border-dark-line bg-paper dark:bg-dark-surface px-4 py-2 shrink-0 flex items-center gap-4">
-          <div className="min-w-0 flex-1">
-            <div className="font-serif font-semibold truncate leading-tight text-[15px]">
-              {ms.title}
-            </div>
-            <div className="text-[11px] text-inkmut dark:text-dark-inkmut truncate">
-              {t("private_manuscript")} · {t("version_label")} {versions[0]?.number ?? 1} · {t("saved_label")}{" "}
-              {timeAgo(ms.updated_at)}
-              {ms.index_status === "indexing" && (
-                <span className="ml-2 inline-flex items-center gap-1 text-brand-deep">
-                  <Spinner className="h-2.5 w-2.5" /> {t("indexing_semantic")}
-                </span>
-              )}
-              {statusBits.length > 0 && (
-                <>
-                  <span className="mx-1.5 text-line">|</span>
-                  {statusBits.join(" · ")}
-                </>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0 relative">
-            <button
-              onClick={() => {
-                navigator.clipboard?.writeText(window.location.href);
-                setShared(true);
-                setTimeout(() => setShared(false), 1500);
-              }}
-              className="btn btn-ghost"
-            >
-              <Share2 className="h-3.5 w-3.5" /> {shared ? t("copied_label") : t("share_label")}
-            </button>
-            <a
-              href={`${BASE}/format/${ms.id}/export?journal=scientific-reports`}
-              className="btn btn-ghost"
-            >
-              <Download className="h-3.5 w-3.5" /> {t("export_label")}
-            </a>
-            <button
-              onClick={() => router.push(`/manuscripts/${ms.id}/review?run=1`)}
-              className="btn btn-primary"
-            >
-              <Play className="h-3.5 w-3.5" /> {t("run_review_button")}
-            </button>
-            <button
-              onClick={() => setDrawerOpen(!drawerOpen)}
-              className={`btn ${drawerOpen ? "btn-primary" : "btn-outline"}`}
-              title="Evidence Ledger"
-            >
-              <ScrollText className="h-3.5 w-3.5" /> {t("evidence_label")} {evidence.length}
-            </button>
-            <button
-              onClick={() => setShowScore(!showScore)}
-              title="How this score is built"
-              className="rounded-full hover:ring-2 hover:ring-brand/40 transition-shadow"
-            >
-              <ReadinessGauge value={ms.readiness} delta={readinessDelta} size={40} />
-            </button>
-            {showScore && <ScorePopover ms={ms} />}
-          </div>
-        </header>
-
-        <div className="flex-1 min-h-0 overflow-hidden relative">
-          {children}
-          {drawerOpen && <EvidenceDrawer />}
-        </div>
-      </div>
-      </div>
-    </div>
-  );
-}
-
-export default function ManuscriptLayout({ children }: { children: React.ReactNode }) {
-  const params = useParams<{ id: string }>();
-  const [ms, setMs] = useState<Manuscript | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let stop = false;
-    let timer: ReturnType<typeof setTimeout>;
-    const tick = async () => {
-      try {
-        const m = await api<Manuscript>(`/manuscripts/${params.id}`);
-        if (stop) return;
-        setMs(m);
-        if (m.status === "ingesting") timer = setTimeout(tick, 1200);
-      } catch (e: any) {
-        if (!stop) setError(e.message);
-      }
-    };
-    tick();
-    return () => {
-      stop = true;
-      clearTimeout(timer);
-    };
-  }, [params.id]);
-
-  if (error)
-    return (
-      <div className="min-h-screen grid place-items-center">
-        <div className="card p-6 text-sm text-danger">
-          Manuscript not found —{" "}
-          <Link href="/home" className="text-brand underline">
-            back to dashboard
-          </Link>
-        </div>
-      </div>
-    );
-  if (!ms)
-    return (
-      <div className="min-h-screen grid place-items-center text-inkmut">
-        <div className="flex items-center gap-2">
-          <Spinner /> Opening workspace…
-        </div>
-      </div>
-    );
-  if (ms.status !== "ready") return <IngestStepper ms={ms} />;
-
-  return (
-    <WorkspaceProvider initial={ms}>
-      <Shell>{children}</Shell>
+    <WorkspaceProvider id={id}>
+      <WorkspaceChrome id={id}>{children}</WorkspaceChrome>
     </WorkspaceProvider>
-  );
+  )
 }

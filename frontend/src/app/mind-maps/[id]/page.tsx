@@ -1,128 +1,141 @@
-"use client";
-/* Map viewer: polls while building, then renders the shared canvas. */
-import dynamic from "next/dynamic";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { ArrowLeft, Bookmark, BookmarkCheck, Trash2 } from "lucide-react";
-import { api } from "@/lib/api";
-import type { MindMapRecord } from "@/lib/types";
-import GlobalShell from "@/components/GlobalShell";
-import { Spinner } from "@/components/ui";
-import { useLocale } from "@/lib/i18n";
+'use client'
 
-const MindMapCanvas = dynamic(() => import("@/components/MindMapCanvas"), { ssr: false });
+import { use, useCallback, useEffect, useRef, useState } from 'react'
+import { AppShell } from '@/components/AppShell'
+import { ResearchMapCanvas } from '@/components/ResearchMapCanvas'
+import { api } from '@/lib/api'
+import type { MindMapRecord } from '@/lib/backend-types'
+import { useRequireAccount } from '@/lib/use-account'
 
-function DeleteButton({ mapId }: { mapId: string }) {
-  const router = useRouter();
-  const { t } = useLocale();
-  return (
-    <button
-      onClick={async () => {
-        await api(`/mindmaps/${mapId}`, { method: "DELETE" });
-        router.push("/mind-maps");
-      }}
-      className="btn btn-ghost hover:text-danger"
-      title={t("delete_map_title")}
-    >
-      <Trash2 className="h-4 w-4" />
-    </button>
-  );
-}
+export default function MindMapViewerPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
+  const blocked = useRequireAccount()
+  const [map, setMap] = useState<MindMapRecord | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [expandingId, setExpandingId] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-export default function MindMapViewPage() {
-  const { t } = useLocale();
-  const params = useParams<{ id: string }>();
-  const [map, setMap] = useState<MindMapRecord | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const toggleSave = async () => {
-    if (!map) return;
-    const r = await api<MindMapRecord>(`/mindmaps/${map.id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ saved: !map.saved }),
-    });
-    setMap({ ...map, saved: r.saved });
-  };
+  const load = useCallback(
+    () =>
+      api<MindMapRecord>(`/mindmaps/${id}`)
+        .then(setMap)
+        .catch((e) =>
+          setError(
+            /404/.test(String(e))
+              ? 'Map not found.'
+              : 'The research backend is unreachable right now.'
+          )
+        ),
+    [id]
+  )
 
   useEffect(() => {
-    let stop = false;
-    let timer: ReturnType<typeof setTimeout>;
-    const tick = async () => {
-      try {
-        const m = await api<MindMapRecord>(`/mindmaps/${params.id}`);
-        if (stop) return;
-        setMap(m);
-        if (m.status === "building") timer = setTimeout(tick, 2500);
-      } catch (e: any) {
-        if (!stop) setError(e.message);
-      }
-    };
-    tick();
+    if (blocked) return
+    void load()
+  }, [blocked, load])
+
+  // A just-created map may still be building — poll until ready.
+  useEffect(() => {
+    if (!map || map.status !== 'building') return
+    pollRef.current = setInterval(() => void load(), 2000)
     return () => {
-      stop = true;
-      clearTimeout(timer);
-    };
-  }, [params.id]);
+      if (pollRef.current) clearInterval(pollRef.current)
+    }
+  }, [map, load])
+
+  async function expand(nodeId: string) {
+    if (!map) return
+    setExpandingId(nodeId)
+    try {
+      const { graph } = await api<{ graph: MindMapRecord['graph'] }>(
+        `/mindmaps/${map.id}/expand`,
+        { method: 'POST', body: JSON.stringify({ node_id: nodeId }) }
+      )
+      setMap((prev) => (prev ? { ...prev, graph } : prev))
+    } catch (e) {
+      setError(
+        /429/.test(String(e))
+          ? 'Public API rate-limited — retry the expansion in a minute.'
+          : 'Expansion failed.'
+      )
+    } finally {
+      setExpandingId(null)
+    }
+  }
+
+  async function toggleSaved() {
+    if (!map) return
+    setSaving(true)
+    try {
+      await api(`/mindmaps/${map.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ saved: !map.saved }),
+      })
+      setMap((prev) => (prev ? { ...prev, saved: !prev.saved } : prev))
+    } catch {
+      /* non-fatal */
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (blocked) {
+    return (
+      <AppShell crumb="Mind map">
+        <div className="px-8 py-16 text-center text-sm text-muted">
+          Checking your account&hellip;
+        </div>
+      </AppShell>
+    )
+  }
 
   return (
-    <GlobalShell>
-      <div className="h-full flex flex-col">
-        <div className="flex items-center gap-3 px-5 py-3 border-b border-line dark:border-dark-line bg-paper dark:bg-dark-surface">
-          <Link href="/mind-maps" className="text-inkmut hover:text-ink">
-            <ArrowLeft className="h-4 w-4" />
-          </Link>
-          <div className="min-w-0 flex-1">
-            <div className="font-serif font-semibold truncate">{map?.title || "…"}</div>
-            <div className="text-[11px] text-inkmut">
-              {map ? `${map.seed_type} ${t("map_status_label")} · ${map.status}` : ""}
-              {map && !map.saved && ` · ${t("draft_note")}`}
+    <AppShell crumb={map?.title ?? 'Mind map'}>
+      <div className="max-w-[1360px] mx-auto px-8 pt-7 pb-16">
+        {error && (
+          <div className="text-sm text-node-coral bg-node-coral-bg border border-node-coral/20 rounded-xl px-4 py-3 mb-4">
+            {error}
+          </div>
+        )}
+
+        {map?.status === 'building' && (
+          <div className="flex flex-col items-center gap-3 py-16">
+            <div className="w-11 h-11 rounded-full bg-node-violet-bg flex items-center justify-center animate-pc-pulse">
+              <span className="w-3.5 h-3.5 rounded-[4px] rotate-45 bg-node-violet" />
+            </div>
+            <div className="text-[13px] text-muted">
+              Building the map — retrieving, clustering, explaining&hellip;
             </div>
           </div>
-          {map?.status === "ready" && (
-            <div className="flex items-center gap-2 shrink-0">
+        )}
+
+        {map?.status === 'error' && (
+          <div className="text-sm text-node-coral bg-node-coral-bg border border-node-coral/20 rounded-xl px-4 py-3">
+            {map.error ?? 'Map generation failed.'}
+          </div>
+        )}
+
+        {map?.graph && (
+          <div className="bg-white border border-border rounded-2xl overflow-hidden">
+            <div className="flex items-center gap-2.5 px-5 py-3.5 border-b border-border">
+              <span className="w-2.5 h-2.5 rounded-full bg-node-violet shrink-0" />
+              <span className="text-sm font-semibold text-ink truncate">{map.title}</span>
+              <span className="flex-1" />
               <button
-                onClick={toggleSave}
-                className={`btn ${map.saved ? "btn-outline" : "btn-primary"}`}
+                onClick={toggleSaved}
+                disabled={saving}
+                className={`text-[12px] font-semibold transition-colors ${
+                  map.saved ? 'text-node-teal' : 'text-muted hover:text-ink'
+                }`}
               >
-                {map.saved ? (
-                  <>
-                    <BookmarkCheck className="h-4 w-4 text-manuscript" /> {t("saved_button")}
-                  </>
-                ) : (
-                  <>
-                    <Bookmark className="h-4 w-4" /> {t("save_map_button")}
-                  </>
-                )}
+                {map.saved ? '★ Saved' : '☆ Save to my maps'}
               </button>
-              <DeleteButton mapId={map.id} />
             </div>
-          )}
-        </div>
-        <div className="flex-1 min-h-0">
-          {error && <div className="p-6 text-sm text-danger">{error}</div>}
-          {!error && (!map || map.status === "building") && (
-            <div className="h-full grid place-items-center text-inkmut">
-              <div className="flex flex-col items-center gap-2">
-                <Spinner className="h-6 w-6 text-brand" />
-                <span className="text-sm">
-                  {t("building_map_text")}
-                </span>
-              </div>
-            </div>
-          )}
-          {map?.status === "error" && (
-            <div className="p-6 text-sm text-danger">{map.error}</div>
-          )}
-          {map?.status === "ready" && map.graph && (
-            <MindMapCanvas
-              mapId={map.id}
-              graph={map.graph}
-              onGraphChange={(g) => setMap({ ...map, graph: g })}
-            />
-          )}
-        </div>
+            <ResearchMapCanvas graph={map.graph} onExpand={expand} expandingId={expandingId} />
+          </div>
+        )}
       </div>
-    </GlobalShell>
-  );
+    </AppShell>
+  )
 }
