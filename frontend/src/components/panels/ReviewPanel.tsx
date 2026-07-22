@@ -2,7 +2,7 @@
 /* Review v2: a workflow, not a wall. Severity groups -> compact list ->
    selected issue detail with Why it matters / Suggested action and
    Accept / Edit / Dismiss. Citations get their own sub-view. */
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   BadgeCheck,
@@ -40,6 +40,7 @@ export default function ReviewPanel() {
   const { ms, requestHighlight, refreshEvidence, refreshMs, setDrawerOpen } =
     useWorkspace();
   const params = useSearchParams();
+  const router = useRouter();
   const autoran = useRef(false);
 
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -130,10 +131,17 @@ export default function ReviewPanel() {
       setSelectedId(null);
       setEditing(false);
       try {
-        await api(`/review-issues/${issue.id}`, {
+        const result = await api<{
+          working_copy?: { id: string };
+          applied?: boolean;
+        }>(`/review-issues/${issue.id}`, {
           method: "PATCH",
           body: JSON.stringify({ action, edit: edit || null }),
         });
+        if (action === "accept" && result.working_copy?.id && result.working_copy.id !== ms.id) {
+          router.push(`/manuscripts/${result.working_copy.id}/review?copy=created`);
+          return;
+        }
         await load();
         refreshMs();
         refreshEvidence();
@@ -141,7 +149,7 @@ export default function ReviewPanel() {
         await load();
       }
     },
-    [load, refreshMs, refreshEvidence]
+    [load, refreshMs, refreshEvidence, ms.id, router]
   );
 
   const open = issues.filter((i) => i.status === "open");
@@ -285,6 +293,11 @@ export default function ReviewPanel() {
   /* ---------- list / workflow ---------- */
   return (
     <div className="p-4 flex flex-col gap-3">
+      {params.get("copy") === "created" && (
+        <div className="rounded-lg border border-manuscript/40 bg-manuscript-soft/60 px-3 py-2 text-xs text-manuscript">
+          Revision Copy created. The source paper is preserved; accepted fixes are applied to this copy.
+        </div>
+      )}
       <div>
         <div className="flex items-center gap-2">
           <ClipboardCheck className="h-4 w-4 text-brand" />

@@ -50,8 +50,10 @@ def _warmup():
     """Heavy startup work runs OFF the request path: the API answers
     immediately while the embedding model loads and the corpus seeds."""
     try:
-        from .services import embeddings
-        embeddings.get_model()
+        from .config import settings
+        if settings.embedding_provider == "fastembed":
+            from .services import embeddings
+            embeddings.get_model()
     except Exception as e:
         print(f"embed model warmup failed: {e}")
     try:

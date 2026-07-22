@@ -13,7 +13,7 @@ from ..services import claude, embeddings, s2
 
 router = APIRouter()
 
-UNI_COLLECTION = f"uni_{settings.tenant_id}"
+UNI_COLLECTION = embeddings.tenant_collection("uni")
 
 
 class BrowseBody(BaseModel):
@@ -33,7 +33,10 @@ def _search_mine(query: str, user_id: str, limit: int = 6) -> list[dict]:
         for ms in mss:
             if not ms.qdrant_collection:
                 continue
-            for h in embeddings.search(ms.qdrant_collection, query, limit=3):
+            if ms.index_status != "ready":
+                continue
+            for h in embeddings.search(ms.qdrant_collection, query, limit=3,
+                                       tenant_id=settings.tenant_id, user_id=user_id):
                 out.append({
                     "corpus_id": f"{ms.id}:p{h.get('page')}",
                     "title": f"{ms.title} — p.{h.get('page')} ({h.get('section', '')})",
@@ -54,7 +57,8 @@ def _search_mine(query: str, user_id: str, limit: int = 6) -> list[dict]:
 def _search_university(query: str, limit: int = 8) -> list[dict]:
     """Tenant-scoped search. The RLS filter (tenant_id) applies before scoring;
     university text NEVER leaves the tenant."""
-    hits = embeddings.search(UNI_COLLECTION, query, limit=limit)
+    hits = embeddings.search(UNI_COLLECTION, query, limit=limit,
+                             tenant_id=settings.tenant_id)
     db = SessionLocal()
     try:
         out = []

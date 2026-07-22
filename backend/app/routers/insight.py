@@ -83,7 +83,14 @@ async def chat(ms_id: str, body: ChatBody, db=Depends(get_db),
                current_user: dict = Depends(get_current_user)):
     """SSE stream. Grounded on the manuscript's private Qdrant collection only."""
     ms = get_ms(db, ms_id, current_user["user_id"])
-    hits = embeddings.search(ms.qdrant_collection, body.question, limit=6)
+    try:
+        indexed = embeddings.ensure_manuscript_index(db, ms, current_user["user_id"])
+        hits = (embeddings.search(ms.qdrant_collection, body.question, limit=6,
+                                  tenant_id=ms.tenant_id,
+                                  user_id=current_user["user_id"])
+                if indexed else [])
+    except Exception:
+        hits = []
     if not hits:
         hits = lexical.search(db, ms.id, body.question, limit=6)
     context = "\n\n".join(
@@ -132,7 +139,14 @@ def explain_selection(ms_id: str, body: ExplainBody, db=Depends(get_db),
                        current_user: dict = Depends(get_current_user)):
     """PDF -> feature: contextual action on selected text."""
     ms = get_ms(db, ms_id, current_user["user_id"])
-    hits = embeddings.search(ms.qdrant_collection, body.text, limit=3)
+    try:
+        indexed = embeddings.ensure_manuscript_index(db, ms, current_user["user_id"])
+        hits = (embeddings.search(ms.qdrant_collection, body.text, limit=3,
+                                  tenant_id=ms.tenant_id,
+                                  user_id=current_user["user_id"])
+                if indexed else [])
+    except Exception:
+        hits = []
     if not hits:
         hits = lexical.search(db, ms.id, body.text, limit=3)
     context = "\n".join(f"[p.{h['page']}] {h['text']}" for h in hits)

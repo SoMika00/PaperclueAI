@@ -58,6 +58,7 @@ def _paper_node(p: dict, why: str | None = None) -> dict:
             "tldr": p.get("tldr") or (p.get("abstract") or "")[:260],
             "citation_count": p.get("citation_count"),
             "venue": p.get("venue"), "url": p.get("url"),
+            "doi": p.get("doi"),
             "authors": p.get("authors", [])[:4],
             "collection": p.get("collection"),
         },
@@ -306,14 +307,25 @@ def list_mindmaps(manuscript_id: str | None = None, db=Depends(get_db),
 
 
 class SavedBody(BaseModel):
-    saved: bool
+    saved: bool | None = None
+    positions: dict[str, dict[str, float]] | None = None
 
 
 @router.patch("/mindmaps/{map_id}")
 def save_mindmap(map_id: str, body: SavedBody, db=Depends(get_db),
                   current_user: dict = Depends(get_current_user)):
     m = _get_map(db, map_id, current_user["user_id"])
-    m.saved = body.saved
+    if body.saved is not None:
+        m.saved = body.saved
+    if body.positions:
+        graph = dict(m.graph or {})
+        nodes = [dict(node) for node in graph.get("nodes", [])]
+        for node in nodes:
+            position = body.positions.get(node.get("id"))
+            if position and "x" in position and "y" in position:
+                node["position"] = {"x": position["x"], "y": position["y"]}
+        graph["nodes"] = nodes
+        m.graph = graph
     db.commit()
     return _mindmap_out(m, with_graph=False)
 

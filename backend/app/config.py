@@ -3,6 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     anthropic_api_key: str = ""
+    openai_api_key: str = ""
     s2_api_key: str = ""
     claude_model_fast: str = "claude-sonnet-4-5"
     claude_model_smart: str = "claude-sonnet-4-5"
@@ -12,7 +13,9 @@ class Settings(BaseSettings):
     qdrant_url: str = "http://qdrant:6333"
     storage_dir: str = "/data/pdfs"
     tenant_id: str = "demo-university"
-    embed_model: str = "BAAI/bge-small-en-v1.5"
+    embedding_provider: str = "openai"
+    embed_model: str = "text-embedding-3-small"
+    embed_dimensions: int = 384
     source_database_type: str = "postgres"
     source_database_url: str = ""
     source_database_host: str = ""

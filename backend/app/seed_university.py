@@ -6,7 +6,7 @@ from .db import Base, SessionLocal, engine
 from .models import UniversityPaper
 from .services import embeddings, s2
 
-UNI_COLLECTION = f"uni_{settings.tenant_id}"
+UNI_COLLECTION = embeddings.tenant_collection("uni")
 
 SEED_QUERIES = [
     ("retrieval augmented generation evaluation", "NLP Lab"),
@@ -23,12 +23,18 @@ def seed():
     db = SessionLocal()
     try:
         existing = db.query(UniversityPaper).filter_by(tenant_id=settings.tenant_id).count()
-        if existing >= 10:
+        if existing >= 10 and embeddings.get_client().collection_exists(UNI_COLLECTION):
             print(f"University corpus already seeded ({existing} papers).")
             return
         known_ids = {r.s2_id for r in
                      db.query(UniversityPaper).filter_by(tenant_id=settings.tenant_id).all()}
-        chunks, count = [], 0
+        chunks = [{
+            "text": f"{row.title}. {(row.abstract or '')[:1200]}",
+            "paper_id": row.id, "tenant_id": settings.tenant_id,
+            "page": 0, "section": row.collection_name,
+        } for row in db.query(UniversityPaper).filter_by(tenant_id=settings.tenant_id).all()
+                  if row.abstract]
+        count = 0
         for query, collection_name in SEED_QUERIES:
             try:
                 papers = s2.search(query, limit=3)

@@ -5,8 +5,8 @@
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Download, Play, ScrollText, Share2 } from "lucide-react";
-import { BASE, api } from "@/lib/api";
+import { Download, MessageSquare, Play, ScrollText, Share2 } from "lucide-react";
+import { api, downloadFile } from "@/lib/api";
 import type { Manuscript, Version } from "@/lib/types";
 import { WorkspaceProvider, useWorkspace } from "@/lib/ws";
 import EvidenceDrawer from "@/components/EvidenceDrawer";
@@ -106,8 +106,14 @@ function Shell({ children }: { children: React.ReactNode }) {
               {ms.title}
             </div>
             <div className="text-[11px] text-inkmut dark:text-dark-inkmut truncate">
-              {t("private_manuscript")} · {t("version_label")} {versions[0]?.number ?? 1} · {t("saved_label")}{" "}
+              {(ms.origin as any)?.kind === "revision_copy" ? "Revision Copy · source preserved" : t("private_manuscript")} · {t("version_label")} {versions[0]?.number ?? 1} · {t("saved_label")}{" "}
               {timeAgo(ms.updated_at)}
+              {(ms.origin as any)?.working_copy_of && (
+                <Link href={`/manuscripts/${(ms.origin as any).working_copy_of}/overview`}
+                  className="ml-2 text-brand-deep hover:underline">
+                  View source
+                </Link>
+              )}
               {ms.index_status === "indexing" && (
                 <span className="ml-2 inline-flex items-center gap-1 text-brand-deep">
                   <Spinner className="h-2.5 w-2.5" /> {t("indexing_semantic")}
@@ -122,6 +128,9 @@ function Shell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0 relative">
+            <button onClick={() => router.push(`/manuscripts/${ms.id}/chat`)} className="btn btn-outline">
+              <MessageSquare className="h-3.5 w-3.5" /> Chat
+            </button>
             <button
               onClick={() => {
                 navigator.clipboard?.writeText(window.location.href);
@@ -132,12 +141,11 @@ function Shell({ children }: { children: React.ReactNode }) {
             >
               <Share2 className="h-3.5 w-3.5" /> {shared ? t("copied_label") : t("share_label")}
             </button>
-            <a
-              href={`${BASE}/format/${ms.id}/export?journal=scientific-reports`}
-              className="btn btn-ghost"
-            >
+            <button
+              onClick={() => downloadFile(`/format/${ms.id}/export?journal=scientific-reports`)}
+              className="btn btn-ghost">
               <Download className="h-3.5 w-3.5" /> {t("export_label")}
-            </a>
+            </button>
             <button
               onClick={() => router.push(`/manuscripts/${ms.id}/review?run=1`)}
               className="btn btn-primary"

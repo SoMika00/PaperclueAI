@@ -15,6 +15,7 @@ import {
   History,
   Home,
   LayoutDashboard,
+  MessageSquare,
   Network,
   ShieldCheck,
   Sparkles,
@@ -32,6 +33,7 @@ const GLOBAL = [
 
 const FOCUS = [
   { seg: "overview", label: "Overview", icon: LayoutDashboard },
+  { seg: "chat", label: "Chat", icon: MessageSquare },
   { seg: "insight", label: "Paper Insight", icon: Sparkles },
   { seg: "related-research", label: "Related Research", icon: FileSearch },
   { seg: "mind-map", label: "Mind Map", icon: Network },

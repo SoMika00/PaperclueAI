@@ -4,6 +4,7 @@
    relation (solid cites / dashed similar topic). Nodes explain why they're here.
    Gap Finder spotlights uncited clusters. */
 import { useCallback, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import ReactFlow, {
   Background,
   Controls,
@@ -18,13 +19,16 @@ import {
   Bookmark,
   BookmarkCheck,
   ExternalLink,
+  FileText,
   GitBranch,
   Lightbulb,
+  MessageSquare,
   X,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { useLocale } from "@/lib/i18n";
 import type { MapEdge, MapGap, MapNode } from "@/lib/types";
+import PaperQuickActions, { FocusDestination } from "./PaperQuickActions";
 import { ScopeBadge, Spinner } from "./ui";
 
 const SCOPE_COLOR: Record<string, string> = {
@@ -102,7 +106,8 @@ function layout(
   dimSet: Set<string> | null,
   showLabels: boolean,
   scopeOn: Record<string, boolean>,
-  selectedId: string | null
+  selectedId: string | null,
+  positions: Record<string, { x: number; y: number }>
 ): { nodes: Node[]; edges: Edge[] } {
   const visible = (n: MapNode) => scopeOn[n.source_scope] !== false;
   const papers = nodes.filter((n) => n.type !== "center" && visible(n));
@@ -115,7 +120,7 @@ function layout(
 
   const center = nodes.find((n) => n.type === "center");
   const out: Node[] = center
-    ? [{ id: center.id, type: "center", position: { x: 0, y: 0 }, data: center }]
+    ? [{ id: center.id, type: "center", position: positions[center.id] || center.position || { x: 0, y: 0 }, data: center }]
     : [];
 
   let angleStart = -Math.PI / 2;
@@ -128,7 +133,7 @@ function layout(
       out.push({
         id: p.id,
         type: "paper",
-        position: {
+        position: positions[p.id] || p.position || {
           x: Math.cos(angle) * radius * 1.3 - 100,
           y: Math.sin(angle) * radius - 30,
         },
@@ -178,11 +183,16 @@ export default function MindMapCanvas({
   onGraphChange?: (g: { nodes: MapNode[]; edges: MapEdge[]; gaps: MapGap[] }) => void;
 }) {
   const { t } = useLocale();
+  const router = useRouter();
   const [selected, setSelected] = useState<MapNode | null>(null);
   const [spotlight, setSpotlight] = useState<Set<string> | null>(null);
   const [expanding, setExpanding] = useState(false);
   const [saved, setSaved] = useState<Set<string>>(new Set());
   const [notice, setNotice] = useState<string | null>(null);
+  const [opening, setOpening] = useState<string | null>(null);
+  const [positions, setPositions] = useState<Record<string, { x: number; y: number }>>(() =>
+    Object.fromEntries(graph.nodes.filter((node) => node.position).map((node) => [node.id, node.position!]))
+  );
   const [showLabels, setShowLabels] = useState(true);
   const [scopeOn, setScopeOn] = useState<Record<string, boolean>>({
     public: true,
@@ -193,8 +203,8 @@ export default function MindMapCanvas({
   const flow = useMemo(
     () =>
       layout(graph.nodes, graph.edges, spotlight, showLabels, scopeOn,
-             selected?.id || null),
-    [graph, spotlight, showLabels, scopeOn, selected]
+             selected?.id || null, positions),
+    [graph, spotlight, showLabels, scopeOn, selected, positions]
   );
 
   const stats = useMemo(() => {
@@ -255,6 +265,46 @@ export default function MindMapCanvas({
     }
   }, []);
 
+  const openInFocus = useCallback(async (
+    n: MapNode,
+    destination: string
+  ) => {
+    if (opening) return;
+    setOpening(destination);
+    setNotice(null);
+    try {
+      const result = await api<{ manuscript_id: string }>("/import", {
+        method: "POST",
+        body: JSON.stringify({
+          kind: n.source_scope === "university" ? "university" : "public",
+          id: n.id,
+        }),
+      });
+      router.push(`/manuscripts/${result.manuscript_id}/${destination}`);
+    } catch (error: any) {
+      setNotice(error.message?.includes("open-access")
+        ? "No open-access full text is available for Focus."
+        : error.message?.slice(0, 140) || "Could not open this paper in Focus.");
+      setOpening(null);
+    }
+  }, [opening, router]);
+
+  const moveNode = useCallback((node: Node) => {
+    setPositions((current) => ({ ...current, [node.id]: node.position }));
+  }, []);
+
+  const saveNodePosition = useCallback(async (node: Node) => {
+    moveNode(node);
+    try {
+      await api(`/mindmaps/${mapId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ positions: { [node.id]: node.position } }),
+      });
+    } catch (error: any) {
+      setNotice(error.message?.slice(0, 120) || "Could not save the node position.");
+    }
+  }, [mapId, moveNode]);
+
   return (
     <div className="h-full relative">
       <ReactFlow
@@ -274,6 +324,8 @@ export default function MindMapCanvas({
         }}
         nodesDraggable
         nodesConnectable={false}
+        onNodeDrag={(_, node) => moveNode(node)}
+        onNodeDragStop={(_, node) => saveNodePosition(node)}
       >
         <Background color="#0F172A" gap={28} size={0.7} style={{ opacity: 0.25 }} />
         <Controls showInteractive={false} />
@@ -420,6 +472,16 @@ export default function MindMapCanvas({
             </p>
           )}
           <div className="flex flex-wrap gap-1.5 mt-3">
+            <button onClick={() => openInFocus(selected, "overview")} disabled={!!opening}
+              className="btn btn-primary text-[11px] py-1 px-2">
+              {opening === "overview" ? <Spinner className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
+              Open in Focus
+            </button>
+            <button onClick={() => openInFocus(selected, "chat")} disabled={!!opening}
+              className="btn btn-outline text-[11px] py-1 px-2">
+              {opening === "chat" ? <Spinner className="h-3 w-3" /> : <MessageSquare className="h-3 w-3" />}
+              Chat
+            </button>
             {selected.meta?.url && (
               <a
                 href={selected.meta.url}
@@ -454,6 +516,12 @@ export default function MindMapCanvas({
               Expand branch
             </button>
           </div>
+          <PaperQuickActions
+            compact
+            onOpen={(destination: FocusDestination) => openInFocus(selected, destination)}
+            disabled={!!opening}
+            active={opening}
+          />
         </div>
       )}
     </div>

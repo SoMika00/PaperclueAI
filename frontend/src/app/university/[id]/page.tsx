@@ -11,10 +11,12 @@ import {
   ExternalLink,
   FileSearch,
   FileText,
+  MessageSquare,
   Network,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import GlobalShell from "@/components/GlobalShell";
+import PaperQuickActions, { FocusDestination } from "@/components/PaperQuickActions";
 import { ScopeBadge, Spinner } from "@/components/ui";
 import { useLocale } from "@/lib/i18n";
 
@@ -38,26 +40,26 @@ export default function UniversityPaperPage() {
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [mapping, setMapping] = useState(false);
-  const [importing, setImporting] = useState(false);
+  const [importing, setImporting] = useState<string | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
 
-  const openInFocus = async () => {
+  const openInFocus = async (destination: string = "overview") => {
     if (!paper || importing) return;
-    setImporting(true);
+    setImporting(destination);
     setImportError(null);
     try {
       const r = await api<{ manuscript_id: string }>("/import", {
         method: "POST",
         body: JSON.stringify({ kind: "university", id: paper.id }),
       });
-      router.push(`/manuscripts/${r.manuscript_id}/overview`);
+      router.push(`/manuscripts/${r.manuscript_id}/${destination}`);
     } catch (e: any) {
       setImportError(
         e.message?.includes("open-access")
           ? t("no_oa_fulltext")
           : e.message?.slice(0, 140) || "Import failed"
       );
-      setImporting(false);
+      setImporting(null);
     }
   };
 
@@ -134,9 +136,12 @@ export default function UniversityPaperPage() {
             </div>
 
             <div className="flex flex-wrap gap-2 mt-5">
-              <button onClick={openInFocus} disabled={importing} className="btn btn-primary">
-                {importing ? <Spinner className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
-                {importing ? t("fetching_fulltext") : t("open_in_focus")}
+              <button onClick={() => openInFocus()} disabled={!!importing} className="btn btn-primary">
+                {importing === "overview" ? <Spinner className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
+                {importing === "overview" ? t("fetching_fulltext") : t("open_in_focus")}
+              </button>
+              <button onClick={() => openInFocus("chat")} disabled={!!importing} className="btn btn-outline">
+                <MessageSquare className="h-4 w-4" /> Chat with paper
               </button>
               <button onClick={save} disabled={saved} className="btn btn-outline">
                 {saved ? (
@@ -170,6 +175,12 @@ export default function UniversityPaperPage() {
                 </a>
               )}
             </div>
+
+            <PaperQuickActions
+              onOpen={(destination: FocusDestination) => openInFocus(destination)}
+              disabled={!!importing}
+              active={importing}
+            />
 
             {importError && (
               <div className="mt-3 text-xs text-warn bg-uni-soft/60 border border-uni/40 rounded-lg px-3 py-2 inline-block">

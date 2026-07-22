@@ -85,26 +85,18 @@ def run_pipeline(ms_id: str):
 
         # WORKSPACE OPENS HERE - the PDF is usable before the index exists.
         ms.status = "ready"
-        ms.index_status = "indexing"
-        ms.qdrant_collection = f"ms_{ms.id}"
+        # Semantic indexing is deliberately lazy. Chat and similarity features
+        # trigger it only when a user actually needs vector retrieval.
+        ms.index_status = "pending"
+        ms.qdrant_collection = embeddings.manuscript_collection(ms.user_id, ms.id)
         db.add(Version(manuscript_id=ms.id, number=1, label="Original upload",
                        readiness=0))
         db.commit()
         from ..services import readiness
         readiness.refresh(db, ms)
 
-        # 4. Semantic indexing, batched, in the background of the background.
-        _set_step(db, ms, "indexing", "running")
-        try:
-            chunks = pdf_parse.chunk_pages(pages, sections)
-            if chunks:
-                embeddings.upsert_chunks(ms.qdrant_collection, chunks, batch_size=48)
-            ms.index_status = "ready"
-            _set_step(db, ms, "indexing", "done")
-        except Exception as e:
-            ms.index_status = "failed"
-            _set_step(db, ms, "indexing", f"failed: {str(e)[:120]}")
-        db.commit()
+        # 4. Deferred until a semantic use case is opened.
+        _set_step(db, ms, "indexing", "on_demand")
     except Exception as e:
         db.rollback()
         ms = db.get(Manuscript, ms_id)
@@ -150,16 +142,24 @@ def import_paper(body: ImportBody, background: BackgroundTasks, db=Depends(get_d
 
     if body.kind == "library":
         row = db.get(SavedPaper, body.id)
-        if not row or row.tenant_id != settings.tenant_id:
+        if (not row or row.tenant_id != settings.tenant_id
+                or row.user_id != user_id):
             raise HTTPException(404, "paper not found")
         corpus_id, title, origin_from = row.corpus_id, row.title, row.source_scope
+        if row.source_scope == "university":
+            university_row = db.get(UniversityPaper, row.corpus_id)
+            if not university_row or university_row.tenant_id != settings.tenant_id:
+                raise HTTPException(404, "university paper not found")
+            corpus_id = university_row.s2_id
     elif body.kind == "university":
         row = db.get(UniversityPaper, body.id)
         if not row or row.tenant_id != settings.tenant_id:
             raise HTTPException(404, "paper not found")
         corpus_id, title, origin_from = row.s2_id, row.title, "university"
+    elif body.kind == "public":
+        corpus_id, title, origin_from = body.id, "Public paper", "public"
     else:
-        raise HTTPException(400, "kind must be library|university")
+        raise HTTPException(400, "kind must be library|university|public")
 
     # Already imported? Reopen the existing focus document, but only if it's
     # this user's own copy — never hand back another user's manuscript id.
@@ -174,6 +174,7 @@ def import_paper(body: ImportBody, background: BackgroundTasks, db=Depends(get_d
     if corpus_id:
         try:
             details = s2.paper_details(corpus_id) or {}
+            title = details.get("title") or title
             if details.get("open_access_pdf_url"):
                 candidates.append(details["open_access_pdf_url"])
             if details.get("arxiv_id"):  # most reliable host

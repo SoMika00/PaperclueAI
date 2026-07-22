@@ -121,7 +121,8 @@ def list_university(q: str | None = None, db=Depends(get_db),
     found = {r.id: r for r in lexical}
     try:
         from ..services import embeddings
-        hits = embeddings.search(f"uni_{settings.tenant_id}", q, limit=10)
+        hits = embeddings.search(embeddings.tenant_collection("uni"), q, limit=10,
+                                 tenant_id=settings.tenant_id)
         for h in hits:
             pid = h.get("paper_id")
             if pid and pid not in found:

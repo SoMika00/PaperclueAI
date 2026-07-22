@@ -10,7 +10,7 @@ import {
   Play,
   XCircle,
 } from "lucide-react";
-import { BASE, api, pollTask } from "@/lib/api";
+import { api, downloadFile, pollTask } from "@/lib/api";
 import { useLocale } from "@/lib/i18n";
 import { useWorkspace } from "@/lib/ws";
 import { Spinner, TaskProgress } from "../ui";
@@ -207,12 +207,11 @@ export default function FormatPanel() {
             </div>
           )}
 
-          <a
-            href={`${BASE}/format/${ms.id}/export?journal=${result.journal_id}`}
-            className="btn btn-primary self-start"
-          >
+          <button
+            onClick={() => downloadFile(`/format/${ms.id}/export?journal=${result.journal_id}`)}
+            className="btn btn-primary self-start">
             <Download className="h-3.5 w-3.5" /> {t("export_docx_button")} ({result.journal})
-          </a>
+          </button>
         </div>
       )}
     </div>

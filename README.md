@@ -30,9 +30,9 @@ public corpus.
 ## Features
 
 - **Upload & visible ingestion** — parse structure → extract references →
-  detect metadata → *the workspace opens here* → semantic indexing continues
-  in the background (batched). Until the index is ready, chat/explain fall
-  back to lexical search, so a fresh upload is usable in seconds.
+  detect metadata → *the workspace opens here*. Semantic indexing is lazy and
+  starts only when chat or another vector-retrieval feature needs it. Until the
+  index is ready, chat/explain fall back to lexical search.
 - **Paper Insight** — structured brief (problem, contribution, method,
   results, limitations), every claim anchored to an exact quote: click →
   the PDF scrolls and highlights the passage. Chat with your paper (SSE
@@ -78,7 +78,7 @@ public corpus.
 | Backend | FastAPI (Python 3.11, async) | I/O-bound pipelines, SSE |
 | LLM | Anthropic Claude (Sonnet) | brief/review/synthesis/cluster labels |
 | Public grounding | Semantic Scholar Graph + Recommendations API | real papers, citation graph |
-| Embeddings | FastEmbed (local, `BAAI/bge-small-en-v1.5`, 384d) | free, no external dependency |
+| Embeddings | OpenAI `text-embedding-3-small` (384d) + FastEmbed fallback | lazy semantic indexing, versioned private namespaces |
 | Vector DB | Qdrant | one collection per manuscript / tenant |
 | Metadata | PostgreSQL 16 | manuscripts, refs, issues, versions, maps |
 | Jobs | FastAPI BackgroundTasks + in-process task registry | demo scale; poll `/tasks/{id}` |

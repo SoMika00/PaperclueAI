@@ -28,6 +28,23 @@ export async function upload(file: File) {
   return res.json();
 }
 
+export async function downloadFile(path: string, fallbackName = "paperclue-export.docx") {
+  const auth = await authHeaders();
+  const res = await fetch(`${BASE}${path}`, { headers: auth });
+  if (!res.ok) throw new Error(`${res.status}: ${await res.text()}`);
+  const blob = await res.blob();
+  const disposition = res.headers.get("content-disposition") || "";
+  const match = disposition.match(/filename="?([^";]+)"?/i);
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = match?.[1] || fallbackName;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
 export async function pollTask<T = any>(
   taskId: string,
   onUpdate?: (t: Task<T>) => void,

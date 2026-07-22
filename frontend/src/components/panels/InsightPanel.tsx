@@ -3,6 +3,7 @@
    + grounded chat. One idea per block, each with a location, a proof and an
    action. */
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   FileText,
@@ -73,11 +74,13 @@ function Block({
 
 export default function InsightPanel() {
   const { t } = useLocale();
+  const searchParams = useSearchParams();
+  const requestedView = searchParams.get("view");
   const { ms, requestHighlight, refreshEvidence, refreshMs } = useWorkspace();
   const [brief, setBrief] = useState<InsightBrief | null>((ms.insight as any) || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<Tab>("Overview");
+  const [tab, setTab] = useState<Tab>(requestedView === "gaps" ? "Limitations" : "Overview");
 
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [question, setQuestion] = useState("");
@@ -105,6 +108,14 @@ export default function InsightPanel() {
     if (!brief && !loading) build();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (requestedView === "gaps") setTab("Limitations");
+    else if (requestedView === "summary" || requestedView === "concepts") setTab("Overview");
+    if (brief && requestedView) {
+      window.setTimeout(() => document.getElementById(`insight-${requestedView}`)?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    }
+  }, [brief, requestedView]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -196,10 +207,12 @@ export default function InsightPanel() {
 
         {brief && tab === "Overview" && (
           <div>
-            <Block label={t("main_contribution")} item={brief.contribution} />
-            <Block label={t("problem_addressed")} item={brief.problem} />
+            <div id="insight-summary">
+              <Block label={t("main_contribution")} item={brief.contribution} />
+              <Block label={t("problem_addressed")} item={brief.problem} />
+            </div>
             {(brief.keywords || []).length > 0 && (
-              <div className="py-3 border-b border-line/70">
+              <div id="insight-concepts" className="py-3 border-b border-line/70">
                 <div className="text-[10px] font-bold uppercase tracking-wider text-inkmut">
                   {t("key_concepts")}
                 </div>
@@ -216,7 +229,7 @@ export default function InsightPanel() {
               </div>
             )}
             {(brief.gap_hints || []).length > 0 && (
-              <div className="py-3">
+              <div id="insight-gaps" className="py-3">
                 <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-uni">
                   <Lightbulb className="h-3.5 w-3.5" /> {t("research_gaps_nonblocking")}
                 </div>
@@ -251,7 +264,7 @@ export default function InsightPanel() {
         )}
 
         {brief && tab === "Limitations" && (
-          <div>
+          <div id="insight-gaps">
             {(brief.limitations || []).map((l, i) => (
               <Block key={i} label={`${t("limitation_label")} ${i + 1}`} item={l} />
             ))}

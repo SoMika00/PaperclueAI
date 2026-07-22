@@ -12,6 +12,7 @@ export interface Manuscript {
   readiness: number;
   readiness_detail: Record<string, number>;
   source_scope: SourceScope;
+  origin?: { kind?: string; working_copy_of?: string; source_title?: string } | null;
   created_at: string;
   updated_at: string;
   has_insight: boolean;
@@ -154,6 +155,7 @@ export interface MapNode {
   cluster?: string | null;
   why?: string | null;
   meta: any;
+  position?: { x: number; y: number };
 }
 
 export interface MapEdge {
