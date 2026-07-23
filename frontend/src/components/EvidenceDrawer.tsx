@@ -13,51 +13,53 @@ import {
   X,
 } from "lucide-react";
 import type { EvidenceItem } from "@/lib/types";
+import { useLocale } from "@/lib/i18n";
 import { useWorkspace } from "@/lib/ws";
 import { ScopeBadge } from "./ui";
 
-const KIND_LABEL: Record<string, string> = {
-  insight: "Insights",
-  review: "Review issues",
-  citation: "Citation checks",
-  browse: "Literature claims",
-  format: "Journal compliance",
+const KIND_LABEL_KEY: Record<string, string> = {
+  insight: "ev_kind_insight",
+  review: "ev_kind_review",
+  citation: "ev_kind_citation",
+  browse: "ev_kind_browse",
+  format: "ev_kind_format",
 };
 
 /* Graded support statuses (never a binary "true"). */
-function supportOf(e: EvidenceItem): { label: string; icon: React.ReactNode; cls: string } {
+function supportOf(e: EvidenceItem): { labelKey: string; icon: React.ReactNode; cls: string } {
   if (e.status === "conflict")
     return {
-      label: "Conflict",
+      labelKey: "ev_support_conflict",
       icon: <AlertTriangle className="h-3.5 w-3.5" />,
       cls: "text-danger",
     };
   if (e.status === "unverified")
     return {
-      label: "Unresolved",
+      labelKey: "ev_support_unresolved",
       icon: <HelpCircle className="h-3.5 w-3.5" />,
       cls: "text-aigray",
     };
   if (e.confidence >= 0.85)
     return {
-      label: "Direct support",
+      labelKey: "ev_support_direct",
       icon: <CheckCircle2 className="h-3.5 w-3.5" />,
       cls: "text-manuscript",
     };
   if (e.confidence >= 0.7)
     return {
-      label: "Partial support",
+      labelKey: "ev_support_partial",
       icon: <CircleDot className="h-3.5 w-3.5" />,
       cls: "text-brand-deep",
     };
   return {
-    label: "Contextual support",
+    labelKey: "ev_support_contextual",
     icon: <CircleDot className="h-3.5 w-3.5" />,
     cls: "text-inkmut",
   };
 }
 
 export default function EvidenceDrawer() {
+  const { t } = useLocale();
   const { evidence, requestHighlight, setDrawerOpen } = useWorkspace();
   const [filter, setFilter] = useState<string>("all");
   const [width, setWidth] = useState(360);
@@ -105,7 +107,7 @@ export default function EvidenceDrawer() {
         <div className="px-4 pt-3.5 pb-2 border-b border-line">
           <div className="flex items-center gap-2">
             <BookMarked className="h-4 w-4 text-brand" />
-            <span className="font-serif font-semibold">Evidence Ledger</span>
+            <span className="font-serif font-semibold">{t("evidence_ledger")}</span>
             <span className="text-[11px] text-inkmut">{evidence.length}</span>
             <button
               onClick={() => setDrawerOpen(false)}
@@ -125,7 +127,7 @@ export default function EvidenceDrawer() {
                     : "border-line text-inkmut hover:bg-surface2"
                 }`}
               >
-                {k === "all" ? "All" : KIND_LABEL[k] || k}
+                {k === "all" ? t("scope_all") : KIND_LABEL_KEY[k] ? t(KIND_LABEL_KEY[k] as any) : k}
               </button>
             ))}
           </div>
@@ -134,7 +136,7 @@ export default function EvidenceDrawer() {
         <div className="flex-1 overflow-y-auto panel-scroll px-3 py-2 flex flex-col divide-y divide-line/60">
           {items.length === 0 && (
             <div className="text-center text-xs text-inkmut py-10 px-4">
-              No evidence yet — run Insight, a Review or a literature search.
+              {t("ev_empty")}
             </div>
           )}
           {items.map((e) => {
@@ -150,10 +152,10 @@ export default function EvidenceDrawer() {
                 <div className="flex items-center gap-1.5">
                   <span className={support.cls}>{support.icon}</span>
                   <span className={`text-[10px] font-semibold ${support.cls}`}>
-                    {support.label}
+                    {t(support.labelKey as any)}
                   </span>
                   <span className="text-[10px] text-inkmut">
-                    · {KIND_LABEL[e.kind] || e.kind}
+                    · {KIND_LABEL_KEY[e.kind] ? t(KIND_LABEL_KEY[e.kind] as any) : e.kind}
                   </span>
                   <span className="ml-auto">
                     {isSpan ? (
@@ -171,12 +173,12 @@ export default function EvidenceDrawer() {
                     <>
                       {ref.page ? `p.${ref.page}` : ""}
                       {ref.section ? ` · ${ref.section}` : ""}
-                      {ref.quote ? " → highlight in PDF" : ""}
+                      {ref.quote ? ` ${t("highlight_arrow_pdf")}` : ""}
                     </>
                   ) : (
                     <>
                       <ExternalLink className="h-3 w-3" />
-                      {(ref.title || "").slice(0, 60) || "Open source paper"}
+                      {(ref.title || "").slice(0, 60) || t("ev_open_source_paper")}
                     </>
                   )}
                 </div>

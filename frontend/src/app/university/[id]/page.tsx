@@ -57,7 +57,7 @@ export default function UniversityPaperPage() {
       setImportError(
         e.message?.includes("open-access")
           ? t("no_oa_fulltext")
-          : e.message?.slice(0, 140) || "Import failed"
+          : e.message?.slice(0, 140) || t("import_failed")
       );
       setImporting(null);
     }
@@ -141,7 +141,7 @@ export default function UniversityPaperPage() {
                 {importing === "overview" ? t("fetching_fulltext") : t("open_in_focus")}
               </button>
               <button onClick={() => openInFocus("chat")} disabled={!!importing} className="btn btn-outline">
-                <MessageSquare className="h-4 w-4" /> Chat with paper
+                <MessageSquare className="h-4 w-4" /> {t("paper_chat_with")}
               </button>
               <button onClick={save} disabled={saved} className="btn btn-outline">
                 {saved ? (

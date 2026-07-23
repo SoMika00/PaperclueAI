@@ -21,13 +21,13 @@ import HeroMap from "@/components/HeroMap";
 import { Spinner } from "@/components/ui";
 import { useLocale } from "@/lib/i18n";
 
-function timeAgo(iso: string | null): string {
+function timeAgo(iso: string | null, t: (k: any) => string): string {
   if (!iso) return "";
   const s = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (s < 90) return "just now";
-  if (s < 3600) return `${Math.round(s / 60)} min ago`;
-  if (s < 86400) return `${Math.round(s / 3600)} h ago`;
-  return `${Math.round(s / 86400)} d ago`;
+  if (s < 90) return t("time_just_now");
+  if (s < 3600) return `${Math.round(s / 60)} ${t("time_min_ago")}`;
+  if (s < 86400) return `${Math.round(s / 3600)} ${t("time_h_ago")}`;
+  return `${Math.round(s / 86400)} ${t("time_d_ago")}`;
 }
 
 export default function HomePage() {
@@ -65,17 +65,17 @@ export default function HomePage() {
     ...versions.slice(0, 3).map((v) => ({
       icon: <ClipboardCheck className="h-3.5 w-3.5 text-manuscript" />,
       text: v.label,
-      when: timeAgo(v.created_at),
+      when: timeAgo(v.created_at, t),
     })),
     ...searches.slice(0, 2).map((s) => ({
       icon: <Search className="h-3.5 w-3.5 text-brand" />,
-      text: `Searched “${s.query.slice(0, 60)}” (${s.n_results} results)`,
-      when: timeAgo(s.created_at),
+      text: `${t("home_searched")} “${s.query.slice(0, 60)}” (${s.n_results} ${t("results_label")})`,
+      when: timeAgo(s.created_at, t),
     })),
     ...maps.slice(0, 2).map((m) => ({
       icon: <Network className="h-3.5 w-3.5 text-pub" />,
-      text: `Map created: ${m.title.slice(0, 60)}`,
-      when: timeAgo(m.created_at),
+      text: `${t("home_map_created")} ${m.title.slice(0, 60)}`,
+      when: timeAgo(m.created_at, t),
     })),
   ].slice(0, 6);
 
@@ -122,7 +122,7 @@ export default function HomePage() {
           </Link>
         </div>
 
-        {error && <div className="card p-4 text-sm text-danger">API unreachable — {error}</div>}
+        {error && <div className="card p-4 text-sm text-danger">{t("home_api_unreachable")} {error}</div>}
         {mss === null && !error && (
           <div className="flex items-center gap-2 text-inkmut text-sm">
             <Spinner /> {t("loading")}
@@ -140,8 +140,8 @@ export default function HomePage() {
                     {main.title}
                   </div>
                   <div className="text-xs text-inkmut mt-0.5">
-                    {main.field_of_study || "Manuscript"} · {main.n_pages} pages ·
-                    last activity {timeAgo(main.updated_at)}
+                    {main.field_of_study || t("manuscript_label")} · {main.n_pages} {t("overview_pages")} ·
+                    {" "}{t("home_last_activity")} {timeAgo(main.updated_at, t)}
                   </div>
                 </div>
                 <span className="badge badge-manuscript shrink-0">{t("badge_private")}</span>
@@ -207,8 +207,8 @@ export default function HomePage() {
                     >
                       <span className="line-clamp-2 block">{m.title}</span>
                       <span className="text-[11px] text-inkmut">
-                        {m.status === "ready" ? `readiness ${m.readiness}` : m.status}
-                        {" · "}{timeAgo(m.updated_at)}
+                        {m.status === "ready" ? `${t("readiness_badge")} ${m.readiness}` : m.status}
+                        {" · "}{timeAgo(m.updated_at, t)}
                       </span>
                     </Link>
                     <button
@@ -217,7 +217,7 @@ export default function HomePage() {
                         setMss((prev) => (prev || []).filter((x) => x.id !== m.id));
                       }}
                       className="btn btn-ghost p-1 mt-2 opacity-0 group-hover:opacity-100 hover:text-danger"
-                      title="Delete this manuscript (PDF, index and history)"
+                      title={t("home_delete_ms")}
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -242,7 +242,7 @@ export default function HomePage() {
                   >
                     <span className="line-clamp-2">{s.query}</span>
                     <span className="text-[11px] text-inkmut">
-                      {s.n_results} results · {timeAgo(s.created_at)}
+                      {s.n_results} {t("results_label")} · {timeAgo(s.created_at, t)}
                     </span>
                   </Link>
                 ))}
@@ -265,7 +265,7 @@ export default function HomePage() {
                   >
                     <span className="line-clamp-2">{m.title}</span>
                     <span className="text-[11px] text-inkmut">
-                      {m.seed_type} · {m.n_nodes ?? "…"} nodes · {timeAgo(m.created_at)}
+                      {m.seed_type} · {m.n_nodes ?? "…"} {t("nodes_label")} · {timeAgo(m.created_at, t)}
                     </span>
                   </Link>
                 ))}

@@ -2,14 +2,15 @@
 /* Small shared primitives: provenance badges (constant colors everywhere),
    readiness gauge, spinners. */
 import type { SourceScope } from "@/lib/types";
+import { useLocale } from "@/lib/i18n";
 
 export function ScopeBadge({ scope }: { scope: SourceScope | "ai" }) {
   const map: Record<string, { cls: string; label: string; dot: string }> = {
-    university: { cls: "badge-university", label: "University", dot: "#D68A19" },
-    public: { cls: "badge-public", label: "Public", dot: "#3155C6" },
-    manuscript: { cls: "badge-manuscript", label: "Manuscript", dot: "#15956A" },
-    derived: { cls: "badge-ai", label: "AI-derived", dot: "#64748B" },
-    ai: { cls: "badge-ai", label: "AI", dot: "#64748B" },
+    university: { cls: "badge-university", label: "University", dot: "#E0951A" },
+    public: { cls: "badge-public", label: "Public", dot: "#3D7DFF" },
+    manuscript: { cls: "badge-manuscript", label: "Manuscript", dot: "#0F9B8E" },
+    derived: { cls: "badge-ai", label: "AI-derived", dot: "#8A8A94" },
+    ai: { cls: "badge-ai", label: "AI", dot: "#8A8A94" },
   };
   const m = map[scope] || map.ai;
   return (
@@ -34,7 +35,7 @@ export function ReadinessGauge({
 }) {
   const r = (size - 8) / 2;
   const c = 2 * Math.PI * r;
-  const color = value >= 75 ? "#15956A" : value >= 45 ? "#D68A19" : "#D64545";
+  const color = value >= 75 ? "#0F9B8E" : value >= 45 ? "#E0951A" : "#E5484D";
   return (
     <div className="relative flex items-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
@@ -79,11 +80,12 @@ export function Spinner({ className = "h-4 w-4" }: { className?: string }) {
 }
 
 export function TaskProgress({ step, progress }: { step: string; progress: number }) {
+  const { t } = useLocale();
   return (
     <div className="card p-4 flex flex-col gap-2">
       <div className="flex items-center gap-2 text-sm text-inkmut">
         <Spinner className="h-4 w-4 text-brand-deep" />
-        <span>{step || "Working…"}</span>
+        <span>{step || t("ws_working")}</span>
       </div>
       <div className="h-1.5 w-full rounded-full bg-ink/5 overflow-hidden">
         <div

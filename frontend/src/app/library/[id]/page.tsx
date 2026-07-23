@@ -15,6 +15,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { api } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 import GlobalShell from "@/components/GlobalShell";
 import PaperQuickActions, { FocusDestination } from "@/components/PaperQuickActions";
 import { ScopeBadge, Spinner } from "@/components/ui";
@@ -36,6 +37,7 @@ interface SavedDetail {
 }
 
 export default function SavedPaperPage() {
+  const { t } = useLocale();
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const [paper, setPaper] = useState<SavedDetail | null>(null);
@@ -57,8 +59,8 @@ export default function SavedPaperPage() {
     } catch (e: any) {
       setImportError(
         e.message?.includes("open-access")
-          ? "No open-access full text available — Focus needs the PDF."
-          : e.message?.slice(0, 140) || "Import failed"
+          ? t("no_oa_fulltext")
+          : e.message?.slice(0, 140) || t("import_failed")
       );
       setImporting(null);
     }
@@ -101,7 +103,7 @@ export default function SavedPaperPage() {
           href="/library"
           className="flex items-center gap-1 text-sm text-inkmut hover:text-ink mb-5"
         >
-          <ArrowLeft className="h-4 w-4" /> Library
+          <ArrowLeft className="h-4 w-4" /> {t("library_title")}
         </Link>
 
         {error && <div className="card p-4 text-sm text-danger">{error}</div>}
@@ -118,7 +120,7 @@ export default function SavedPaperPage() {
               {paper.citation_count != null && (
                 <span className="inline-flex items-center gap-1 text-xs text-inkmut">
                   <Quote className="h-3 w-3" /> {paper.citation_count.toLocaleString()}{" "}
-                  citations
+                  {t("lib_citations")}
                 </span>
               )}
             </div>
@@ -132,10 +134,10 @@ export default function SavedPaperPage() {
             <div className="flex flex-wrap gap-2 mt-5">
               <button onClick={() => openInFocus()} disabled={!!importing} className="btn btn-primary">
                 {importing === "overview" ? <Spinner className="h-4 w-4" /> : <FileText className="h-4 w-4" />}
-                {importing === "overview" ? "Fetching full text…" : "Open in Focus"}
+                {importing === "overview" ? t("fetching_fulltext") : t("open_in_focus")}
               </button>
               <button onClick={() => openInFocus("chat")} disabled={!!importing} className="btn btn-outline">
-                <MessageSquare className="h-4 w-4" /> Chat with paper
+                <MessageSquare className="h-4 w-4" /> {t("paper_chat_with")}
               </button>
               {paper.url && (
                 <a
@@ -144,7 +146,7 @@ export default function SavedPaperPage() {
                   rel="noopener noreferrer"
                   className="btn btn-outline"
                 >
-                  <ExternalLink className="h-4 w-4" /> Open on Semantic Scholar
+                  <ExternalLink className="h-4 w-4" /> {t("lib_open_semantic_scholar")}
                 </a>
               )}
               {paper.open_access_pdf_url && (
@@ -154,21 +156,21 @@ export default function SavedPaperPage() {
                   rel="noopener noreferrer"
                   className="btn btn-outline"
                 >
-                  Open-access PDF
+                  {t("lib_open_access_pdf")}
                 </a>
               )}
               <button onClick={mapIt} disabled={mapping} className="btn btn-outline">
                 {mapping ? <Spinner className="h-4 w-4" /> : <Network className="h-4 w-4" />}
-                Map the literature around it
+                {t("map_literature_around")}
               </button>
               <Link
                 href={`/discover?q=${encodeURIComponent(paper.title.slice(0, 180))}`}
                 className="btn btn-outline"
               >
-                <FileSearch className="h-4 w-4" /> Find related work
+                <FileSearch className="h-4 w-4" /> {t("find_related_work")}
               </Link>
               <button onClick={remove} className="btn btn-ghost hover:text-danger">
-                <Trash2 className="h-4 w-4" /> Remove
+                <Trash2 className="h-4 w-4" /> {t("lib_remove")}
               </button>
             </div>
 
@@ -187,16 +189,16 @@ export default function SavedPaperPage() {
             {paper.tldr && (
               <section className="mt-7 card p-4 bg-brand-soft/40 border-brand/30">
                 <h2 className="text-[11px] font-bold uppercase tracking-wider text-brand-deep mb-1">
-                  TL;DR (Semantic Scholar)
+                  {t("lib_tldr")}
                 </h2>
                 <p className="text-sm leading-relaxed text-ink">{paper.tldr}</p>
               </section>
             )}
 
             <section className="mt-6">
-              <h2 className="section-title mb-2">Abstract</h2>
+              <h2 className="section-title mb-2">{t("abstract_label")}</h2>
               <p className="text-[15px] leading-relaxed text-ink whitespace-pre-line">
-                {paper.abstract || "No abstract stored for this paper."}
+                {paper.abstract || t("lib_no_abstract_stored")}
               </p>
             </section>
           </article>

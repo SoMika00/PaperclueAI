@@ -93,7 +93,7 @@ function Field({
   );
 }
 
-function parseApiError(e: any): string {
+function parseApiError(e: any, fallback = "Something went wrong"): string {
   const raw = (e.message || "").replace(/^\d+:\s*/, "");
   let message = raw;
   try {
@@ -101,7 +101,7 @@ function parseApiError(e: any): string {
   } catch {
     /* not JSON, use raw text */
   }
-  return message.slice(0, 300) || "Something went wrong";
+  return message.slice(0, 300) || fallback;
 }
 
 function statusBadge(status: SavedConnection["status"]) {
@@ -128,8 +128,8 @@ export default function ConnectionsSettingsPage() {
     setSavedError(null);
     api<SavedConnection[]>("/connections")
       .then(setSaved)
-      .catch((e) => setSavedError(parseApiError(e)));
-  }, []);
+      .catch((e) => setSavedError(parseApiError(e, t("conn_something_wrong"))));
+  }, [t]);
 
   useEffect(() => {
     loadSaved();
@@ -158,14 +158,14 @@ export default function ConnectionsSettingsPage() {
       );
       setResult({
         ok: true,
-        message: `Connected to ${res.database_type}${res.database_host ? ` @ ${res.database_host}` : ""}.`,
+        message: `${t("conn_connected_to")} ${res.database_type}${res.database_host ? ` @ ${res.database_host}` : ""}`,
       });
     } catch (e: any) {
-      setResult({ ok: false, message: parseApiError(e) });
+      setResult({ ok: false, message: parseApiError(e, t("conn_something_wrong")) });
     } finally {
       setTesting(false);
     }
-  }, [form, useUrl]);
+  }, [form, useUrl, t]);
 
   const saveConnection = useCallback(async () => {
     setSaving(true);
@@ -179,11 +179,11 @@ export default function ConnectionsSettingsPage() {
       setUseUrl(false);
       loadSaved();
     } catch (e: any) {
-      setResult({ ok: false, message: parseApiError(e) });
+      setResult({ ok: false, message: parseApiError(e, t("conn_something_wrong")) });
     } finally {
       setSaving(false);
     }
-  }, [form, useUrl, loadSaved]);
+  }, [form, useUrl, loadSaved, t]);
 
   const retestConnection = useCallback(
     async (id: string) => {
@@ -208,7 +208,7 @@ export default function ConnectionsSettingsPage() {
         await api(`/connections/${id}`, { method: "DELETE" });
         loadSaved();
       } catch (e: any) {
-        setSavedError(parseApiError(e));
+        setSavedError(parseApiError(e, t("conn_something_wrong")));
       } finally {
         setBusyId(null);
       }
@@ -233,11 +233,10 @@ export default function ConnectionsSettingsPage() {
         <div>
           <div className="flex items-center gap-2">
             <Database className="h-4 w-4 text-brand-deep" />
-            <h1 className="font-serif font-semibold text-lg">Data Source Connection</h1>
+            <h1 className="font-serif font-semibold text-lg">{t("conn_title")}</h1>
           </div>
           <p className="text-[11px] text-inkmut mt-0.5">
-            Test and save connections to external databases. Saved connections are encrypted at rest and
-            listed below.
+            {t("conn_intro")}
           </p>
         </div>
 
@@ -246,7 +245,7 @@ export default function ConnectionsSettingsPage() {
           <div className="flex items-center justify-between">
             <span className={labelCls}>{t("connections_saved_title")}</span>
             <button onClick={loadSaved} className="btn btn-ghost text-[11px] px-2 py-1">
-              Refresh
+              {t("conn_refresh")}
             </button>
           </div>
           {savedError && (
@@ -256,7 +255,7 @@ export default function ConnectionsSettingsPage() {
           )}
           {saved === null && !savedError && (
             <div className="flex items-center gap-2 text-xs text-inkmut mt-2">
-              <Spinner className="h-3.5 w-3.5" /> Loading…
+              <Spinner className="h-3.5 w-3.5" /> {t("loading")}
             </div>
           )}
           {saved && saved.length === 0 && (
@@ -301,7 +300,7 @@ export default function ConnectionsSettingsPage() {
                       <button
                         onClick={() => deleteConnection(c.id)}
                         disabled={busyId === c.id}
-                        title="Delete"
+                        title={t("action_delete")}
                         className="btn btn-ghost p-1.5 text-danger"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
@@ -317,10 +316,10 @@ export default function ConnectionsSettingsPage() {
         {/* Form */}
         <div className="card p-4 flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <span className={labelCls}>New connection</span>
+            <span className={labelCls}>{t("conn_new_connection")}</span>
             <label className="flex items-center gap-1.5 text-[11px] text-inkmut">
               <input type="checkbox" checked={useUrl} onChange={(e) => setUseUrl(e.target.checked)} />
-              Use a connection URL instead
+              {t("conn_use_url")}
             </label>
           </div>
 
@@ -333,7 +332,7 @@ export default function ConnectionsSettingsPage() {
             />
           </Field>
 
-          <Field label="Database type">
+          <Field label={t("conn_db_type")}>
             <select
               value={form.database_type}
               onChange={(e) => onTypeChange(e.target.value as DbType)}
@@ -368,7 +367,7 @@ export default function ConnectionsSettingsPage() {
             <>
               <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-2">
-                  <Field label="Host">
+                  <Field label={t("conn_host")}>
                     <input
                       value={form.database_host}
                       onChange={(e) => set("database_host", e.target.value)}
@@ -377,7 +376,7 @@ export default function ConnectionsSettingsPage() {
                     />
                   </Field>
                 </div>
-                <Field label="Port">
+                <Field label={t("conn_port")}>
                   <input
                     value={form.database_port}
                     onChange={(e) => set("database_port", e.target.value)}
@@ -386,7 +385,7 @@ export default function ConnectionsSettingsPage() {
                   />
                 </Field>
               </div>
-              <Field label="Database name">
+              <Field label={t("conn_db_name")}>
                 <input
                   value={form.database_name}
                   onChange={(e) => set("database_name", e.target.value)}
@@ -394,14 +393,14 @@ export default function ConnectionsSettingsPage() {
                 />
               </Field>
               <div className="grid grid-cols-2 gap-2">
-                <Field label="User">
+                <Field label={t("conn_user")}>
                   <input
                     value={form.database_user}
                     onChange={(e) => set("database_user", e.target.value)}
                     className={inputCls}
                   />
                 </Field>
-                <Field label="Password">
+                <Field label={t("conn_password")}>
                   <input
                     type="password"
                     value={form.database_password}
@@ -412,9 +411,9 @@ export default function ConnectionsSettingsPage() {
               </div>
 
               <details className="text-xs">
-                <summary className="cursor-pointer text-inkmut select-none">SSL / TLS options</summary>
+                <summary className="cursor-pointer text-inkmut select-none">{t("conn_ssl_options")}</summary>
                 <div className="flex flex-col gap-2 mt-2">
-                  <Field label={form.database_type === "mssql" ? "Encrypt" : "SSL mode"}>
+                  <Field label={form.database_type === "mssql" ? t("conn_encrypt") : t("conn_ssl_mode")}>
                     <select
                       value={form.database_ssl_mode}
                       onChange={(e) => set("database_ssl_mode", e.target.value)}
@@ -437,7 +436,7 @@ export default function ConnectionsSettingsPage() {
                       )}
                     </select>
                   </Field>
-                  <Field label="SSL CA path">
+                  <Field label={t("conn_ssl_ca")}>
                     <input
                       value={form.database_ssl_ca}
                       onChange={(e) => set("database_ssl_ca", e.target.value)}
@@ -446,14 +445,14 @@ export default function ConnectionsSettingsPage() {
                     />
                   </Field>
                   <div className="grid grid-cols-2 gap-2">
-                    <Field label="SSL cert path">
+                    <Field label={t("conn_ssl_cert")}>
                       <input
                         value={form.database_ssl_cert}
                         onChange={(e) => set("database_ssl_cert", e.target.value)}
                         className={inputCls}
                       />
                     </Field>
-                    <Field label="SSL key path">
+                    <Field label={t("conn_ssl_key")}>
                       <input
                         value={form.database_ssl_key}
                         onChange={(e) => set("database_ssl_key", e.target.value)}
@@ -470,7 +469,7 @@ export default function ConnectionsSettingsPage() {
                           set("database_trust_server_certificate", e.target.checked ? "true" : "false")
                         }
                       />
-                      Trust server certificate
+                      {t("conn_trust_cert")}
                     </label>
                   )}
                 </div>
@@ -481,7 +480,7 @@ export default function ConnectionsSettingsPage() {
           <div className="flex items-center gap-2 pt-1">
             <button onClick={runTest} disabled={testing} className="btn btn-outline">
               {testing ? <Spinner className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
-              Test connection
+              {t("conn_test")}
             </button>
             <button onClick={saveConnection} disabled={saving || !form.name.trim()} className="btn btn-primary">
               {saving ? <Spinner className="h-3.5 w-3.5" /> : <Save className="h-3.5 w-3.5" />}

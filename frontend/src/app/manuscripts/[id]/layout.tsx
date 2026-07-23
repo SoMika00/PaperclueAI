@@ -18,13 +18,18 @@ import TopBar from "@/components/TopBar";
 import { ReadinessGauge, Spinner } from "@/components/ui";
 import { useLocale } from "@/lib/i18n";
 
+function PdfViewerLoading() {
+  const { t } = useLocale();
+  return (
+    <div className="flex items-center gap-2 p-8 text-inkmut">
+      <Spinner /> {t("loading_pdf_viewer")}
+    </div>
+  );
+}
+
 const PdfViewer = dynamic(() => import("@/components/PdfViewer"), {
   ssr: false,
-  loading: () => (
-    <div className="flex items-center gap-2 p-8 text-inkmut">
-      <Spinner /> Loading PDF viewer…
-    </div>
-  ),
+  loading: () => <PdfViewerLoading />,
 });
 
 /* Sections whose right-hand canvas is the (shared, persistent) PDF. */
@@ -37,13 +42,13 @@ const SCORE_PARTS: { key: string; labelKey: string; max: number; doneKey?: strin
   { key: "review", labelKey: "score_review_findings", max: 40, doneKey: "review_done" },
 ];
 
-function timeAgo(iso: string | null): string {
+function timeAgo(iso: string | null, t: (k: any) => string): string {
   if (!iso) return "";
   const s = (Date.now() - new Date(iso).getTime()) / 1000;
-  if (s < 90) return "just now";
-  if (s < 3600) return `${Math.round(s / 60)} min ago`;
-  if (s < 86400) return `${Math.round(s / 3600)} h ago`;
-  return `${Math.round(s / 86400)} d ago`;
+  if (s < 90) return t("time_just_now");
+  if (s < 3600) return `${Math.round(s / 60)} ${t("time_min_ago")}`;
+  if (s < 86400) return `${Math.round(s / 3600)} ${t("time_h_ago")}`;
+  return `${Math.round(s / 86400)} ${t("time_d_ago")}`;
 }
 
 function ScorePopover({ ms }: { ms: Manuscript }) {
@@ -123,12 +128,12 @@ function Shell({ children }: { children: React.ReactNode }) {
               {ms.title}
             </div>
             <div className="text-[11px] text-inkmut dark:text-dark-inkmut truncate">
-              {(ms.origin as any)?.kind === "revision_copy" ? "Revision Copy · source preserved" : t("private_manuscript")} · {t("version_label")} {versions[0]?.number ?? 1} · {t("saved_label")}{" "}
-              {timeAgo(ms.updated_at)}
+              {(ms.origin as any)?.kind === "revision_copy" ? t("ws_revision_copy") : t("private_manuscript")} · {t("version_label")} {versions[0]?.number ?? 1} · {t("saved_label")}{" "}
+              {timeAgo(ms.updated_at, t)}
               {(ms.origin as any)?.working_copy_of && (
                 <Link href={`/manuscripts/${(ms.origin as any).working_copy_of}/overview`}
                   className="ml-2 text-brand-deep hover:underline">
-                  View source
+                  {t("ws_view_source")}
                 </Link>
               )}
               {ms.index_status === "indexing" && (
@@ -146,7 +151,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-2 shrink-0 relative">
             <button onClick={() => router.push(`/manuscripts/${ms.id}/chat`)} className="btn btn-outline">
-              <MessageSquare className="h-3.5 w-3.5" /> Chat
+              <MessageSquare className="h-3.5 w-3.5" /> {t("chat_label")}
             </button>
             <button
               onClick={() => {
@@ -172,13 +177,13 @@ function Shell({ children }: { children: React.ReactNode }) {
             <button
               onClick={() => setDrawerOpen(!drawerOpen)}
               className={`btn ${drawerOpen ? "btn-primary" : "btn-outline"}`}
-              title="Evidence Ledger"
+              title={t("evidence_ledger")}
             >
               <ScrollText className="h-3.5 w-3.5" /> {t("evidence_label")} {evidence.length}
             </button>
             <button
               onClick={() => setShowScore(!showScore)}
-              title="How this score is built"
+              title={t("ws_score_built")}
               className="rounded-full hover:ring-2 hover:ring-brand/40 transition-shadow"
             >
               <ReadinessGauge value={ms.readiness} delta={readinessDelta} size={40} />
@@ -209,6 +214,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 }
 
 export default function ManuscriptLayout({ children }: { children: React.ReactNode }) {
+  const { t } = useLocale();
   const params = useParams<{ id: string }>();
   const [ms, setMs] = useState<Manuscript | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -237,9 +243,9 @@ export default function ManuscriptLayout({ children }: { children: React.ReactNo
     return (
       <div className="min-h-screen grid place-items-center">
         <div className="card p-6 text-sm text-danger">
-          Manuscript not found —{" "}
+          {t("ws_ms_not_found")}{" "}
           <Link href="/home" className="text-brand underline">
-            back to dashboard
+            {t("ws_back_dashboard")}
           </Link>
         </div>
       </div>
@@ -248,7 +254,7 @@ export default function ManuscriptLayout({ children }: { children: React.ReactNo
     return (
       <div className="min-h-screen grid place-items-center text-inkmut">
         <div className="flex items-center gap-2">
-          <Spinner /> Opening workspace…
+          <Spinner /> {t("ws_opening")}
         </div>
       </div>
     );

@@ -65,7 +65,7 @@ export default function AdminPage() {
   };
 
   const exclude = async (m: Member) => {
-    if (!confirm(`Remove ${m.full_name || m.email} from your institution?`)) return;
+    if (!confirm(`${t("admin_remove_confirm_pre")}${m.full_name || m.email}${t("admin_remove_confirm_post")}`)) return;
     setError(null);
     try {
       await api(`/admin/members/${m.id}/exclude`, { method: "POST" });
@@ -122,21 +122,21 @@ export default function AdminPage() {
                   onChange={(e) => setDraft(m.id, "role", e.target.value)}
                   className="rounded-lg border border-line dark:border-dark-line bg-surface2 dark:bg-dark-surface2 dark:text-dark-ink px-2.5 py-1.5 text-sm"
                 >
-                  <option value="teacher">Teacher</option>
-                  <option value="student">Student</option>
+                  <option value="teacher">{t("role_teacher")}</option>
+                  <option value="student">{t("role_student")}</option>
                 </select>
                 <button
                   onClick={() => save(m)}
                   disabled={savingId === m.id}
                   className="btn btn-primary px-2.5 py-1.5"
-                  title="Save changes"
+                  title={t("admin_save_changes")}
                 >
                   {savingId === m.id ? <Spinner className="h-4 w-4" /> : <Save className="h-4 w-4" />}
                 </button>
                 <button
                   onClick={() => exclude(m)}
                   className="btn btn-outline px-2.5 py-1.5 hover:text-danger"
-                  title="Exclude from institution"
+                  title={t("admin_exclude")}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>

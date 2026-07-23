@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FileText, MessageSquare, Send, ShieldCheck } from "lucide-react";
 import { sseStream } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 import { useWorkspace } from "@/lib/ws";
 import { Spinner } from "./ui";
 
@@ -13,6 +14,7 @@ interface ChatMessage {
 }
 
 export default function DocumentChatPanel() {
+  const { t } = useLocale();
   const { ms, requestHighlight, refreshMs } = useWorkspace();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [question, setQuestion] = useState("");
@@ -57,19 +59,19 @@ export default function DocumentChatPanel() {
       <div className="px-5 py-4 border-b border-line dark:border-dark-line">
         <div className="flex items-center gap-2">
           <MessageSquare className="h-4 w-4 text-brand" />
-          <h1 className="font-serif font-semibold">Chat with this paper</h1>
+          <h1 className="font-serif font-semibold">{t("chat_with_this_paper")}</h1>
         </div>
         <p className="text-[11px] text-inkmut mt-1 flex items-center gap-1.5">
           <ShieldCheck className="h-3 w-3 text-manuscript" />
-          Answers use only this document and link back to source pages.
+          {t("chat_answers_grounded")}
         </p>
       </div>
 
       <div className="flex-1 overflow-y-auto panel-scroll px-5 py-4 flex flex-col gap-3">
         {messages.length === 0 && (
           <div className="rounded-xl border border-line bg-surface2/60 p-4 text-sm text-inkmut">
-            <div className="font-medium text-ink mb-2">Start with a question</div>
-            {["What is the main contribution?", "Explain the methodology", "What limitations do the authors mention?"].map((q) => (
+            <div className="font-medium text-ink mb-2">{t("chat_start_question")}</div>
+            {[t("chat_example_question"), t("chat_example_methodology"), t("chat_example_limitations")].map((q) => (
               <button key={q} onClick={() => setQuestion(q)}
                 className="block text-left text-xs text-brand-deep hover:underline mt-1.5">
                 {q}
@@ -105,7 +107,7 @@ export default function DocumentChatPanel() {
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(); }
             }}
-            placeholder="Ask about this paper…"
+            placeholder={t("chat_ask_placeholder")}
             className="flex-1 resize-none rounded-xl border border-line bg-surface2 px-3 py-2 text-sm outline-none focus:border-brand" />
           <button onClick={ask} disabled={streaming || !question.trim()}
             className="btn btn-primary self-end px-3 py-2">
@@ -113,7 +115,7 @@ export default function DocumentChatPanel() {
           </button>
         </div>
         {ms.index_status !== "ready" && (
-          <p className="text-[10px] text-inkmut mt-1.5">The private semantic index is created on your first question.</p>
+          <p className="text-[10px] text-inkmut mt-1.5">{t("chat_index_note")}</p>
         )}
       </div>
     </div>

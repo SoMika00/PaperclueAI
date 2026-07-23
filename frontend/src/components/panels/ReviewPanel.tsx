@@ -193,7 +193,7 @@ export default function ReviewPanel() {
             {selected.title}
           </h3>
           <div className="text-xs text-inkmut mt-1">
-            {t("location_label")}: {selected.section || "—"} · page {selected.page || "?"}
+            {t("location_label")}: {selected.section || "—"} · {t("review_page")} {selected.page || "?"}
           </div>
         </div>
 
@@ -295,7 +295,7 @@ export default function ReviewPanel() {
     <div className="p-4 flex flex-col gap-3">
       {params.get("copy") === "created" && (
         <div className="rounded-lg border border-manuscript/40 bg-manuscript-soft/60 px-3 py-2 text-xs text-manuscript">
-          Revision Copy created. The source paper is preserved; accepted fixes are applied to this copy.
+          {t("review_copy_created")}
         </div>
       )}
       <div>

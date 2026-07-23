@@ -8,6 +8,7 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import { useRouter } from "next/navigation";
 import { FileSearch, Loader2, Sparkles, X } from "lucide-react";
 import { BASE, api } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 import { supabase } from "@/lib/supabase";
 import { useWorkspace } from "@/lib/ws";
 import { Spinner } from "./ui";
@@ -23,6 +24,7 @@ function escapeHtml(s: string) {
 }
 
 export default function PdfViewer() {
+  const { t } = useLocale();
   const { ms, highlight, refreshEvidence } = useWorkspace();
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -143,9 +145,9 @@ export default function PdfViewer() {
       setExplain({ loading: false, text: res.explanation });
       refreshEvidence();
     } catch (e: any) {
-      setExplain({ loading: false, text: `Explain failed: ${e.message?.slice(0, 140)}` });
+      setExplain({ loading: false, text: `${t("pdf_explain_failed")} ${e.message?.slice(0, 140)}` });
     }
-  }, [selMenu, ms.id, refreshEvidence]);
+  }, [selMenu, ms.id, refreshEvidence, t]);
 
   return (
     <div
@@ -154,17 +156,17 @@ export default function PdfViewer() {
       onMouseUp={onMouseUp}
     >
       {file === null ? (
-        <div className="flex items-center gap-2 p-8 text-inkmut"><Spinner /> Loading…</div>
+        <div className="flex items-center gap-2 p-8 text-inkmut"><Spinner /> {t("loading")}</div>
       ) : (
       <Document
         file={file}
         onLoadSuccess={({ numPages }) => setNumPages(numPages)}
         loading={
           <div className="flex items-center gap-2 p-8 text-inkmut">
-            <Spinner /> Rendering PDF…
+            <Spinner /> {t("pdf_rendering")}
           </div>
         }
-        error={<div className="p-8 text-sm text-danger">Could not load the PDF.</div>}
+        error={<div className="p-8 text-sm text-danger">{t("pdf_load_error")}</div>}
       >
         <div className="flex flex-col items-center gap-4 py-6">
           {Array.from({ length: numPages }, (_, i) => i + 1).map((n) => (
@@ -197,7 +199,7 @@ export default function PdfViewer() {
             className="flex items-center gap-1.5 bg-brand text-white px-3 py-1.5 text-sm font-medium hover:bg-brand-deep"
             onClick={runExplain}
           >
-            <Sparkles className="h-3.5 w-3.5" /> Explain
+            <Sparkles className="h-3.5 w-3.5" /> {t("pdf_explain")}
           </button>
           <button
             className="flex items-center gap-1.5 bg-paper text-ink px-3 py-1.5 text-sm font-medium hover:bg-surface2"
@@ -209,7 +211,7 @@ export default function PdfViewer() {
               );
             }}
           >
-            <FileSearch className="h-3.5 w-3.5" /> Find sources
+            <FileSearch className="h-3.5 w-3.5" /> {t("pdf_find_sources")}
           </button>
         </div>
       )}
@@ -218,7 +220,7 @@ export default function PdfViewer() {
         <div className="fixed bottom-6 right-6 z-30 w-96 card p-4 border-brand/60">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-1.5 text-sm font-semibold text-brand-deep">
-              <Sparkles className="h-4 w-4" /> Explanation
+              <Sparkles className="h-4 w-4" /> {t("pdf_explanation")}
               <span className="badge badge-ai ml-1">AI</span>
             </div>
             <button onClick={() => setExplain(null)} className="text-inkmut hover:text-ink">
@@ -227,7 +229,7 @@ export default function PdfViewer() {
           </div>
           {explain.loading ? (
             <div className="flex items-center gap-2 text-sm text-inkmut mt-2">
-              <Loader2 className="h-4 w-4 animate-spin" /> Reading the surrounding context…
+              <Loader2 className="h-4 w-4 animate-spin" /> {t("pdf_reading_context")}
             </div>
           ) : (
             <p className="text-sm leading-relaxed mt-2 text-ink/90 max-h-56 overflow-y-auto panel-scroll">

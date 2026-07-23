@@ -3,8 +3,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { FileUp, Loader2 } from "lucide-react";
 import { upload } from "@/lib/api";
+import { useLocale } from "@/lib/i18n";
 
 export default function UploadDropzone({ compact = false }: { compact?: boolean }) {
+  const { t } = useLocale();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [drag, setDrag] = useState(false);
@@ -14,7 +16,7 @@ export default function UploadDropzone({ compact = false }: { compact?: boolean 
   const send = useCallback(
     async (file: File) => {
       if (!file.name.toLowerCase().endsWith(".pdf")) {
-        setError("Only PDF files are supported.");
+        setError(t("upload_only_pdf"));
         return;
       }
       setBusy(true);
@@ -23,11 +25,11 @@ export default function UploadDropzone({ compact = false }: { compact?: boolean 
         const ms = await upload(file);
         router.push(`/manuscripts/${ms.id}/overview`);
       } catch (e: any) {
-        setError(e.message?.slice(0, 160) || "Upload failed");
+        setError(e.message?.slice(0, 160) || t("upload_failed"));
         setBusy(false);
       }
     },
-    [router]
+    [router, t]
   );
 
   return (
@@ -65,12 +67,11 @@ export default function UploadDropzone({ compact = false }: { compact?: boolean 
       )}
       <div>
         <div className="font-serif text-ink text-lg">
-          {busy ? "Uploading manuscript…" : "Drop your manuscript PDF"}
+          {busy ? t("upload_uploading") : t("upload_drop")}
         </div>
         {!compact && (
           <div className="text-sm text-inkmut mt-1">
-            We parse the structure, extract references and index it privately — you
-            watch every step.
+            {t("upload_desc")}
           </div>
         )}
       </div>
