@@ -8,6 +8,7 @@ import {
   FileOutput,
   FileSearch,
   History,
+  MessageSquare,
   Network,
   Sparkles,
 } from "lucide-react";
@@ -36,6 +37,13 @@ export default function OverviewPage() {
   const d: any = ms.readiness_detail || {};
 
   const features = [
+    {
+      seg: "chat",
+      icon: MessageSquare,
+      label: "Chat",
+      status: t("chat_feature_status" as any),
+      done: false,
+    },
     {
       seg: "insight",
       icon: Sparkles,

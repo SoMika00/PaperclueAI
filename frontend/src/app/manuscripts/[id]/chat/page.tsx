@@ -1,21 +1,16 @@
 "use client";
-
-import dynamic from "next/dynamic";
+/* Left panel only — the shared PDF canvas is mounted by the layout and
+   survives navigation between chat/insight/review/journal. */
+import { Suspense } from "react";
 import DocumentChatPanel from "@/components/DocumentChatPanel";
 import { Spinner } from "@/components/ui";
 
-const PdfViewer = dynamic(() => import("@/components/PdfViewer"), {
-  ssr: false,
-  loading: () => <div className="p-8 text-inkmut flex gap-2"><Spinner /> Loading PDF…</div>,
-});
-
 export default function DocumentChatPage() {
   return (
-    <div className="h-full flex">
-      <section className="w-[390px] shrink-0 border-r border-line dark:border-dark-line">
+    <section className="w-[390px] shrink-0 border-r border-line dark:border-dark-line">
+      <Suspense fallback={<Spinner className="h-5 w-5 m-4 text-brand" />}>
         <DocumentChatPanel />
-      </section>
-      <section className="flex-1 min-w-0"><PdfViewer /></section>
-    </div>
+      </Suspense>
+    </section>
   );
 }

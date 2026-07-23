@@ -1,17 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { FileText, MessageSquare, Send, ShieldCheck } from "lucide-react";
 import { sseStream } from "@/lib/api";
 import { useWorkspace } from "@/lib/ws";
 import { Spinner } from "./ui";
-
-const PROMPTS: Record<string, string> = {
-  explain: "Explain this paper in plain language: its problem, approach, results, and limitations. Cite the relevant pages.",
-  figures: "List every figure in the paper and explain what each figure shows. Cite the page for every figure.",
-  tables: "List every table in the paper, summarize its data and explain the main takeaway. Cite the page for every table.",
-};
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -21,9 +14,8 @@ interface ChatMessage {
 
 export default function DocumentChatPanel() {
   const { ms, requestHighlight, refreshMs } = useWorkspace();
-  const searchParams = useSearchParams();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [question, setQuestion] = useState(() => PROMPTS[searchParams.get("prompt") || ""] || "");
+  const [question, setQuestion] = useState("");
   const [streaming, setStreaming] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 

@@ -1,37 +1,28 @@
 "use client";
-/* Paper Insight v2: tabbed brief (Overview / Claims / Methods / Limitations)
-   + grounded chat. One idea per block, each with a location, a proof and an
-   action. */
-import { useCallback, useEffect, useRef, useState } from "react";
+/* Paper Insight v2: tabbed brief (Overview / Claims / Methods / Limitations).
+   One idea per block, each with a location, a proof and an action.
+   Chat lives in its own Focus section, grounded on the same index. */
+import { useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   AlertCircle,
   FileText,
   Lightbulb,
-  MessageSquare,
   ScrollText,
-  Send,
   Sparkles,
 } from "lucide-react";
-import { api, sseStream } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useLocale } from "@/lib/i18n";
 import type { AnchoredClaim, InsightBrief } from "@/lib/types";
 import { useWorkspace } from "@/lib/ws";
 import { Spinner } from "../ui";
 
-interface ChatMsg {
-  role: "user" | "assistant";
-  content: string;
-  sources?: { page: number; section: string; quote: string }[];
-}
-
-const TABS = ["Overview", "Claims", "Methods", "Limitations", "Chat"] as const;
+const TABS = ["Overview", "Claims", "Methods", "Limitations"] as const;
 const TAB_LABEL_KEY: Record<string, string> = {
   Overview: "tab_overview",
   Claims: "tab_claims",
   Methods: "tab_methods",
   Limitations: "tab_limitations",
-  Chat: "tab_chat",
 };
 type Tab = (typeof TABS)[number];
 
@@ -76,16 +67,11 @@ export default function InsightPanel() {
   const { t } = useLocale();
   const searchParams = useSearchParams();
   const requestedView = searchParams.get("view");
-  const { ms, requestHighlight, refreshEvidence, refreshMs } = useWorkspace();
+  const { ms, refreshEvidence, refreshMs } = useWorkspace();
   const [brief, setBrief] = useState<InsightBrief | null>((ms.insight as any) || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>(requestedView === "gaps" ? "Limitations" : "Overview");
-
-  const [messages, setMessages] = useState<ChatMsg[]>([]);
-  const [question, setQuestion] = useState("");
-  const [streaming, setStreaming] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
 
   const build = useCallback(async () => {
     setLoading(true);
@@ -117,50 +103,6 @@ export default function InsightPanel() {
     }
   }, [brief, requestedView]);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const ask = useCallback(async () => {
-    const q = question.trim();
-    if (!q || streaming) return;
-    setQuestion("");
-    setStreaming(true);
-    const history = messages.map((m) => ({ role: m.role, content: m.content }));
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", content: q },
-      { role: "assistant", content: "" },
-    ]);
-    await sseStream(`/insight/${ms.id}/chat`, { question: q, history }, {
-      onSources: (sources) =>
-        setMessages((prev) => {
-          const next = [...prev];
-          next[next.length - 1] = { ...next[next.length - 1], sources };
-          return next;
-        }),
-      onDelta: (text) =>
-        setMessages((prev) => {
-          const next = [...prev];
-          const last = next[next.length - 1];
-          next[next.length - 1] = { ...last, content: last.content + text };
-          return next;
-        }),
-      onError: (e) =>
-        setMessages((prev) => {
-          const next = [...prev];
-          const last = next[next.length - 1];
-          next[next.length - 1] = {
-            ...last,
-            content: last.content || `⚠ ${String(e).slice(0, 160)}`,
-          };
-          return next;
-        }),
-    });
-    setStreaming(false);
-    refreshEvidence();
-  }, [question, streaming, messages, ms.id, refreshEvidence]);
-
   return (
     <div className="flex flex-col h-full">
       <div className="px-4 pt-4 pb-0">
@@ -181,7 +123,6 @@ export default function InsightPanel() {
               }`}
             >
               {t(TAB_LABEL_KEY[tabItem] as any)}
-              {tabItem === "Chat" && <MessageSquare className="h-3 w-3 inline ml-1 -mt-0.5" />}
             </button>
           ))}
         </div>
@@ -285,73 +226,7 @@ export default function InsightPanel() {
           </div>
         )}
 
-        {tab === "Chat" && (
-          <div className="flex flex-col gap-2 pt-3">
-            {messages.length === 0 && (
-              <div className="text-[11px] text-inkmut">
-                {t("chat_grounded_note")}{" "}
-                <button
-                  className="underline"
-                  onClick={() =>
-                    setQuestion(t("chat_example_question"))
-                  }
-                >
-                  “{t("chat_example_question")}”
-                </button>
-              </div>
-            )}
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                className={`rounded-xl px-3 py-2 text-[13px] leading-relaxed ${
-                  m.role === "user"
-                    ? "bg-brand text-white self-end max-w-[92%]"
-                    : "bg-surface2 text-ink self-start w-full"
-                }`}
-              >
-                {m.content || (
-                  <span className="inline-flex items-center gap-1.5 text-inkmut">
-                    <Spinner className="h-3 w-3" /> {t("thinking_label")}
-                  </span>
-                )}
-                {m.sources && m.sources.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {m.sources.map((s, j) => (
-                      <button
-                        key={j}
-                        onClick={() => requestHighlight(s.page, s.quote)}
-                        className="rounded-full bg-manuscript-soft text-manuscript border border-manuscript/40 px-2 py-0.5 text-[10px] font-medium hover:bg-manuscript hover:text-white transition-colors"
-                      >
-                        p.{s.page} {s.section ? `· ${s.section}` : ""}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-            <div ref={chatEndRef} />
-          </div>
-        )}
       </div>
-
-      {tab === "Chat" && (
-        <div className="p-3 border-t border-line flex gap-2">
-          <input
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && ask()}
-            placeholder={t("ask_manuscript_placeholder")}
-            className="flex-1 rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-brand"
-          />
-          <button
-            onClick={ask}
-            disabled={streaming || !question.trim()}
-            className="btn btn-primary"
-          >
-            <Send className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      )}
     </div>
   );
 }

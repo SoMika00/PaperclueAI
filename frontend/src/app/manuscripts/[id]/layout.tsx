@@ -1,9 +1,11 @@
 "use client";
 /* Manuscript Space: the SAME left menu as everywhere (global items constant,
    manuscript features as the Focus submenu) + compact document header.
-   Evidence Ledger stays a drawer. */
+   Evidence Ledger stays a drawer. The PDF canvas is mounted HERE, once, and
+   stays alive while navigating between chat/insight/review/journal. */
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Download, MessageSquare, Play, ScrollText, Share2 } from "lucide-react";
 import { api, downloadFile } from "@/lib/api";
@@ -15,6 +17,18 @@ import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
 import { ReadinessGauge, Spinner } from "@/components/ui";
 import { useLocale } from "@/lib/i18n";
+
+const PdfViewer = dynamic(() => import("@/components/PdfViewer"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center gap-2 p-8 text-inkmut">
+      <Spinner /> Loading PDF viewer…
+    </div>
+  ),
+});
+
+/* Sections whose right-hand canvas is the (shared, persistent) PDF. */
+const PDF_SEGMENTS = ["chat", "insight", "review", "journal"];
 
 const SCORE_PARTS: { key: string; labelKey: string; max: number; doneKey?: string }[] = [
   { key: "base", labelKey: "score_document_processed", max: 15 },
@@ -71,6 +85,9 @@ function Shell({ children }: { children: React.ReactNode }) {
   const { ms, refreshMs, evidence, drawerOpen, setDrawerOpen, readinessDelta } =
     useWorkspace();
   const router = useRouter();
+  const pathname = usePathname();
+  const segment = pathname.split("/").pop() || "";
+  const withPdf = PDF_SEGMENTS.includes(segment);
   const { t } = useLocale();
   const [versions, setVersions] = useState<Version[]>([]);
   const [shared, setShared] = useState(false);
@@ -171,7 +188,18 @@ function Shell({ children }: { children: React.ReactNode }) {
         </header>
 
         <div className="flex-1 min-h-0 overflow-hidden relative">
-          {children}
+          {withPdf ? (
+            <div className="h-full flex">
+              {children}
+              {/* Keyed on the manuscript only: navigating between PDF sections
+                  keeps this exact viewer instance — the PDF never reloads. */}
+              <section className="flex-1 min-w-0">
+                <PdfViewer key={ms.id} />
+              </section>
+            </div>
+          ) : (
+            children
+          )}
           {drawerOpen && <EvidenceDrawer />}
         </div>
       </div>

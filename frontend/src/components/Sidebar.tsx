@@ -31,14 +31,16 @@ const GLOBAL = [
   { href: "/university", key: "nav_university" as const, icon: GraduationCap },
 ];
 
+/* PDF-canvas features (chat/insight/review/journal) sit together: switching
+   between them keeps the same mounted PDF viewer — no reload. */
 const FOCUS = [
   { seg: "overview", label: "Overview", icon: LayoutDashboard },
   { seg: "chat", label: "Chat", icon: MessageSquare },
   { seg: "insight", label: "Paper Insight", icon: Sparkles },
-  { seg: "related-research", label: "Related Research", icon: FileSearch },
-  { seg: "mind-map", label: "Mind Map", icon: Network },
   { seg: "review", label: "Review", icon: ClipboardCheck },
   { seg: "journal", label: "Journal Format", icon: FileOutput },
+  { seg: "related-research", label: "Related Research", icon: FileSearch },
+  { seg: "mind-map", label: "Mind Map", icon: Network },
   { seg: "versions", label: "Versions", icon: History },
 ];
 

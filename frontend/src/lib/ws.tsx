@@ -45,7 +45,7 @@ export function useWorkspace(): WorkspaceState {
 }
 
 // Routes whose canvas is the PDF; highlights can only land there.
-const PDF_SEGMENTS = ["insight", "review", "journal"];
+const PDF_SEGMENTS = ["chat", "insight", "review", "journal"];
 
 export function WorkspaceProvider({
   initial,
