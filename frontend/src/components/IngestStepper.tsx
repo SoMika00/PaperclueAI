@@ -33,7 +33,7 @@ export default function IngestStepper({ ms }: { ms: Manuscript }) {
     <div className="min-h-screen grid place-items-center px-6">
       <div className="card p-8 w-full max-w-lg">
         <div className="flex items-center gap-2.5 mb-1">
-          <img src="/paperclue/paperclue-logo.png" alt="PaperClue" className="h-5 w-auto" />
+          <img src="/paperclue-logo.png" alt="PaperClue" className="h-5 w-auto" />
           <span className="font-serif text-lg font-semibold">Ingesting your manuscript</span>
         </div>
         <p className="text-sm text-inkmut mb-6 truncate">{ms.title}</p>

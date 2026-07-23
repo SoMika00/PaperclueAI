@@ -1,7 +1,7 @@
 import type { Task } from "./types";
 import { supabase } from "./supabase";
 
-export const BASE = "/paperclue/api";
+export const BASE = "/api";
 
 async function authHeaders(): Promise<Record<string, string>> {
   const { data } = await supabase.auth.getSession();

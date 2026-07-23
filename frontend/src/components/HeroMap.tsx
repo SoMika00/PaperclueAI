@@ -8,6 +8,8 @@ import { useTheme } from "@/lib/theme";
 const PUB = "#3155C6";
 const UNI = "#D68A19";
 const MS = "#15956A";
+const CENTER_X = 155;
+const CENTER_Y = 96;
 
 const NODES: { x: number; y: number; c: string; d: number }[] = [
   { x: 62, y: 42, c: PUB, d: 0.6 },
@@ -16,6 +18,10 @@ const NODES: { x: number; y: number; c: string; d: number }[] = [
   { x: 44, y: 138, c: UNI, d: 3.0 },
   { x: 150, y: 24, c: PUB, d: 3.8 },
 ];
+
+function edgeLength(x: number, y: number) {
+  return Math.round(Math.hypot(x - CENTER_X, y - CENTER_Y));
+}
 
 export default function HeroMap() {
   const { t } = useLocale();
@@ -27,17 +33,10 @@ export default function HeroMap() {
   const gapText = isDark ? "#E7EEF9" : undefined;
 
   return (
-    <div className="relative select-none" aria-hidden>
-      <svg viewBox="0 0 310 190" className="w-[300px] h-auto">
+    <div className="relative select-none px-6 py-4" aria-hidden>
+      <svg viewBox="0 0 310 190" className="w-full max-w-[300px] h-auto">
         <style>{`
-          .hm-edge { stroke-dasharray: 90; stroke-dashoffset: 90;
-            animation: hmDraw 9s ease-in-out infinite; }
           .hm-node { opacity: 0; animation: hmPop 9s ease-out infinite; }
-          @keyframes hmDraw {
-            0% { stroke-dashoffset: 90; } 10% { stroke-dashoffset: 0; }
-            88% { stroke-dashoffset: 0; opacity: 1; }
-            96%, 100% { stroke-dashoffset: 0; opacity: 0; }
-          }
           @keyframes hmPop {
             0% { opacity: 0; } 6% { opacity: 1; }
             88% { opacity: 1; } 96%, 100% { opacity: 0; }
@@ -46,18 +45,33 @@ export default function HeroMap() {
           @keyframes hmPulse { 0%,100% { transform: scale(1);} 50% { transform: scale(1.05);} }
         `}</style>
 
-        {NODES.map((n, i) => (
-          <line
-            key={`e${i}`}
-            className="hm-edge"
-            x1={155} y1={96} x2={n.x} y2={n.y}
-            stroke={n.c}
-            strokeWidth={i === 2 || i === 3 ? 2.2 : 1.4}
-            strokeDasharray={i % 2 ? "6 4" : undefined}
-            opacity={0.75}
-            style={{ animationDelay: `${n.d}s` }}
-          />
-        ))}
+        {NODES.map((n, i) => {
+          const len = edgeLength(n.x, n.y);
+          return (
+            <line
+              key={`e${i}`}
+              x1={CENTER_X} y1={CENTER_Y} x2={n.x} y2={n.y}
+              stroke={n.c}
+              strokeWidth={i === 2 || i === 3 ? 2.2 : 1.4}
+              strokeDasharray={len}
+              opacity={0.75}
+              style={{
+                strokeDashoffset: len,
+                animation: `hmDraw${i} 9s ease-in-out infinite`,
+                animationDelay: `${n.d}s`,
+              }}
+            >
+              <style>{`
+                @keyframes hmDraw${i} {
+                  0% { stroke-dashoffset: ${len}; }
+                  10% { stroke-dashoffset: 0; }
+                  88% { stroke-dashoffset: 0; opacity: 0.75; }
+                  96%, 100% { stroke-dashoffset: 0; opacity: 0; }
+                }
+              `}</style>
+            </line>
+          );
+        })}
 
         {NODES.map((n, i) => (
           <g key={`n${i}`} className="hm-node" style={{ animationDelay: `${n.d}s` }}>
@@ -78,18 +92,54 @@ export default function HeroMap() {
         </g>
       </svg>
 
+      {/* near node 2 (UNI, bottom-right) */}
       <div
-        className="absolute -bottom-2 right-0 rounded-lg border border-uni/60 bg-uni-soft px-2.5 py-1.5 shadow-card hm-gap"
+        className="absolute rounded-lg border px-2.5 py-1.5 shadow-card max-w-[150px] w-max"
         style={{
+          left: "68%", top: "78%",
           animation: "hmPop 9s ease-out infinite", animationDelay: "5s", opacity: 0,
-          backgroundColor: gapBg, borderColor: isDark ? "#22406B" : undefined,
+          backgroundColor: isDark ? "#15315A" : "#FBF0DC", borderColor: "rgba(214,138,25,0.6)",
         }}
       >
-        <div className="text-[9px] font-bold text-uni uppercase tracking-wide">
+        <div className="text-[9px] font-bold uppercase tracking-wide" style={{ color: UNI }}>
           {t("heromap_gap_title")}
         </div>
         <div className="text-[9px] leading-snug" style={{ color: gapText }}>
           {t("heromap_gap_desc")}
+        </div>
+      </div>
+
+      {/* near node 1 (PUB, top-right) */}
+      <div
+        className="absolute rounded-lg border px-2.5 py-1.5 shadow-card max-w-[150px] w-max"
+        style={{
+          left: "58%", top: "-8%",
+          animation: "hmPop 9s ease-out infinite", animationDelay: "8s", opacity: 0,
+          backgroundColor: isDark ? "#0F2340" : "#E2E8F8", borderColor: "rgba(49,85,198,0.6)",
+        }}
+      >
+        <div className="text-[9px] font-bold uppercase tracking-wide" style={{ color: PUB }}>
+          {t("heromap_verified_title")}
+        </div>
+        <div className="text-[9px] leading-snug" style={{ color: gapText }}>
+          {t("heromap_verified_desc")}
+        </div>
+      </div>
+
+      {/* near node 3 (UNI, bottom-left) */}
+      <div
+        className="absolute rounded-lg border px-2.5 py-1.5 shadow-card max-w-[150px] w-max"
+        style={{
+          left: "-8%", top: "85%",
+          animation: "hmPop 9s ease-out infinite", animationDelay: "2s", opacity: 0,
+          backgroundColor: isDark ? "#0F2340" : "#DCF2EA", borderColor: "rgba(21,149,106,0.6)",
+        }}
+      >
+        <div className="text-[9px] font-bold uppercase tracking-wide" style={{ color: MS }}>
+          {t("heromap_related_title")}
+        </div>
+        <div className="text-[9px] leading-snug" style={{ color: gapText }}>
+          {t("heromap_related_desc")}
         </div>
       </div>
     </div>

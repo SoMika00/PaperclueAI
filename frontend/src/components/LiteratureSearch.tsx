@@ -266,7 +266,7 @@ export default function LiteratureSearch({
               </div>
               {p.source_scope === "university" ? (
                 <a
-                  href={`/paperclue/university/${p.corpus_id}`}
+                  href={`/university/${p.corpus_id}`}
                   className="block font-medium text-[14px] leading-snug mt-1 hover:text-brand-deep hover:underline"
                 >
                   {p.title}

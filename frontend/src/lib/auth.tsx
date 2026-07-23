@@ -8,6 +8,7 @@ import {
 } from "react";
 import { supabase } from "./supabase";
 import { useLocale } from "./i18n";
+import { usePathname, useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 
 export interface Profile {
@@ -80,13 +81,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function SignInGate({ children }: { children: React.ReactNode }) {
   const { session, ready } = useAuth();
   const { t, locale, toggle: toggleLocale } = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const KNOWN_PREFIXES = [
+    "/home", "/discover", "/library", "/literature", "/mind-maps",
+    "/university", "/admin", "/manuscripts", "/ms", "/settings",
+  ];
+  const isKnownRoute = KNOWN_PREFIXES.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
+  );
+  const isPublicRoute = pathname === "/" || pathname === "/login";
+
+  if (!isPublicRoute && !isKnownRoute && ready) {
+    return <>{children}</>; // let Next.js render its not-found boundary
+  }
+
   if (!ready) return null;
-  if (session) return <>{children}</>;
+  if (session && pathname === "/login") {
+    router.replace("/home");
+    return null;
+  }
+  if (session || (isPublicRoute && pathname !== "/login")) return <>{children}</>;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -94,7 +114,8 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) setError(error.message);
+    if (error) { setError(error.message); return; }
+    router.replace("/home");
   };
 
   return (
@@ -107,7 +128,7 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
         >
           {locale === "en" ? "日本語" : "English"}
         </button>
-        <img src="/paperclue/paperclue-logo.png" alt="PaperClue" className="mx-auto h-9 w-auto" />
+        <img src="/paperclue-logo.png" alt="PaperClue" className="mx-auto h-9 w-auto" />
         <h1 className="font-serif text-xl font-semibold mt-3">{t("signin_title")}</h1>
         <p className="text-sm text-inkmut dark:text-dark-inkmut mt-1 mb-5">
           {t("signin_subtitle")}

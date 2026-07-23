@@ -14,7 +14,7 @@ import { Spinner } from "./ui";
 
 // Served statically from public/ (copied by the prebuild script) — letting
 // webpack bundle the worker makes SWC choke on the minified module.
-pdfjs.GlobalWorkerOptions.workerSrc = "/paperclue/pdf.worker.min.mjs";
+pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
 const norm = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim();
 

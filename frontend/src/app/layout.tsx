@@ -8,9 +8,9 @@ import { LocaleProvider } from "@/lib/i18n";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "PaperClue - Grounded research workspace",
+  title: "PaperClue — every claim traced to a real source",
   description:
-    "One workspace anchored on your manuscript. Every AI output traceable to a real source.",
+    "A research workspace for academic writing. Understand your paper, find what's missing, and get it ready to submit.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
