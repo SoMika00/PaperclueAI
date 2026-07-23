@@ -16,6 +16,7 @@ import { api } from "@/lib/api";
 import type { Version } from "@/lib/types";
 import { useWorkspace } from "@/lib/ws";
 import { ReadinessGauge } from "@/components/ui";
+import { CitationIntegrity } from "@/components/CitationIntegrity";
 import { useLocale } from "@/lib/i18n";
 
 const WEIGHT: Record<string, number> = { citations: 30, review: 40, insight: 15, base: 15 };
@@ -40,7 +41,7 @@ export default function OverviewPage() {
     {
       seg: "chat",
       icon: MessageSquare,
-      label: "Chat",
+      label: t("chat_label"),
       status: t("chat_feature_status" as any),
       done: false,
     },
@@ -60,15 +61,6 @@ export default function OverviewPage() {
           ? `${d.open_issues} ${d.open_issues !== 1 ? t("feat_open_issues_p") : t("feat_open_issue_s")}`
           : t("feat_not_run_yet"),
       done: d.open_issues === 0,
-    },
-    {
-      seg: "review?tab=citations",
-      icon: ClipboardCheck,
-      label: t("feat_citations"),
-      status: d.refs_total
-        ? `${d.refs_verified}/${d.refs_total} ${t("feat_verified_against")}`
-        : t("feat_no_refs_extracted"),
-      done: d.refs_total > 0 && d.refs_verified === d.refs_total,
     },
     {
       seg: "related-research",
@@ -124,6 +116,8 @@ export default function OverviewPage() {
             </div>
           </div>
         </section>
+
+        <CitationIntegrity msId={ms.id} />
 
         <section>
           <h2 className="section-title mb-2">{t("where_you_stand")}</h2>
