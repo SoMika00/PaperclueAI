@@ -19,6 +19,7 @@ import {
   Network,
   ShieldCheck,
   Sparkles,
+  SpellCheck2,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useLocale } from "@/lib/i18n";
@@ -29,6 +30,15 @@ const GLOBAL = [
   { href: "/mind-maps", key: "nav_mindmaps" as const, icon: Network },
   { href: "/library", key: "nav_library" as const, icon: Bookmark },
   { href: "/university", key: "nav_university" as const, icon: GraduationCap },
+];
+
+/* One-shot document tools (Supabase edge functions) — no manuscript workspace
+   needed; attach a paper and get a result. */
+const TOOLS = [
+  { href: "/tools/paper-insights", key: "tool_insights_title" as const, icon: Sparkles },
+  { href: "/tools/proofreader", key: "tool_proof_title" as const, icon: SpellCheck2 },
+  { href: "/tools/journal-match", key: "tool_journal_title" as const, icon: FileOutput },
+  { href: "/tools/manuscript-review", key: "tool_review_title" as const, icon: ClipboardCheck },
 ];
 
 /* PDF-canvas features (chat/insight/review/journal) sit together: switching
@@ -79,6 +89,34 @@ export default function Sidebar({
           </Link>
         );
       })}
+
+      {profile?.role !== "institution_admin" && (
+        <>
+          <div className="mx-4 mt-4 mb-1.5 border-t border-line pt-3 dark:border-dark-line">
+            <div className="text-[10px] font-bold uppercase tracking-wider text-inkmut dark:text-dark-inkmut">
+              {t("nav_tools")}
+            </div>
+          </div>
+          {TOOLS.map((n) => {
+            const active = pathname.startsWith(n.href);
+            const Icon = n.icon;
+            return (
+              <Link
+                key={n.href}
+                href={n.href}
+                className={`mx-2 flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors ${
+                  active
+                    ? "bg-brand-soft text-brand-deep dark:bg-dark-surface2 dark:text-white"
+                    : "text-inkmut hover:bg-surface2 hover:text-ink dark:text-dark-inkmut dark:hover:bg-dark-surface2 dark:hover:text-dark-ink"
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                {t(n.key)}
+              </Link>
+            );
+          })}
+        </>
+      )}
 
       {focus && (
         <>
