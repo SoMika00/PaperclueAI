@@ -4,18 +4,18 @@ import { createContext, useContext, useEffect, useState, useCallback } from "rea
 type Theme = "light" | "dark";
 
 const Ctx = createContext<{ theme: Theme; toggle: () => void }>({
-  theme: "dark",
+  theme: "light",
   toggle: () => {},
 });
 
 export const useTheme = () => useContext(Ctx);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+  const [theme, setTheme] = useState<Theme>("light");
 
   useEffect(() => {
     const stored = localStorage.getItem("pc_theme") as Theme | null;
-    const initial = stored || "dark";
+    const initial = stored || "light";
     setTheme(initial);
     document.documentElement.classList.toggle("dark", initial === "dark");
   }, []);

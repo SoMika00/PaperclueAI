@@ -1,22 +1,23 @@
 "use client";
 /* The 5-second product explainer: an animated mini research map — a manuscript
-   at the center, papers connecting from both corpora, then a literature-gap
-   card appears. Pure SVG/CSS, loops forever, no fake user data. */
+   at the center, papers connecting from both corpora — followed by three
+   annotation cards that fade in in sequence, then a color legend. Pure SVG/CSS,
+   loops forever, no fake user data. Laid out in clean flow (map → cards →
+   legend) so nothing overlaps at any width. */
 import { useLocale } from "@/lib/i18n";
 import { useTheme } from "@/lib/theme";
 
-const PUB = "#3155C6";
-const UNI = "#D68A19";
-const MS = "#15956A";
-const CENTER_X = 155;
+const PUB = "#3D7DFF";
+const UNI = "#E0951A";
+const MS = "#0F9B8E";
+const CENTER_X = 180;
 const CENTER_Y = 96;
 
 const NODES: { x: number; y: number; c: string; d: number }[] = [
-  { x: 62, y: 42, c: PUB, d: 0.6 },
-  { x: 246, y: 34, c: PUB, d: 1.4 },
-  { x: 270, y: 132, c: UNI, d: 2.2 },
-  { x: 44, y: 138, c: UNI, d: 3.0 },
-  { x: 150, y: 24, c: PUB, d: 3.8 },
+  { x: 54, y: 40, c: PUB, d: 0.4 },
+  { x: 306, y: 34, c: PUB, d: 1.0 },
+  { x: 316, y: 150, c: UNI, d: 1.6 },
+  { x: 44, y: 150, c: UNI, d: 2.2 },
 ];
 
 function edgeLength(x: number, y: number) {
@@ -27,24 +28,35 @@ export default function HeroMap() {
   const { t } = useLocale();
   const { theme } = useTheme();
   const isDark = theme === "dark";
-  const cardBg = isDark ? "#0F2340" : "#DCF2EA";
-  const cardText = isDark ? "#E7EEF9" : "#101828";
-  const gapBg = isDark ? "#15315A" : undefined;
-  const gapText = isDark ? "#E7EEF9" : undefined;
+  const cardBg = isDark ? "#14213D" : "#E0F7F4";
+  const cardText = isDark ? "#E7EEF9" : "#14213D";
+
+  // Annotation cards — shown in a clean row below the map, each fading in on a
+  // stagger so it reads as a sequence, then the whole set loops.
+  const cards = [
+    { c: MS, delay: "0.6s", title: t("heromap_related_title"), desc: t("heromap_related_desc") },
+    { c: PUB, delay: "1.4s", title: t("heromap_verified_title"), desc: t("heromap_verified_desc") },
+    { c: UNI, delay: "2.2s", title: t("heromap_gap_title"), desc: t("heromap_gap_desc") },
+  ];
+
+  const legend = [
+    { c: MS, label: t("heromap_manuscript_short") },
+    { c: UNI, label: t("nav_university") },
+    { c: PUB, label: t("heromap_legend_public") },
+  ];
 
   return (
-    <div className="relative select-none px-6 py-4" aria-hidden>
-      <svg viewBox="0 0 310 190" className="w-full max-w-[300px] h-auto">
-        <style>{`
-          .hm-node { opacity: 0; animation: hmPop 9s ease-out infinite; }
-          @keyframes hmPop {
-            0% { opacity: 0; } 6% { opacity: 1; }
-            88% { opacity: 1; } 96%, 100% { opacity: 0; }
-          }
-          .hm-pulse { animation: hmPulse 2.4s ease-in-out infinite; transform-origin: 155px 96px; }
-          @keyframes hmPulse { 0%,100% { transform: scale(1);} 50% { transform: scale(1.05);} }
-        `}</style>
+    <div className="w-full max-w-[420px] select-none" aria-hidden>
+      <style>{`
+        .hm-node { opacity: 0; animation: hmPop 9s ease-out infinite; }
+        @keyframes hmPop { 0% { opacity: 0; } 6% { opacity: 1; } 92% { opacity: 1; } 98%, 100% { opacity: 0; } }
+        .hm-pulse { animation: hmPulse 2.4s ease-in-out infinite; transform-origin: ${CENTER_X}px ${CENTER_Y}px; }
+        @keyframes hmPulse { 0%,100% { transform: scale(1);} 50% { transform: scale(1.04);} }
+        .hm-card { opacity: 0; animation: hmCard 9s ease-out infinite; }
+        @keyframes hmCard { 0% { opacity: 0; transform: translateY(6px); } 10% { opacity: 1; transform: translateY(0); } 92% { opacity: 1; } 98%, 100% { opacity: 0; } }
+      `}</style>
 
+      <svg viewBox="0 0 360 196" className="w-full h-auto">
         {NODES.map((n, i) => {
           const len = edgeLength(n.x, n.y);
           return (
@@ -54,19 +66,15 @@ export default function HeroMap() {
               stroke={n.c}
               strokeWidth={i === 2 || i === 3 ? 2.2 : 1.4}
               strokeDasharray={len}
-              opacity={0.75}
-              style={{
-                strokeDashoffset: len,
-                animation: `hmDraw${i} 9s ease-in-out infinite`,
-                animationDelay: `${n.d}s`,
-              }}
+              opacity={0.7}
+              style={{ strokeDashoffset: len, animation: `hmDraw${i} 9s ease-in-out infinite`, animationDelay: `${n.d}s` }}
             >
               <style>{`
                 @keyframes hmDraw${i} {
-                  0% { stroke-dashoffset: ${len}; }
-                  10% { stroke-dashoffset: 0; }
-                  88% { stroke-dashoffset: 0; opacity: 0.75; }
-                  96%, 100% { stroke-dashoffset: 0; opacity: 0; }
+                  0% { stroke-dashoffset: ${len}; opacity: 0; }
+                  10% { stroke-dashoffset: 0; opacity: 0.7; }
+                  92% { stroke-dashoffset: 0; opacity: 0.7; }
+                  98%, 100% { opacity: 0; }
                 }
               `}</style>
             </line>
@@ -81,66 +89,43 @@ export default function HeroMap() {
         ))}
 
         <g className="hm-pulse">
-          <rect x={105} y={78} width={100} height={36} rx={9}
+          <rect x={CENTER_X - 52} y={CENTER_Y - 18} width={104} height={36} rx={10}
             fill={cardBg} stroke={MS} strokeWidth={2} />
-          <text x={155} y={93} textAnchor="middle" fontSize={8.5} fontWeight={700} fill={MS}>
+          <text x={CENTER_X} y={CENTER_Y - 3} textAnchor="middle" fontSize={8.5} fontWeight={700} fill={MS}>
             {t("heromap_manuscript")}
           </text>
-          <text x={155} y={105} textAnchor="middle" fontSize={7} fill={cardText}>
+          <text x={CENTER_X} y={CENTER_Y + 9} textAnchor="middle" fontSize={7} fill={cardText}>
             {t("heromap_anchored")}
           </text>
         </g>
       </svg>
 
-      {/* near node 2 (UNI, bottom-right) */}
-      <div
-        className="absolute rounded-lg border px-2.5 py-1.5 shadow-card max-w-[150px] w-max"
-        style={{
-          left: "68%", top: "78%",
-          animation: "hmPop 9s ease-out infinite", animationDelay: "5s", opacity: 0,
-          backgroundColor: isDark ? "#15315A" : "#FBF0DC", borderColor: "rgba(214,138,25,0.6)",
-        }}
-      >
-        <div className="text-[9px] font-bold uppercase tracking-wide" style={{ color: UNI }}>
-          {t("heromap_gap_title")}
-        </div>
-        <div className="text-[9px] leading-snug" style={{ color: gapText }}>
-          {t("heromap_gap_desc")}
-        </div>
+      {/* Annotation cards — aligned row, sequenced fade-in */}
+      <div className="mt-4 grid grid-cols-3 gap-2">
+        {cards.map((c) => (
+          <div
+            key={c.title}
+            className="hm-card rounded-lg border bg-paper dark:bg-dark-surface px-2.5 py-1.5 shadow-card"
+            style={{ borderColor: `${c.c}66`, animationDelay: c.delay }}
+          >
+            <div className="text-[9px] font-bold uppercase tracking-wide leading-tight" style={{ color: c.c }}>
+              {c.title}
+            </div>
+            <div className="text-[9.5px] leading-snug text-inkmut dark:text-dark-inkmut mt-0.5">
+              {c.desc}
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* near node 1 (PUB, top-right) */}
-      <div
-        className="absolute rounded-lg border px-2.5 py-1.5 shadow-card max-w-[150px] w-max"
-        style={{
-          left: "58%", top: "-8%",
-          animation: "hmPop 9s ease-out infinite", animationDelay: "8s", opacity: 0,
-          backgroundColor: isDark ? "#0F2340" : "#E2E8F8", borderColor: "rgba(49,85,198,0.6)",
-        }}
-      >
-        <div className="text-[9px] font-bold uppercase tracking-wide" style={{ color: PUB }}>
-          {t("heromap_verified_title")}
-        </div>
-        <div className="text-[9px] leading-snug" style={{ color: gapText }}>
-          {t("heromap_verified_desc")}
-        </div>
-      </div>
-
-      {/* near node 3 (UNI, bottom-left) */}
-      <div
-        className="absolute rounded-lg border px-2.5 py-1.5 shadow-card max-w-[150px] w-max"
-        style={{
-          left: "-8%", top: "85%",
-          animation: "hmPop 9s ease-out infinite", animationDelay: "2s", opacity: 0,
-          backgroundColor: isDark ? "#0F2340" : "#DCF2EA", borderColor: "rgba(21,149,106,0.6)",
-        }}
-      >
-        <div className="text-[9px] font-bold uppercase tracking-wide" style={{ color: MS }}>
-          {t("heromap_related_title")}
-        </div>
-        <div className="text-[9px] leading-snug" style={{ color: gapText }}>
-          {t("heromap_related_desc")}
-        </div>
+      {/* Color legend — every node color maps to a source scope */}
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+        {legend.map((l) => (
+          <span key={l.label} className="inline-flex items-center gap-1.5 text-[10px] font-medium text-inkmut dark:text-dark-inkmut">
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: l.c }} />
+            {l.label}
+          </span>
+        ))}
       </div>
     </div>
   );

@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, LogOut, Moon, Sun, User } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { useTheme } from "@/lib/theme";
 import { useLocale } from "@/lib/i18n";
@@ -35,7 +36,7 @@ export default function TopBar() {
     <>
       <header className="h-14 shrink-0 bg-white text-ink dark:bg-topbar dark:text-white flex items-center px-4 gap-3 shadow-md z-40 relative border-b border-line dark:border-none">
         <Link href="/home" className="flex items-center gap-2">
-          <img src="/paperclue-logo.png" alt="PaperClue" className="h-6 w-auto" />
+          <Logo className="h-6" />
         </Link>
 
         <button

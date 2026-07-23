@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import HeroMap from "@/components/HeroMap";
+import { Logo } from "@/components/Logo";
 import { useTheme } from "@/lib/theme";
 import { Moon, Sun } from "lucide-react";
 
@@ -33,7 +34,7 @@ export default function LandingPage() {
       {/* Top bar */}
       <header className="border-b border-line dark:border-dark-line bg-ivory/80 dark:bg-dark-bg/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="flex items-center justify-between px-4 py-[19px] max-w-[1400px] mx-auto">
-        <img src="/paperclue-logo.png" alt="PaperClue" className="h-[34px] w-[200px]" />
+        <Logo className="h-8" />
         <div className="flex items-center gap-3">
           <button
             onClick={toggleTheme}
@@ -129,7 +130,7 @@ export default function LandingPage() {
       <footer className="border-t border-line dark:border-dark-line py-8">
         <div className="max-w-5xl mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="/paperclue-logo.png" alt="PaperClue" className="h-5 w-auto opacity-70" />
+            <Logo className="h-5 opacity-80" />
             <span className="text-xs text-inkmut dark:text-dark-inkmut">{t("landing_footer_tagline")}</span>
           </div>
           <Link href="/login" className="text-xs text-brand-deep hover:underline">

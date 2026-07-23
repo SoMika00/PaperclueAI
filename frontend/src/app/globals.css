@@ -47,7 +47,7 @@ h1, h2, h3, .font-display {
 .btn {
   @apply inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
 }
-.btn-primary { @apply bg-brand text-white hover:bg-brand-deep; }
+.btn-primary { @apply bg-brand text-ink hover:bg-brand-deep hover:text-white; }
 .btn-ghost { @apply text-inkmut hover:bg-surface2 hover:text-ink dark:text-dark-inkmut dark:hover:bg-dark-surface2 dark:hover:text-dark-ink; }
 .btn-outline { @apply border border-line text-ink hover:bg-surface2 dark:border-dark-line dark:text-dark-ink dark:hover:bg-dark-surface2; }
 .btn-danger { @apply border border-danger/40 text-danger hover:bg-danger/10; }
@@ -63,16 +63,16 @@ h1, h2, h3, .font-display {
   border-radius: 2px;
   padding: 0 1px;
 }
-mark.hl-review { background: rgba(214, 138, 25, 0.4); color: transparent; }
-mark.hl-insight { background: rgba(47, 128, 237, 0.35); color: transparent; }
-mark.hl-citation { background: rgba(21, 149, 106, 0.35); color: transparent; }
+mark.hl-review { background: rgba(224, 149, 26, 0.4); color: transparent; }
+mark.hl-insight { background: rgba(108, 77, 230, 0.35); color: transparent; }
+mark.hl-citation { background: rgba(61, 125, 255, 0.35); color: transparent; }
 
 .hl-flash {
   animation: flash 1.6s ease-out;
 }
 @keyframes flash {
-  0% { box-shadow: 0 0 0 6px rgba(47, 128, 237, 0.55); }
-  100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+  0% { box-shadow: 0 0 0 6px rgba(255, 138, 61, 0.55); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 138, 61, 0); }
 }
 
 /* Thin scrollbars for panels */
