@@ -228,21 +228,30 @@ function ResultView({ kind, data }: { kind: PaperToolKind; data: AnyResult }) {
         {d.tables.map((t, i) => (
           <div key={i}>
             <div className="text-[11px] text-muted-light mb-1">page {t.page}</div>
-            <div className="overflow-x-auto border border-border rounded-lg">
-              <table className="text-[11.5px] border-collapse w-full">
-                <tbody>
-                  {t.rows.map((row, r) => (
-                    <tr key={r} className={r === 0 ? 'bg-background font-semibold' : ''}>
-                      {row.map((cell, c) => (
-                        <td key={c} className="border border-border px-2 py-1 align-top whitespace-pre-wrap">
-                          {cell}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {t.image ? (
+              // A rendered crop reads correctly even when the cell parser can't
+              // untangle a complex multi-column table.
+              <div className="border border-border rounded-lg overflow-x-auto bg-white">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={t.image} alt={`Table from page ${t.page}`} className="max-w-full h-auto block" />
+              </div>
+            ) : (
+              <div className="overflow-x-auto border border-border rounded-lg">
+                <table className="text-[11.5px] border-collapse w-full">
+                  <tbody>
+                    {t.rows.map((row, r) => (
+                      <tr key={r} className={r === 0 ? 'bg-background font-semibold' : ''}>
+                        {row.map((cell, c) => (
+                          <td key={c} className="border border-border px-2 py-1 align-top whitespace-pre-wrap">
+                            {cell}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         ))}
       </div>

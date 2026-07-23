@@ -236,7 +236,15 @@ export interface PaperFiguresResult {
   cached: boolean;
 }
 
-export interface PaperTable { page: number; n_rows: number; n_cols: number; rows: string[][] }
+export interface PaperTable {
+  page: number;
+  n_rows: number;
+  n_cols: number;
+  rows: string[][];
+  /** A rendered crop of the table region — cleaner than parsed cells for
+      complex multi-column tables; the UI shows this and keeps rows as fallback. */
+  image?: string | null;
+}
 export interface PaperTablesResult {
   corpus_id: string;
   tables: PaperTable[];

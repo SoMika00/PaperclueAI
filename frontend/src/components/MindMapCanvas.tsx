@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type { MindMap, MindMapNode } from '@/lib/mindmap'
 
 /**
@@ -92,6 +93,7 @@ function wrapLabel(label: string): string[] {
 }
 
 export function MindMapCanvas({ map }: { map: MindMap }) {
+  const router = useRouter()
   const [positions, setPositions] = useState<Record<string, Pos>>(() => radialLayout(map))
   const [zoom, setZoom] = useState(1)
   const [pan, setPan] = useState<Pos>({ x: 0, y: 0 })
@@ -249,12 +251,22 @@ export function MindMapCanvas({ map }: { map: MindMap }) {
 
       <div className="px-5 py-3.5 border-t border-border bg-background text-[13px] text-muted leading-normal">
         {selected ? (
-          <>
-            <span className="font-semibold text-ink">{selected.label}</span>
-            {selected.summary ? ` — ${selected.summary}` : ''}
-          </>
+          <div className="flex items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <span className="font-semibold text-ink">{selected.label}</span>
+              {selected.summary ? ` — ${selected.summary}` : ''}
+            </div>
+            {selected.group !== 0 && (
+              <button
+                onClick={() => router.push(`/discover?q=${encodeURIComponent(selected.label)}`)}
+                className="shrink-0 inline-flex items-center gap-1.5 bg-node-violet text-white text-[12px] font-semibold rounded-lg px-3 py-1.5 hover:opacity-90 transition-opacity"
+              >
+                Find papers →
+              </button>
+            )}
+          </div>
         ) : (
-          'Drag nodes to rearrange · scroll to zoom · click a node to see its summary.'
+          'Drag nodes to rearrange · scroll to zoom · click a research direction to explore its papers.'
         )}
       </div>
     </div>

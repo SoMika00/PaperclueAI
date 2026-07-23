@@ -33,6 +33,8 @@ export function PromptBar({
   onSubmit,
   disabled,
   initialValue = '',
+  initialDoc = null,
+  onDocChange,
   accentColor = '#ff8a3d',
   arrowColor = '#14213d',
   textareaRef,
@@ -41,12 +43,18 @@ export function PromptBar({
   onSubmit: (value: string, doc: ParsedDocument | null) => void
   disabled?: boolean
   initialValue?: string
+  /** A previously-attached document to restore — keeps the paper across
+      remounts (e.g. clicking a follow-up chip) so it isn't re-requested. */
+  initialDoc?: ParsedDocument | null
+  /** Notified as soon as a document is attached/cleared, so the parent can
+      remember it independently of this component's lifecycle. */
+  onDocChange?: (doc: ParsedDocument | null) => void
   accentColor?: string
   arrowColor?: string
   textareaRef?: RefObject<HTMLTextAreaElement | null>
 }) {
   const [value, setValue] = useState(initialValue)
-  const [doc, setDoc] = useState<ParsedDocument | null>(null)
+  const [doc, setDoc] = useState<ParsedDocument | null>(initialDoc)
   const [parsing, setParsing] = useState(false)
   const [parseError, setParseError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -54,6 +62,7 @@ export function PromptBar({
   async function handleFile(file: File | null) {
     setParseError(null)
     setDoc(null)
+    onDocChange?.(null)
     if (!file) return
     if (!isSupportedFile(file)) {
       setParseError(`Unsupported file type: ${file.name}`)
@@ -61,7 +70,9 @@ export function PromptBar({
     }
     setParsing(true)
     try {
-      setDoc(await parseFile(file))
+      const parsed = await parseFile(file)
+      setDoc(parsed)
+      onDocChange?.(parsed)
     } catch (err) {
       setParseError(err instanceof Error ? err.message : 'Could not read this file.')
     } finally {

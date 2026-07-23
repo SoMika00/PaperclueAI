@@ -336,9 +336,23 @@ def tables(corpus_id: str, db=Depends(get_db),
                 rows = [[("" if c is None else str(c))[:300] for c in r] for r in rows][:60]
                 if not rows or all(not any(c.strip() for c in r) for r in rows):
                     continue
+                # Render the table's region as an image too. PyMuPDF's cell
+                # parser garbles multi-column scientific tables (misaligned/
+                # merged cells); a crop of the actual page area always reads
+                # correctly, so the UI shows the image and keeps rows as a
+                # copy-able fallback.
+                image = None
+                try:
+                    clip = fitz.Rect(t.bbox)
+                    # Pad slightly so borders/headers aren't clipped.
+                    clip += (-4, -4, 4, 4)
+                    pm = doc[pno].get_pixmap(matrix=fitz.Matrix(2, 2), clip=clip)
+                    image = "data:image/png;base64," + base64.b64encode(pm.tobytes("png")).decode()
+                except Exception:
+                    image = None
                 out.append({"page": pno + 1, "n_rows": len(rows),
                             "n_cols": max((len(r) for r in rows), default=0),
-                            "rows": rows})
+                            "rows": rows, "image": image})
         doc.close()
     finally:
         if is_temp:

@@ -12,6 +12,9 @@ export type ParsedDocument = {
   filename: string
   text: string
   words: number
+  /** The original file, kept so a document tool can hand it off to Focus
+      (full workspace + grounded chat) without re-uploading. Not serialized. */
+  file?: File
 }
 
 export function isSupportedFile(file: File): boolean {
@@ -57,6 +60,7 @@ export async function parseFile(file: File): Promise<ParsedDocument> {
     filename: file.name,
     text: cleaned,
     words: cleaned.split(/\s+/).length,
+    file,
   }
 }
 

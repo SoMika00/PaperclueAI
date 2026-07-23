@@ -33,6 +33,13 @@ function extractJson(text: string) {
   try {
     return { parsed: JSON.parse(cleaned), raw: text };
   } catch {
+    const s = cleaned.indexOf('{');
+    const e = cleaned.lastIndexOf('}');
+    if (s !== -1 && e > s) {
+      try {
+        return { parsed: JSON.parse(cleaned.slice(s, e + 1)), raw: text };
+      } catch { /* fall through */ }
+    }
     return { parsed: null, raw: text };
   }
 }
@@ -93,19 +100,27 @@ Deno.serve(async (req) => {
       ? '\n\nRespond entirely in Japanese (日本語), including every field value in the JSON output.'
       : '\n\nRespond entirely in English.';
 
+    // Best-effort spacing of the shared Semantic Scholar key. Previously this
+    // HARD-FAILED with 429 whenever the single shared `external_api_state` row
+    // was missing or had been touched within the last ~1.1s — which made
+    // Journal Match look permanently "not connected." Now we try to claim a
+    // slot but never block the user: if we can't, we self-seed the row and
+    // proceed, letting S2's own rate limits (handled below) be the real guard.
     const cutoff = new Date(Date.now() - S2_MIN_INTERVAL_MS).toISOString();
+    const nowIso = new Date().toISOString();
     const { data: slot } = await supabaseAdmin
       .from('external_api_state')
-      .update({ last_call_at: new Date().toISOString() })
+      .update({ last_call_at: nowIso })
       .eq('api_name', 'semantic_scholar')
       .lt('last_call_at', cutoff)
       .select();
 
     if (!slot || slot.length === 0) {
-      return new Response(JSON.stringify({ error: 'Journal matching is busy right now, please try again in a moment.' }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      });
+      try {
+        await supabaseAdmin
+          .from('external_api_state')
+          .upsert({ api_name: 'semantic_scholar', last_call_at: nowIso }, { onConflict: 'api_name' });
+      } catch { /* row seeding is best-effort; proceed regardless */ }
     }
 
     const searchQuery = `${title} ${(keywords || []).join(' ')}`.trim();
@@ -159,8 +174,18 @@ Deno.serve(async (req) => {
       }),
     });
 
+    if (!anthropicResponse.ok) {
+      return new Response(JSON.stringify({ error: 'The journal-match service is busy right now. Please try again in a moment.' }), {
+        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
     const result = await anthropicResponse.json();
     const text = result?.content?.[0]?.text ?? '';
+    if (!text) {
+      return new Response(JSON.stringify({ error: 'The journal-match service returned an empty response. Please try again.' }), {
+        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
     const { parsed, raw } = extractJson(text);
 
     return new Response(JSON.stringify(parsed ?? { raw_response: raw }), {

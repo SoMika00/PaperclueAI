@@ -6,19 +6,13 @@ import { PromptBar, PromptExampleChip } from '@/components/PromptBar'
 import { ContinueWorking } from '@/components/ContinueWorking'
 import { LockedToolCard } from '@/components/LockedToolCard'
 import { MindMapCanvas } from '@/components/MindMapCanvas'
-import { UploadModal } from '@/components/UploadModal'
 import { ToolIcon } from '@/components/ToolIcon'
 import { useAuth } from '@/lib/auth-context'
-import {
-  analyzePaper,
-  generateMindMap,
-  type MindMapAnalyzeResponse,
-} from '@/lib/edge-functions'
+import { generateMindMap } from '@/lib/edge-functions'
 import { keywordsToMindMap, parseKeywordsResponse, type MindMap } from '@/lib/mindmap'
 import type { ParsedDocument } from '@/lib/parse-file'
 import { splitIntoSections } from '@/lib/sections'
 import { TOOLS, toolById } from '@/lib/tools'
-import { BulletList, LabeledRow } from '@/components/ResultParts'
 
 const mindMap = toolById('mindmap')
 
@@ -48,48 +42,6 @@ function HeroNetwork() {
 
 type MindMapResult = { prompt: string; map: MindMap | null }
 
-const VIOLET = '#6c4de6'
-
-function PaperAnalysisCard({ analysis }: { analysis: MindMapAnalyzeResponse }) {
-  if (analysis.raw_response || !analysis.summary) return null
-  return (
-    <div className="bg-white border border-border rounded-2xl mt-4 overflow-hidden">
-      <div className="flex items-center gap-2.5 px-5 py-4 border-b border-border">
-        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: VIOLET }} />
-        <span className="text-sm font-semibold text-ink">Paper analysis</span>
-      </div>
-      <div className="px-5 py-3">
-        <p className="text-[13.5px] text-[#3c465c] leading-relaxed py-2">{analysis.summary}</p>
-        {analysis.explanation && (
-          <LabeledRow label="Contribution" color={VIOLET}>
-            {analysis.explanation}
-          </LabeledRow>
-        )}
-        {analysis.key_concepts && analysis.key_concepts.length > 0 && (
-          <LabeledRow label="Concepts" color={VIOLET}>
-            <BulletList items={analysis.key_concepts} />
-          </LabeledRow>
-        )}
-        {analysis.key_findings && analysis.key_findings.length > 0 && (
-          <LabeledRow label="Findings" color={VIOLET}>
-            <BulletList items={analysis.key_findings} />
-          </LabeledRow>
-        )}
-        {analysis.research_gaps && analysis.research_gaps.length > 0 && (
-          <LabeledRow label="Gaps" color={VIOLET}>
-            <BulletList items={analysis.research_gaps} />
-          </LabeledRow>
-        )}
-        {analysis.related_directions && analysis.related_directions.length > 0 && (
-          <LabeledRow label="Next" color={VIOLET}>
-            <BulletList items={analysis.related_directions} />
-          </LabeledRow>
-        )}
-      </div>
-    </div>
-  )
-}
-
 export default function HomePage() {
   const { isGuest, loading: authLoading } = useAuth()
   const guest = authLoading || isGuest
@@ -98,34 +50,23 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<MindMapResult | null>(null)
-  const [analysis, setAnalysis] = useState<MindMapAnalyzeResponse | null>(null)
-  const [uploadOpen, setUploadOpen] = useState(false)
 
   async function handleSubmit(prompt: string, doc: ParsedDocument | null) {
     setError(null)
     setLoading(true)
     setResult(null)
 
-    setAnalysis(null)
-
-    // The mind-map function takes a topic string. When a paper is
-    // attached, anchor the topic to its title so keywords match the paper,
-    // and run analyze mode on the title+abstract in parallel.
+    // Topic-seeded mind map. When a paper is attached, anchor the topic to its
+    // title so the map's research directions match the paper. (Document
+    // analysis / review lives in the dedicated tools, not here.)
     let topic = prompt
-    let analyzeCall: Promise<MindMapAnalyzeResponse> | null = null
     if (doc) {
       const sections = splitIntoSections(doc.text, doc.filename)
       topic = `${prompt} (paper: ${sections.title})`.slice(0, 250)
-      const abstract = (sections.abstract ?? doc.text.slice(0, 2000)).slice(0, 4000)
-      analyzeCall = analyzePaper(sections.title, abstract)
     }
 
     try {
-      const [response, analyzed] = await Promise.all([
-        generateMindMap(topic),
-        // Analysis is a bonus — don't fail the whole map if it errors.
-        analyzeCall?.catch(() => null) ?? Promise.resolve(null),
-      ])
+      const response = await generateMindMap(topic)
       const keywords = parseKeywordsResponse(response)
       const map = keywordsToMindMap(prompt, keywords)
       if (!map) {
@@ -133,7 +74,6 @@ export default function HomePage() {
         return
       }
       setResult({ prompt, map })
-      setAnalysis(analyzed)
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Something went wrong'
       if (message === 'RATE_LIMITED') {
@@ -157,6 +97,13 @@ export default function HomePage() {
     requestAnimationFrame(() => taRef.current?.focus())
   }
 
+  // Follow-up: drill into one of the generated research directions by
+  // regenerating the map focused on it.
+  function exploreDirection(label: string) {
+    setPrefill(label)
+    void handleSubmit(label, null)
+  }
+
   return (
     <AppShell>
       <div className="max-w-[880px] mx-auto px-8 pt-7 pb-16">
@@ -170,29 +117,18 @@ export default function HomePage() {
               </span>
             </div>
             <h1 className="text-[32px] font-bold leading-[1.2] text-white tracking-[-0.5px] text-balance">
-              Every paper is a{' '}
+              Every topic is a{' '}
               <span className="font-serif italic font-semibold text-accent">network</span>, not a
               wall of text
             </h1>
             <p className="text-[15px] text-hero-sub leading-relaxed mt-3.5 mb-[22px] max-w-[420px]">
-              Upload a paper and watch it unfold into ideas, citations, and gaps you can act on.
+              Enter a research topic and watch it unfold into a map of directions, themes, and
+              gaps. To analyze or review your own paper, head to Discover or the tools below.
             </p>
             <div className="flex flex-wrap gap-2.5">
-              {!guest && (
-                <button
-                  onClick={() => setUploadOpen(true)}
-                  className="inline-flex items-center gap-2 bg-accent hover:bg-accent-light text-ink text-sm font-semibold rounded-[10px] px-5 py-[11px] whitespace-nowrap transition-colors"
-                >
-                  Upload a manuscript
-                </button>
-              )}
               <button
                 onClick={() => taRef.current?.focus()}
-                className={`inline-flex items-center gap-2 text-sm font-semibold rounded-[10px] px-5 py-[11px] whitespace-nowrap transition-colors ${
-                  guest
-                    ? 'bg-accent hover:bg-accent-light text-ink'
-                    : 'bg-ink-light hover:bg-[#22355c] text-white border border-[#3a4a6b]'
-                }`}
+                className="inline-flex items-center gap-2 bg-accent hover:bg-accent-light text-ink text-sm font-semibold rounded-[10px] px-5 py-[11px] whitespace-nowrap transition-colors"
               >
                 Start a mind map
               </button>
@@ -264,9 +200,32 @@ export default function HomePage() {
           </div>
         )}
 
-        {analysis && !loading && <PaperAnalysisCard analysis={analysis} />}
-
-        <UploadModal open={uploadOpen} onClose={() => setUploadOpen(false)} />
+        {/* Follow-up suggestions: the generated research directions as chips —
+            click to drill into a focused sub-map, or open one to find papers. */}
+        {result && !loading && result.map && result.map.nodes.length > 1 && (
+          <div className="mt-5">
+            <div className="text-[11px] font-semibold tracking-[1.4px] text-muted-light mb-2.5">
+              EXPLORE THESE DIRECTIONS
+            </div>
+            <div className="flex flex-wrap gap-2.5">
+              {result.map.nodes
+                .filter((n) => n.group !== 0)
+                .slice(0, 8)
+                .map((n) => (
+                  <button
+                    key={n.id}
+                    onClick={() => exploreDirection(n.label)}
+                    className="inline-flex items-center gap-2 bg-white border border-border hover:border-node-violet rounded-full px-4 py-[9px] text-[13px] font-medium text-ink transition-colors"
+                  >
+                    <svg width="11" height="11" viewBox="0 0 12 12">
+                      <path d="M6 0l1.5 4.5L12 6 7.5 7.5 6 12 4.5 7.5 0 6l4.5-1.5z" fill="#6c4de6" />
+                    </svg>
+                    {n.label}
+                  </button>
+                ))}
+            </div>
+          </div>
+        )}
 
         {!guest && <ContinueWorking />}
 

@@ -116,8 +116,10 @@ def run_pipeline(ms_id: str):
 
 
 class ImportBody(BaseModel):
-    kind: str  # "library" | "university"
-    id: str
+    kind: str  # "library" | "university" | "public"
+    id: str | None = None            # SavedPaper / UniversityPaper row id
+    corpus_id: str | None = None     # S2 id — used directly for kind "public"
+    title: str | None = None         # display title for a "public" import
 
 
 MAX_PDF_BYTES = 30 * 1024 * 1024
@@ -149,17 +151,23 @@ def import_paper(body: ImportBody, background: BackgroundTasks, db=Depends(get_d
     user_id = current_user["user_id"]
 
     if body.kind == "library":
-        row = db.get(SavedPaper, body.id)
+        row = db.get(SavedPaper, body.id or "")
         if not row or row.tenant_id != settings.tenant_id:
             raise HTTPException(404, "paper not found")
         corpus_id, title, origin_from = row.corpus_id, row.title, row.source_scope
     elif body.kind == "university":
-        row = db.get(UniversityPaper, body.id)
+        row = db.get(UniversityPaper, body.id or "")
         if not row or row.tenant_id != settings.tenant_id:
             raise HTTPException(404, "paper not found")
         corpus_id, title, origin_from = row.s2_id, row.title, "university"
+    elif body.kind == "public":
+        # A suggested paper straight from a mind map / search — no saved row,
+        # just its S2 corpus_id. Resolve the open-access PDF directly below.
+        if not body.corpus_id:
+            raise HTTPException(400, "corpus_id required for a public import")
+        corpus_id, title, origin_from = body.corpus_id, body.title, "public"
     else:
-        raise HTTPException(400, "kind must be library|university")
+        raise HTTPException(400, "kind must be library|university|public")
 
     # Already imported? Reopen the existing focus document, but only if it's
     # this user's own copy — never hand back another user's manuscript id.

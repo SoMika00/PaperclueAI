@@ -8,9 +8,11 @@
  * the S2 recommendations endpoint.
  */
 import { useMemo, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import type { MapEdge, MapGap, MapNode } from '@/lib/backend-types'
 import { PROVENANCE } from '@/components/Provenance'
 import { PaperTools } from '@/components/PaperTools'
+import { api } from '@/lib/api'
 
 type Pos = { x: number; y: number }
 type Graph = { nodes: MapNode[]; edges: MapEdge[]; gaps: MapGap[] }
@@ -105,6 +107,59 @@ export function ResearchMapCanvas({
   const [selected, setSelected] = useState<MapNode | null>(null)
   const [hiddenScopes, setHiddenScopes] = useState<Set<string>>(new Set())
   const [gapFocus, setGapFocus] = useState<Set<string> | null>(null)
+  const router = useRouter()
+  const [busy, setBusy] = useState<string | null>(null)
+  const [saved, setSaved] = useState<Set<string>>(new Set())
+  const [nodeError, setNodeError] = useState<string | null>(null)
+
+  // Open a suggested paper in the full Focus workspace (PDF preview + grounded
+  // chat): import its open-access PDF by corpus_id, then navigate. This is how
+  // "chat with / read a paper" works — the same manuscript workspace, reused.
+  async function openInFocus(node: MapNode) {
+    setBusy('focus:' + node.id)
+    setNodeError(null)
+    try {
+      const { manuscript_id } = await api<{ manuscript_id: string }>('/import', {
+        method: 'POST',
+        body: JSON.stringify({ kind: 'public', corpus_id: node.id, title: node.label }),
+      })
+      router.push(`/manuscripts/${manuscript_id}`)
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : ''
+      setNodeError(
+        /open-access|No open-access|404/i.test(msg)
+          ? 'No open-access PDF is available for this paper, so it can’t be opened in Focus. You can still use the tools above on its abstract.'
+          : `Could not open in Focus. ${msg.slice(0, 140)}`
+      )
+      setBusy(null)
+    }
+  }
+
+  async function addToResearch(node: MapNode) {
+    setBusy('save:' + node.id)
+    setNodeError(null)
+    const m = (node.meta ?? {}) as { venue?: string; authors?: string[]; tldr?: string }
+    try {
+      await api('/library', {
+        method: 'POST',
+        body: JSON.stringify({
+          corpus_id: node.id,
+          title: node.label,
+          authors: m.authors ?? [],
+          year: node.year,
+          venue: m.venue ?? '',
+          abstract: m.tldr ?? '',
+          url: (node.meta as { url?: string })?.url,
+          source_scope: node.source_scope,
+        }),
+      })
+      setSaved((prev) => new Set(prev).add(node.id))
+    } catch (e) {
+      setNodeError(`Could not save. ${e instanceof Error ? e.message.slice(0, 140) : ''}`)
+    } finally {
+      setBusy(null)
+    }
+  }
   const drag = useRef<{ id: string | null; startX: number; startY: number; moved: boolean }>({
     id: null,
     startX: 0,
@@ -340,16 +395,56 @@ export function ResearchMapCanvas({
                   <p className="text-[12px] text-[#3c465c] mt-1.5 leading-relaxed line-clamp-2">{meta.tldr}</p>
                 )}
               </div>
+            </div>
+
+            {/* Actions: open the paper in the full Focus workspace (PDF + chat),
+                save it, expand neighbours, or open the source. */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              <button
+                onClick={() => openInFocus(selected)}
+                disabled={busy !== null}
+                className="inline-flex items-center gap-1.5 bg-accent hover:bg-accent-light disabled:opacity-50 text-ink text-[12px] font-semibold rounded-lg px-3 py-2 transition-colors"
+              >
+                {busy === 'focus:' + selected.id ? 'Opening…' : 'Open in Focus'}
+              </button>
+              {saved.has(selected.id) ? (
+                <span className="inline-flex items-center text-[12px] font-semibold text-node-teal px-2 py-2">
+                  ✓ In your research
+                </span>
+              ) : (
+                <button
+                  onClick={() => addToResearch(selected)}
+                  disabled={busy !== null}
+                  className="inline-flex items-center gap-1.5 bg-white border border-border hover:border-ink disabled:opacity-50 text-ink text-[12px] font-semibold rounded-lg px-3 py-2 transition-colors"
+                >
+                  {busy === 'save:' + selected.id ? 'Adding…' : '+ Add to my research'}
+                </button>
+              )}
               {onExpand && (
                 <button
                   onClick={() => onExpand(selected.id)}
                   disabled={expandingId !== null && expandingId !== undefined}
-                  className="shrink-0 bg-ink hover:bg-ink-light disabled:opacity-50 text-white text-[12px] font-semibold rounded-lg px-3 py-2 transition-colors"
+                  className="inline-flex items-center gap-1.5 bg-white border border-border hover:border-ink disabled:opacity-50 text-ink text-[12px] font-semibold rounded-lg px-3 py-2 transition-colors"
                 >
                   {expandingId === selected.id ? 'Expanding…' : 'Expand branch'}
                 </button>
               )}
+              {meta.url && (
+                <a
+                  href={meta.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 bg-white border border-border hover:border-ink text-ink text-[12px] font-semibold rounded-lg px-3 py-2 transition-colors"
+                >
+                  Open paper ↗
+                </a>
+              )}
             </div>
+
+            {nodeError && (
+              <p className="text-[12px] text-node-coral mt-2 leading-snug">{nodeError}</p>
+            )}
+
             {/* The seven paper tools, on every suggested paper in the map. */}
             <div className="mt-3">
               <PaperTools corpusId={selected.id} compact />

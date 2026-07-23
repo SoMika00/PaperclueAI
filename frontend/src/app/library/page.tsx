@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AppShell } from '@/components/AppShell'
 import { ProvenanceBadge } from '@/components/Provenance'
-import { UploadModal } from '@/components/UploadModal'
 import { api } from '@/lib/api'
 import type { Manuscript, SavedPaper } from '@/lib/backend-types'
 import { useRequireAccount } from '@/lib/use-account'
@@ -14,7 +13,6 @@ export default function LibraryPage() {
   const [manuscripts, setManuscripts] = useState<Manuscript[] | null>(null)
   const [saved, setSaved] = useState<SavedPaper[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [uploadOpen, setUploadOpen] = useState(false)
 
   useEffect(() => {
     if (blocked) return
@@ -44,19 +42,12 @@ export default function LibraryPage() {
   return (
     <AppShell crumb="Library">
       <div className="max-w-[880px] mx-auto px-8 pt-9 pb-16">
-        <div className="mb-6 flex items-start gap-4">
-          <div className="flex-1 min-w-0">
-            <div className="text-[22px] font-bold tracking-[-0.3px] text-ink">My Research</div>
-            <div className="text-[13px] text-muted">
-              Your manuscripts and the papers you&rsquo;ve added from Discover
-            </div>
+        <div className="mb-6">
+          <div className="text-[22px] font-bold tracking-[-0.3px] text-ink">My Research</div>
+          <div className="text-[13px] text-muted">
+            Papers you&rsquo;ve saved from Discover and the mind map, plus manuscripts
+            you&rsquo;ve opened in Focus. To upload a new manuscript, go to Discover.
           </div>
-          <button
-            onClick={() => setUploadOpen(true)}
-            className="shrink-0 bg-accent hover:bg-accent-light text-ink text-[13px] font-semibold rounded-[9px] px-4 py-2.5 transition-colors"
-          >
-            Upload manuscript
-          </button>
         </div>
 
         {error && (
@@ -136,8 +127,6 @@ export default function LibraryPage() {
             </Link>
           ))}
         </div>
-
-        <UploadModal open={uploadOpen} onClose={() => setUploadOpen(false)} />
       </div>
     </AppShell>
   )

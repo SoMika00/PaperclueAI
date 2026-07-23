@@ -6,6 +6,7 @@ import { AppShell } from '@/components/AppShell'
 import { Markdown } from '@/components/Markdown'
 import { PromptBar } from '@/components/PromptBar'
 import { ProvenanceBadge } from '@/components/Provenance'
+import { UploadModal } from '@/components/UploadModal'
 import { api, pollTask } from '@/lib/api'
 import type { BrowsePaper, Task } from '@/lib/backend-types'
 import { useRequireAccount } from '@/lib/use-account'
@@ -37,6 +38,7 @@ function DiscoverInner() {
   const [lastQuery, setLastQuery] = useState('')
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set())
   const [creatingMap, setCreatingMap] = useState(false)
+  const [uploadOpen, setUploadOpen] = useState(false)
   const autoRan = useRef(false)
 
   // "Find related work" from a paper focus lands here with ?q= — run once.
@@ -131,11 +133,19 @@ function DiscoverInner() {
   return (
     <AppShell crumb="Discover">
       <div className="max-w-[880px] mx-auto px-8 pt-9 pb-16">
-        <div className="mb-2">
-          <div className="text-[22px] font-bold tracking-[-0.3px] text-ink">Discover</div>
-          <div className="text-[13px] text-muted">
-            Grounded literature search — public, university, and your own corpus
+        <div className="mb-2 flex items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="text-[22px] font-bold tracking-[-0.3px] text-ink">Discover</div>
+            <div className="text-[13px] text-muted">
+              Search the literature or upload your own manuscript to work on
+            </div>
           </div>
+          <button
+            onClick={() => setUploadOpen(true)}
+            className="shrink-0 bg-accent hover:bg-accent-light text-ink text-[13px] font-semibold rounded-[9px] px-4 py-2.5 transition-colors"
+          >
+            Upload manuscript
+          </button>
         </div>
 
         <div className="mt-5">
@@ -273,6 +283,8 @@ function DiscoverInner() {
             )}
           </div>
         )}
+
+        <UploadModal open={uploadOpen} onClose={() => setUploadOpen(false)} />
       </div>
     </AppShell>
   )

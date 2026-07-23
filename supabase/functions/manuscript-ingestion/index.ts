@@ -39,6 +39,14 @@ function extractJson(text: string) {
   try {
     return { parsed: JSON.parse(cleaned), raw: text };
   } catch {
+    // Prose-wrapped JSON — parse the outermost object.
+    const s = cleaned.indexOf('{');
+    const e = cleaned.lastIndexOf('}');
+    if (s !== -1 && e > s) {
+      try {
+        return { parsed: JSON.parse(cleaned.slice(s, e + 1)), raw: text };
+      } catch { /* fall through */ }
+    }
     return { parsed: null, raw: text };
   }
 }
@@ -110,14 +118,27 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 2000,
+        // The full review JSON (two scored justifications + concerns + four gap
+        // assessments + overlap notes) overflows a small budget and truncates
+        // into invalid JSON, which the client then dumps raw. Give it room.
+        max_tokens: 4096,
         system: MANUSCRIPT_SYSTEM_PROMPT + langInstruction,
         messages: [{ role: 'user', content: manuscriptText }],
       }),
     });
 
+    if (!anthropicResponse.ok) {
+      return new Response(JSON.stringify({ error: 'The review service is busy right now. Please try again in a moment.' }), {
+        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
     const result = await anthropicResponse.json();
     const text = result?.content?.[0]?.text ?? '';
+    if (!text) {
+      return new Response(JSON.stringify({ error: 'The review service returned an empty response. Please try again.' }), {
+        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
+    }
     const { parsed, raw } = extractJson(text);
 
     return new Response(JSON.stringify(parsed ?? { raw_response: raw }), {

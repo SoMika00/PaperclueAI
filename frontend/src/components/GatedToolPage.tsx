@@ -7,6 +7,7 @@ import { Markdown } from '@/components/Markdown'
 import { PromptBar, PromptExampleChip } from '@/components/PromptBar'
 import { ToolIcon } from '@/components/ToolIcon'
 import { useAuth } from '@/lib/auth-context'
+import { upload } from '@/lib/api'
 import { callEdgeFunction, type EdgeFunctionName } from '@/lib/edge-functions'
 import type { ParsedDocument } from '@/lib/parse-file'
 import { toolById } from '@/lib/tools'
@@ -35,6 +36,10 @@ export function GatedToolPage({
   const [result, setResult] = useState<{ prompt: string; data: Record<string, unknown> } | null>(
     null
   )
+  // Remember the attached paper across submits. Follow-up questions (and the
+  // suggestion chips, which remount the PromptBar) would otherwise lose it and
+  // wrongly demand a re-upload every time.
+  const [doc, setDoc] = useState<ParsedDocument | null>(null)
 
   useEffect(() => {
     if (!authLoading && isGuest) {
@@ -42,10 +47,15 @@ export function GatedToolPage({
     }
   }, [authLoading, isGuest, router])
 
-  async function handleSubmit(prompt: string, doc: ParsedDocument | null) {
+  async function handleSubmit(prompt: string, submittedDoc: ParsedDocument | null) {
     setError(null)
 
-    if (requiresDocument && !doc) {
+    // Reuse the remembered paper when this submit didn't carry one (follow-up
+    // question, or a chip click that remounted the PromptBar).
+    const effectiveDoc = submittedDoc ?? doc
+    if (submittedDoc && submittedDoc !== doc) setDoc(submittedDoc)
+
+    if (requiresDocument && !effectiveDoc) {
       setError('Attach your paper first — this tool analyzes the document itself.')
       return
     }
@@ -56,7 +66,7 @@ export function GatedToolPage({
     try {
       const data = await callEdgeFunction<Record<string, unknown>>(
         edgeFunction,
-        buildBody(prompt, doc)
+        buildBody(prompt, effectiveDoc)
       )
       setResult({ prompt, data })
     } catch (err) {
@@ -76,6 +86,24 @@ export function GatedToolPage({
   function fillChip(text: string) {
     setPrefill(text)
     requestAnimationFrame(() => taRef.current?.focus())
+  }
+
+  // Open the analyzed paper in the full Focus workspace, which has grounded
+  // chat + PDF preview. Reuses the manuscript upload pipeline, so it needs the
+  // original PDF (the ingest endpoint is PDF-only).
+  const [openingFocus, setOpeningFocus] = useState(false)
+  const canChat = !!doc?.file && /\.pdf$/i.test(doc.filename)
+  async function openInFocus() {
+    if (!doc?.file) return
+    setOpeningFocus(true)
+    setError(null)
+    try {
+      const created = await upload(doc.file)
+      router.push(`/manuscripts/${created.id}`)
+    } catch {
+      setError('Could not open this paper in Focus. Try uploading it from Discover.')
+      setOpeningFocus(false)
+    }
   }
 
   if (authLoading || isGuest) {
@@ -122,6 +150,8 @@ export function GatedToolPage({
           <PromptBar
             key={prefill}
             initialValue={prefill}
+            initialDoc={doc}
+            onDocChange={setDoc}
             placeholder={tool.placeholder}
             onSubmit={handleSubmit}
             disabled={loading}
@@ -171,6 +201,17 @@ export function GatedToolPage({
               <span className="text-sm font-semibold text-ink truncate">
                 &ldquo;{result.prompt}&rdquo;
               </span>
+              <span className="flex-1" />
+              {canChat && (
+                <button
+                  onClick={openInFocus}
+                  disabled={openingFocus}
+                  className="shrink-0 inline-flex items-center gap-1.5 bg-ink hover:bg-ink-light disabled:opacity-50 text-white text-[12px] font-semibold rounded-lg px-3 py-1.5 transition-colors"
+                  title="Open this paper in the full workspace to chat with it and read the PDF"
+                >
+                  {openingFocus ? 'Opening…' : '💬 Chat with this paper'}
+                </button>
+              )}
             </div>
             <div className="px-5 py-3">{renderBody(result.data)}</div>
           </div>
