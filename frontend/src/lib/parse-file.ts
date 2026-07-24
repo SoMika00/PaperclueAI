@@ -66,10 +66,12 @@ export async function parseFile(file: File): Promise<ParsedDocument> {
 
 async function parsePdf(file: File): Promise<string> {
   const pdfjs = await import("pdfjs-dist");
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.min.mjs",
-    import.meta.url
-  ).toString();
+  // Point at the worker copied into public/ by the `copy-worker` script — a
+  // plain string path. Using `new URL(..., import.meta.url)` makes webpack
+  // bundle the worker, and Next 14's production build then fails minifying it
+  // ("import/export cannot be used outside module code"). Same approach as
+  // PdfViewer.tsx.
+  pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
 
   const data = await file.arrayBuffer();
   const pdf = await pdfjs.getDocument({ data }).promise;
