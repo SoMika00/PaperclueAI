@@ -9,7 +9,7 @@ from .auth import deny_institution_admins
 from .db import Base, engine
 from .routers import (admin, browse, connection, ingest, insight,
                       journal_format, library, manuscripts, mindmap,
-                      mindmaps, review)
+                      mindmaps, quick_tools, review)
 
 
 def _migrate():
@@ -77,7 +77,7 @@ app.add_middleware(
 )
 
 for r in (ingest, manuscripts, insight, browse, review, mindmap, mindmaps,
-          library, journal_format):
+          library, journal_format, quick_tools):
     app.include_router(r.router, prefix="/api", dependencies=[Depends(deny_institution_admins)])
 
 for r in (admin, connection):

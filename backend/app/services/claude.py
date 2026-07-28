@@ -36,6 +36,20 @@ def complete_json(prompt: str, system: str = "", model: str | None = None,
     return json.loads(txt[start:])
 
 
+def complete_json_or_raw(prompt: str, system: str = "", model: str | None = None,
+                         max_tokens: int = 4096) -> dict:
+    """Like complete_json, but on a parse failure returns {"raw_response": text}
+    instead of raising - lets callers fall back to rendering the model's prose
+    (used by the quick tools, where the system prompt - not this helper -
+    is what asks the model for strict JSON)."""
+    txt = complete(prompt, system=system, model=model, max_tokens=max_tokens)
+    cleaned = re.sub(r"```json|```", "", txt, flags=re.IGNORECASE).strip()
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        return {"raw_response": txt}
+
+
 async def stream(messages: list[dict], system: str = "", model: str | None = None,
                  max_tokens: int = 2048):
     """Async generator of text deltas."""

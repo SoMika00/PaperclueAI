@@ -4,10 +4,12 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 /**
- * Deployed edge functions — contracts verified against the actual
- * function sources (paperclue-backend repo). Every function returns parsed
- * JSON directly (NOT a raw Anthropic message); if the model output failed
- * JSON parsing server-side, the response is `{ raw_response: string }`.
+ * Quick Tools backends. `proofreading`, `paper-insights` and
+ * `journal-formatting` now run locally (backend/app/routers/quick_tools.py);
+ * `mind-map` and `manuscript-ingestion` are still deployed Supabase edge
+ * functions. Every function returns parsed JSON directly (NOT a raw
+ * Anthropic message); if the model output failed JSON parsing server-side,
+ * the response is `{ raw_response: string }`.
  */
 export type EdgeFunctionName =
   | "mind-map"
@@ -15,6 +17,13 @@ export type EdgeFunctionName =
   | "manuscript-ingestion"
   | "proofreading"
   | "journal-formatting";
+
+/** Migrated tools: served locally instead of via a Supabase edge function. */
+const LOCAL_PATHS: Partial<Record<EdgeFunctionName, string>> = {
+  proofreading: "/api/quick/proofreading",
+  "paper-insights": "/api/quick/paper-insights",
+  "journal-formatting": "/api/quick/journal-formatting",
+};
 
 export type ScoreWithJustification = { score: number; justification: string };
 
@@ -85,13 +94,16 @@ export async function callEdgeFunction<T = unknown>(
     throw new Error("NO_SESSION");
   }
 
-  const response = await fetch(`${SUPABASE_URL}/functions/v1/${name}`, {
+  const localPath = LOCAL_PATHS[name];
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${session.access_token}`,
+  };
+  if (!localPath) headers.apikey = SUPABASE_ANON_KEY;
+
+  const response = await fetch(localPath ?? `${SUPABASE_URL}/functions/v1/${name}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      apikey: SUPABASE_ANON_KEY,
-      Authorization: `Bearer ${session.access_token}`,
-    },
+    headers,
     body: JSON.stringify(body),
   });
 
