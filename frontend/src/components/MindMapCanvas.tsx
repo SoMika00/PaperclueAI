@@ -426,16 +426,14 @@ export default function MindMapCanvas({
       setOpening(destination);
       setNotice(null);
       try {
-        // A university node carries the row id (kind:university → id); a public
-        // node is a Semantic Scholar paper, so the backend's public import wants
-        // its corpus_id (the node id IS the corpus_id) + a title.
-        const body =
-          n.source_scope === "university"
-            ? { kind: "university", id: n.id }
-            : { kind: "public", corpus_id: n.id, title: n.label };
+        // The backend /import takes { kind, id }: for a public node the id IS
+        // the Semantic Scholar corpus_id; for a university node it's the row id.
         const result = await api<{ manuscript_id: string }>("/import", {
           method: "POST",
-          body: JSON.stringify(body),
+          body: JSON.stringify({
+            kind: n.source_scope === "university" ? "university" : "public",
+            id: n.id,
+          }),
         });
         router.push(`/manuscripts/${result.manuscript_id}/${destination}`);
       } catch (error: any) {

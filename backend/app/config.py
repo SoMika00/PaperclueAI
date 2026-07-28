@@ -13,8 +13,11 @@ class Settings(BaseSettings):
     qdrant_url: str = "http://qdrant:6333"
     storage_dir: str = "/data/pdfs"
     tenant_id: str = "demo-university"
-    embedding_provider: str = "openai"
-    embed_model: str = "text-embedding-3-small"
+    # Default to the local fastembed model so semantic indexing works without
+    # an external key (BAAI/bge-small-en-v1.5 → 384-dim). Set EMBEDDING_PROVIDER=
+    # openai + OPENAI_API_KEY + EMBED_MODEL=text-embedding-3-small to use OpenAI.
+    embedding_provider: str = "fastembed"
+    embed_model: str = "BAAI/bge-small-en-v1.5"
     embed_dimensions: int = 384
     source_database_type: str = "postgres"
     source_database_url: str = ""
