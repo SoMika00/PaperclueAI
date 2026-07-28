@@ -172,7 +172,7 @@ export default function FormatPanel() {
               <div className="rounded-lg bg-danger/5 border border-danger/10 p-2.5 text-[11px] leading-snug text-ink/60">
                 {result.rewrite.abstract_before?.slice(0, 600)}
               </div>
-              <div className="rounded-lg bg-manuscript-soft border border-manuscript/20 p-2.5 text-[11px] leading-snug text-ink/85 mt-1.5">
+              <div className="rounded-lg bg-manuscript-soft border border-manuscript/20 p-2.5 text-[11px] leading-snug text-manuscript mt-1.5">
                 {result.rewrite.abstract_after}
               </div>
             </div>
