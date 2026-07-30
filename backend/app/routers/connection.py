@@ -72,7 +72,8 @@ def _is_configured() -> bool:
 
 
 @router.get("/health")
-def get_connection_health():
+def get_connection_health(db=Depends(get_db), current_user: dict = Depends(get_current_user)):
+    _require_admin(db, current_user["user_id"])
     if not _is_configured():
         return {"status": "not_configured"}
     try:
@@ -90,7 +91,8 @@ def get_connection_health():
 
 
 @router.get("/config")
-def get_connection_config():
+def get_connection_config(db=Depends(get_db), current_user: dict = Depends(get_current_user)):
+    _require_admin(db, current_user["user_id"])
     if not _is_configured():
         return {"configured": False}
     try:
@@ -107,14 +109,17 @@ def get_connection_config():
 
 
 @router.get("/types")
-def get_supported_database_types():
+def get_supported_database_types(db=Depends(get_db), current_user: dict = Depends(get_current_user)):
+    _require_admin(db, current_user["user_id"])
     return {"types": sorted(SUPPORTED_DATABASE_TYPES)}
 
 
 @router.post("/test")
-def test_connection(payload: ConnectionTestRequest):
+def test_connection(payload: ConnectionTestRequest, db=Depends(get_db),
+                    current_user: dict = Depends(get_current_user)):
     """Validate connection parameters entered in the UI without persisting
     them anywhere — never touches the process environment or a .env file."""
+    _require_admin(db, current_user["user_id"])
     try:
         config = DatabaseConnectionConfig.from_env(payload.as_env())
         config.test_connection()

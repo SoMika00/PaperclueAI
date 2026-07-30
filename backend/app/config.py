@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = ""
     database_url: str = "postgresql+psycopg2://paperclue:paperclue@postgres:5432/paperclue"
     qdrant_url: str = "http://qdrant:6333"
+    qdrant_api_key: str = ""  # required by Qdrant Cloud; empty for a local instance
     storage_dir: str = "/data/pdfs"
     tenant_id: str = "demo-university"
     # Default to the local fastembed model so semantic indexing works without

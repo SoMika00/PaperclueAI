@@ -53,7 +53,11 @@ def get_model() -> TextEmbedding:
 def get_client() -> QdrantClient:
     global _client
     if _client is None:
-        _client = QdrantClient(url=settings.qdrant_url)
+        # api_key is required for Qdrant Cloud; None for a local instance.
+        _client = QdrantClient(
+            url=settings.qdrant_url,
+            api_key=settings.qdrant_api_key or None,
+        )
     return _client
 
 
