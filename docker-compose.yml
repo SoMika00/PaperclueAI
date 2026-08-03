@@ -52,17 +52,7 @@ services:
       HOSTNAME: 0.0.0.0
     depends_on:
       - api
-    networks:
-      - default
-      - edge
     restart: unless-stopped
-
-networks:
-  # Shared with the MIRROR stack so mirror-caddy can reverse-proxy
-  # mymirror.fr/paperclue -> paperclue-web:3000 without touching the mirror app.
-  edge:
-    external: true
-    name: mirror_default
 
 volumes:
   pg_data:

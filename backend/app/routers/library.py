@@ -83,6 +83,23 @@ def get_saved_paper(paper_id: str, db=Depends(get_db),
     return out
 
 
+@router.get("/public/{paper_id}")
+def get_public_paper(paper_id: str,
+                     current_user: dict = Depends(get_current_user)):
+    """Full public-paper metadata for the Discover detail page."""
+    from ..services import s2
+
+    try:
+        paper = s2.paper_details(paper_id)
+    except Exception as exc:
+        raise HTTPException(
+            502, "public paper metadata is temporarily unavailable"
+        ) from exc
+    if not paper:
+        raise HTTPException(404, "public paper not found")
+    return paper
+
+
 @router.delete("/library/{paper_id}")
 def remove_paper(paper_id: str, db=Depends(get_db),
                   current_user: dict = Depends(get_current_user)):

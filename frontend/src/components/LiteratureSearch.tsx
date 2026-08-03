@@ -271,6 +271,13 @@ export default function LiteratureSearch({
                 >
                   {p.title}
                 </a>
+              ) : p.source_scope === "public" ? (
+                <a
+                  href={`/public/${encodeURIComponent(p.corpus_id)}`}
+                  className="block font-medium text-[14px] leading-snug mt-1 hover:text-brand-deep hover:underline"
+                >
+                  {p.title}
+                </a>
               ) : (
                 <div className="font-medium text-[14px] leading-snug mt-1">{p.title}</div>
               )}

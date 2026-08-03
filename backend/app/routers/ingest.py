@@ -3,6 +3,7 @@ the text is parsed; embedding/indexing continues in the background with a
 lexical-search fallback until the semantic index is ready."""
 import os
 import re
+from concurrent.futures import ThreadPoolExecutor
 
 import httpx
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile
@@ -27,6 +28,35 @@ def _set_step(db, ms: Manuscript, step: str, state: str):
     db.commit()
 
 
+def _extract_references(sections) -> list[dict]:
+    ref_block = pdf_parse.extract_reference_block(sections)
+    if not ref_block:
+        return []
+    try:
+        parsed = claude.complete_json(
+            "Extract the bibliography entries from this References section. "
+            "Return a JSON array, each item: {\"raw\": \"the full entry text\", "
+            "\"title\": \"paper title only\", \"year\": 2020 or null, "
+            "\"authors\": [\"Last, F.\"]}. Max 40 entries.\n\n" + ref_block,
+            max_tokens=8000,
+        )
+        return parsed[:40] if isinstance(parsed, list) else []
+    except Exception:
+        return []
+
+
+def _extract_metadata(pages) -> dict:
+    try:
+        return claude.complete_json(
+            "From this first page of an academic paper, extract JSON: "
+            "{\"title\": str, \"authors\": [str], \"field_of_study\": str, "
+            "\"language\": \"en\"|\"fr\"|...}.\n\n" + pages[0][:3000],
+            max_tokens=800,
+        )
+    except Exception:
+        return {}
+
+
 def run_pipeline(ms_id: str):
     db = SessionLocal()
     try:
@@ -42,44 +72,32 @@ def run_pipeline(ms_id: str):
         db.commit()
         _set_step(db, ms, "parsing", "done")
 
-        # 2. Extract references (Claude on the reference block)
+        # 2 + 3. References and first-page metadata are independent. Run both
+        # Claude calls concurrently, then persist their results on this thread so
+        # the SQLAlchemy session is never shared across workers.
         _set_step(db, ms, "references", "running")
-        ref_block = pdf_parse.extract_reference_block(sections)
-        if ref_block:
-            try:
-                parsed = claude.complete_json(
-                    "Extract the bibliography entries from this References section. "
-                    "Return a JSON array, each item: {\"raw\": \"the full entry text\", "
-                    "\"title\": \"paper title only\", \"year\": 2020 or null, "
-                    "\"authors\": [\"Last, F.\"]}. Max 40 entries.\n\n" + ref_block,
-                    max_tokens=8000,
-                )
-                for r in parsed[:40]:
-                    db.add(Reference(
-                        manuscript_id=ms.id, raw=(r.get("raw") or "")[:1500],
-                        title=(r.get("title") or "")[:400], year=r.get("year"),
-                        authors=r.get("authors") or [],
-                    ))
-                db.commit()
-            except Exception:
-                pass
+        _set_step(db, ms, "metadata", "running")
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            references_future = executor.submit(_extract_references, sections)
+            metadata_future = executor.submit(_extract_metadata, pages)
+            parsed = references_future.result()
+            meta = metadata_future.result()
+
+        for r in parsed:
+            db.add(Reference(
+                manuscript_id=ms.id, raw=(r.get("raw") or "")[:1500],
+                title=(r.get("title") or "")[:400], year=r.get("year"),
+                authors=r.get("authors") or [],
+            ))
+        db.commit()
         _set_step(db, ms, "references", "done")
 
-        # 3. Metadata detection
-        _set_step(db, ms, "metadata", "running")
-        try:
-            head = pages[0][:3000]
-            meta = claude.complete_json(
-                "From this first page of an academic paper, extract JSON: "
-                "{\"title\": str, \"authors\": [str], \"field_of_study\": str, "
-                "\"language\": \"en\"|\"fr\"|...}.\n\n" + head,
-                max_tokens=800,
-            )
+        if meta:
             ms.title = (meta.get("title") or pdf_parse.guess_title(pages))[:300]
             ms.authors = (meta.get("authors") or [])[:10]
             ms.field_of_study = (meta.get("field_of_study") or "")[:100]
             ms.language = meta.get("language") or "en"
-        except Exception:
+        else:
             ms.title = pdf_parse.guess_title(pages)
         _set_step(db, ms, "metadata", "done")
 

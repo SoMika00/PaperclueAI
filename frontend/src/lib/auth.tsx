@@ -90,7 +90,7 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(false);
 
   const KNOWN_PREFIXES = [
-    "/home", "/discover", "/library", "/literature", "/mind-maps",
+    "/home", "/discover", "/library", "/literature", "/mind-maps", "/public",
     "/university", "/admin", "/manuscripts", "/ms", "/settings",
   ];
   const isKnownRoute = KNOWN_PREFIXES.some(

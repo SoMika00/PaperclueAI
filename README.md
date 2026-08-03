@@ -3,10 +3,6 @@
 Understand your research. Discover what is missing. Prepare your work for
 publication — **every AI claim traced back to an inspectable source**.
 
-Live demo: **https://mymirror.fr/paperclue** (you need to connect 
-*with a demo user*; the account menu top-right lets you
-sign out/in).
-
 ---
 
 ## The mental model: My Research ↔ Discover
@@ -71,7 +67,7 @@ public corpus.
 
 | Layer | Choice | Why |
 |---|---|---|
-| Frontend | Next.js 14 (App Router, TS, `basePath /paperclue`) | SSR + streaming, single deployable |
+| Frontend | Next.js 14 (App Router, TS) | SSR + streaming, single deployable |
 | UI | Tailwind (custom tokens), lucide icons | high-contrast, no generic-AI look |
 | PDF | react-pdf / pdf.js + custom highlight layer | quote-anchored, bidirectional |
 | Graph | React Flow | custom nodes, radial cluster layout |
@@ -82,7 +78,7 @@ public corpus.
 | Vector DB | Qdrant | one collection per manuscript / tenant |
 | Metadata | PostgreSQL 16 | manuscripts, refs, issues, versions, maps |
 | Jobs | FastAPI BackgroundTasks + in-process task registry | demo scale; poll `/tasks/{id}` |
-| Hosting | Docker Compose behind the MIRROR Caddy | route `/paperclue*` → `paperclue-web:3000` |
+| Hosting | Docker Compose | portable deployment for web, API, PostgreSQL and Qdrant |
 
 Robustness choices for keyless Semantic Scholar: max 1 concurrent request,
 1.2 s spacing, 9 s timeout, bounded retries, in-memory TTL cache (searches
@@ -93,7 +89,7 @@ warning instead of a blocked screen.
 
 ```
 PaperclueAI/
-├── docker-compose.yml       # postgres + qdrant + api + web (joins mirror_default)
+├── docker-compose.yml       # postgres + qdrant + api + web
 ├── .env.example             # ANTHROPIC_API_KEY, S2_API_KEY, models, tenant
 ├── backend/
 │   ├── Dockerfile  start.sh
@@ -140,15 +136,8 @@ PaperclueAI/
 ```bash
 cp .env.example .env    # set ANTHROPIC_API_KEY (S2_API_KEY optional but recommended)
 docker compose up -d --build
-# → web on :3000 under basePath /paperclue, api on :8000
+# → web on :3000, api on :8000
 ```
-
-The `web` container also joins the external `mirror_default` network so the
-MIRROR Caddy can reverse-proxy it. Without that stack:
-`docker network create mirror_default`.
-
-Note: the Caddyfile is bind-mounted as a single file — after editing it,
-`docker restart mirror-caddy` (an in-container reload still sees the old inode).
 
 ## Secure source database connection
 

@@ -4,7 +4,6 @@ import "./globals.css";
 import { AuthProvider, SignInGate } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
 import { LocaleProvider } from "@/lib/i18n";
-import ChatDock from "@/components/ChatDock";
 
 const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -36,7 +35,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <LocaleProvider>
             <AuthProvider>
               <SignInGate>{children}</SignInGate>
-              <ChatDock />
             </AuthProvider>
           </LocaleProvider>
         </ThemeProvider>
