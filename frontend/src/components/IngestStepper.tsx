@@ -1,5 +1,4 @@
 "use client";
-import { Logo } from "@/components/Logo";
 /* The visible ingestion pipeline — the system shows it understands your paper. */
 import { CheckCircle2, Circle, Loader2, XCircle } from "lucide-react";
 import type { Manuscript } from "@/lib/types";
@@ -36,7 +35,7 @@ export default function IngestStepper({ ms }: { ms: Manuscript }) {
     <div className="min-h-screen grid place-items-center px-6">
       <div className="card p-8 w-full max-w-lg">
         <div className="flex items-center gap-2.5 mb-1">
-          <Logo className="h-5" />
+          <img src="/paperclue-logo.png" alt="PaperClue" className="h-5 w-auto" />
           <span className="font-serif text-lg font-semibold">{t("ingest_title")}</span>
         </div>
         <p className="text-sm text-inkmut mb-6 truncate">{ms.title}</p>

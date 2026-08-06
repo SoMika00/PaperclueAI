@@ -1,5 +1,4 @@
 "use client";
-import { Logo } from "@/components/Logo";
 import {
   createContext,
   useCallback,
@@ -129,7 +128,7 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
         >
           {locale === "en" ? "日本語" : "English"}
         </button>
-        <Logo className="mx-auto block h-9" />
+        <img src="/paperclue-logo.png" alt="PaperClue" className="mx-auto h-9 w-auto" />
         <h1 className="font-serif text-xl font-semibold mt-3">{t("signin_title")}</h1>
         <p className="text-sm text-inkmut dark:text-dark-inkmut mt-1 mb-5">
           {t("signin_subtitle")}
