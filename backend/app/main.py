@@ -8,7 +8,7 @@ from sqlalchemy import text
 from .auth import deny_institution_admins
 from .db import Base, engine
 from .routers import (admin, billing, browse, connection, ingest, insight,
-                      journal_format, library, manuscripts, mindmap,
+                      journal_format, library, manuscripts,
                       mindmaps, quick_tools, review)
 
 
@@ -76,7 +76,7 @@ app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
 )
 
-for r in (ingest, manuscripts, insight, browse, review, mindmap, mindmaps,
+for r in (ingest, manuscripts, insight, browse, review, mindmaps,
           library, journal_format, quick_tools):
     app.include_router(r.router, prefix="/api", dependencies=[Depends(deny_institution_admins)])
 

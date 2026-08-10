@@ -4,25 +4,24 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 /**
- * Quick Tools backends. `proofreading`, `paper-insights` and
- * `journal-formatting` now run locally (backend/app/routers/quick_tools.py);
- * `mind-map` and `manuscript-ingestion` are still deployed Supabase edge
- * functions. Every function returns parsed JSON directly (NOT a raw
- * Anthropic message); if the model output failed JSON parsing server-side,
- * the response is `{ raw_response: string }`.
+ * Quick Tools backends. All four tools now run locally on our own FastAPI
+ * backend (backend/app/routers/quick_tools.py) — no Supabase edge function is
+ * called anywhere. Each returns parsed JSON directly (NOT a raw Anthropic
+ * message); if the model output failed JSON parsing server-side, the response
+ * is `{ raw_response: string }`.
  */
 export type EdgeFunctionName =
-  | "mind-map"
   | "paper-insights"
   | "manuscript-ingestion"
   | "proofreading"
   | "journal-formatting";
 
-/** Migrated tools: served locally instead of via a Supabase edge function. */
+/** Every tool is served locally; the Supabase-edge fallback is now unused. */
 const LOCAL_PATHS: Partial<Record<EdgeFunctionName, string>> = {
   proofreading: "/api/quick/proofreading",
   "paper-insights": "/api/quick/paper-insights",
   "journal-formatting": "/api/quick/journal-formatting",
+  "manuscript-ingestion": "/api/quick/manuscript-review",
 };
 
 export type ScoreWithJustification = { score: number; justification: string };
@@ -68,15 +67,6 @@ export type JournalMatchResponse = {
   raw_response?: string;
 };
 
-export type MindMapAnalyzeResponse = {
-  summary?: string;
-  key_concepts?: string[];
-  research_gaps?: string[];
-  explanation?: string;
-  key_findings?: string[];
-  related_directions?: string[];
-  raw_response?: string;
-};
 
 /**
  * Calls an edge function with the user's session JWT. Throws:
@@ -117,18 +107,4 @@ export async function callEdgeFunction<T = unknown>(
   }
 
   return response.json();
-}
-
-/** keywords mode: topic → keyword clusters. */
-export async function generateMindMap(topic: string) {
-  return callEdgeFunction("mind-map", { topic });
-}
-
-/** analyze mode: title + abstract → summary, concepts, gaps, findings. */
-export async function analyzePaper(title: string, abstract: string) {
-  return callEdgeFunction<MindMapAnalyzeResponse>("mind-map", {
-    mode: "analyze",
-    title,
-    abstract,
-  });
 }
