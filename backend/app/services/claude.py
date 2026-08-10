@@ -47,7 +47,16 @@ def complete_json_or_raw(prompt: str, system: str = "", model: str | None = None
     try:
         return json.loads(cleaned)
     except json.JSONDecodeError:
-        return {"raw_response": txt}
+        pass
+    # Fall back to the outermost {...} so a stray preamble/suffix around
+    # otherwise-valid JSON doesn't force a raw dump (the #7-class robustness fix).
+    start, end = cleaned.find("{"), cleaned.rfind("}")
+    if start != -1 and end > start:
+        try:
+            return json.loads(cleaned[start:end + 1])
+        except json.JSONDecodeError:
+            pass
+    return {"raw_response": txt}
 
 
 async def stream(messages: list[dict], system: str = "", model: str | None = None,
