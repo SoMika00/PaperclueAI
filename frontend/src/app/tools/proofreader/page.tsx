@@ -1,5 +1,6 @@
 "use client";
 import GlobalShell from "@/components/GlobalShell";
+import { PremiumGate } from "@/components/PremiumGate";
 import { QuickToolPage } from "@/components/QuickToolPage";
 import { BulletList, LabeledRow, StatTile, scoreColor } from "@/components/ResultParts";
 import type { ProofreadingResponse } from "@/lib/edge-functions";
@@ -41,7 +42,7 @@ export default function ProofreaderPage() {
   };
 
   return (
-    <GlobalShell>
+    <GlobalShell><PremiumGate>
       <QuickToolPage
         titleKey="tool_proof_title"
         taglineKey="tool_proof_tagline"
@@ -58,6 +59,6 @@ export default function ProofreaderPage() {
         }}
         renderResult={renderResult}
       />
-    </GlobalShell>
+    </PremiumGate></GlobalShell>
   );
 }

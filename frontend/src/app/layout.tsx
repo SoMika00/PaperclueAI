@@ -4,6 +4,7 @@ import "./globals.css";
 import { AuthProvider, SignInGate } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
 import { LocaleProvider } from "@/lib/i18n";
+import { EntitlementProvider } from "@/lib/entitlement";
 
 const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -34,7 +35,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <LocaleProvider>
             <AuthProvider>
-              <SignInGate>{children}</SignInGate>
+              <EntitlementProvider>
+                <SignInGate>{children}</SignInGate>
+              </EntitlementProvider>
             </AuthProvider>
           </LocaleProvider>
         </ThemeProvider>

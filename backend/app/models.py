@@ -198,3 +198,17 @@ class DatabaseConnection(Base):
     last_tested_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), default=now)
     updated_at = Column(DateTime(timezone=True), default=now, onupdate=now)
+
+
+class Subscription(Base):
+    """One row per Supabase user, tracking their Stripe subscription state.
+    `status` in (active, trialing) grants premium entitlement."""
+    __tablename__ = "subscriptions"
+    user_id = Column(String, primary_key=True)  # supabase auth user id (sub)
+    stripe_customer_id = Column(String, nullable=True, index=True)
+    stripe_subscription_id = Column(String, nullable=True)
+    status = Column(String, default="none")  # none|active|trialing|past_due|canceled|incomplete
+    plan = Column(String, nullable=True)  # monthly|annual
+    current_period_end = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=now)
+    updated_at = Column(DateTime(timezone=True), default=now, onupdate=now)

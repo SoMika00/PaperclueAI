@@ -1,5 +1,6 @@
 "use client";
 import GlobalShell from "@/components/GlobalShell";
+import { PremiumGate } from "@/components/PremiumGate";
 import { QuickToolPage } from "@/components/QuickToolPage";
 import { ScoreBar, scoreColor } from "@/components/ResultParts";
 import type { PaperInsightsResponse, ScoreWithJustification } from "@/lib/edge-functions";
@@ -52,7 +53,7 @@ export default function PaperInsightsPage() {
   };
 
   return (
-    <GlobalShell>
+    <GlobalShell><PremiumGate>
       <QuickToolPage
         titleKey="tool_insights_title"
         taglineKey="tool_insights_tagline"
@@ -66,6 +67,6 @@ export default function PaperInsightsPage() {
         })}
         renderResult={renderResult}
       />
-    </GlobalShell>
+    </PremiumGate></GlobalShell>
   );
 }

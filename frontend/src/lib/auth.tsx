@@ -90,7 +90,7 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
 
   const KNOWN_PREFIXES = [
     "/home", "/discover", "/library", "/literature", "/mind-maps", "/public",
-    "/university", "/admin", "/manuscripts", "/ms", "/settings",
+    "/university", "/admin", "/manuscripts", "/ms", "/settings", "/upgrade", "/tools",
   ];
   const isKnownRoute = KNOWN_PREFIXES.some(
     (p) => pathname === p || pathname.startsWith(p + "/")

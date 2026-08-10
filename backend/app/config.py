@@ -33,6 +33,15 @@ class Settings(BaseSettings):
     source_database_ssl_key: str = ""
     source_database_trust_server_certificate: str = "false"
     connection_encryption_key: str = ""
+    # Stripe billing. Works identically for test + live — only the key values
+    # differ. Set STRIPE_SECRET_KEY (sk_test_… or sk_live_…), the webhook signing
+    # secret, the two recurring price IDs, and APP_URL (frontend origin for the
+    # post-checkout redirect). Empty secret key → billing endpoints return 503.
+    stripe_secret_key: str = ""
+    stripe_webhook_secret: str = ""
+    stripe_price_monthly: str = ""
+    stripe_price_annual: str = ""
+    app_url: str = "https://paperclue-beta.vercel.app"
 
     class Config:
         env_file = ".env"

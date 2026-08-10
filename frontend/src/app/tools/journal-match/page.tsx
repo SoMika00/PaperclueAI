@@ -1,5 +1,6 @@
 "use client";
 import GlobalShell from "@/components/GlobalShell";
+import { PremiumGate } from "@/components/PremiumGate";
 import { QuickToolPage } from "@/components/QuickToolPage";
 import { BulletList, LabeledRow, scoreColor } from "@/components/ResultParts";
 import type { JournalMatchResponse } from "@/lib/edge-functions";
@@ -48,7 +49,7 @@ export default function JournalMatchPage() {
   };
 
   return (
-    <GlobalShell>
+    <GlobalShell><PremiumGate>
       <QuickToolPage
         titleKey="tool_journal_title"
         taglineKey="tool_journal_tagline"
@@ -66,6 +67,6 @@ export default function JournalMatchPage() {
         }}
         renderResult={renderResult}
       />
-    </GlobalShell>
+    </PremiumGate></GlobalShell>
   );
 }

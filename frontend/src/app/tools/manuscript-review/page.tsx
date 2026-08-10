@@ -1,5 +1,6 @@
 "use client";
 import GlobalShell from "@/components/GlobalShell";
+import { PremiumGate } from "@/components/PremiumGate";
 import { QuickToolPage } from "@/components/QuickToolPage";
 import { BulletList, LabeledRow, ScoreBar } from "@/components/ResultParts";
 import type { ManuscriptResponse } from "@/lib/edge-functions";
@@ -50,7 +51,7 @@ export default function ManuscriptReviewPage() {
   };
 
   return (
-    <GlobalShell>
+    <GlobalShell><PremiumGate>
       <QuickToolPage
         titleKey="tool_review_title"
         taglineKey="tool_review_tagline"
@@ -67,6 +68,6 @@ export default function ManuscriptReviewPage() {
         }}
         renderResult={renderResult}
       />
-    </GlobalShell>
+    </PremiumGate></GlobalShell>
   );
 }
