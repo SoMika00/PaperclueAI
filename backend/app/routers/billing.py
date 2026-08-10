@@ -24,6 +24,10 @@ from ..models import Subscription, now
 router = APIRouter(prefix="/billing", tags=["billing"])
 
 PLAN_PRICE = {
+    "premium": settings.stripe_price_premium,
+    "pro": settings.stripe_price_pro,
+    "team": settings.stripe_price_team,
+    # legacy plan names still resolve if called
     "monthly": settings.stripe_price_monthly,
     "annual": settings.stripe_price_annual,
 }

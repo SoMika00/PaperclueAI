@@ -39,6 +39,12 @@ class Settings(BaseSettings):
     # post-checkout redirect). Empty secret key → billing endpoints return 503.
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""
+    # Named subscription tiers → Stripe price IDs. Any ACTIVE tier grants the
+    # same premium entitlement (binary gating); the tiers differ only in price.
+    stripe_price_premium: str = ""
+    stripe_price_pro: str = ""
+    stripe_price_team: str = ""
+    # Legacy single-plan ids (kept so older checkout calls still resolve).
     stripe_price_monthly: str = ""
     stripe_price_annual: str = ""
     app_url: str = "https://paperclue-beta.vercel.app"
