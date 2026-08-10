@@ -64,8 +64,8 @@ export default function UpgradePage() {
   ];
 
   const PLANS: { id: Plan; name: string; price: string; caption: string }[] = [
-    { id: "monthly", name: t("plan_monthly"), price: "$19", caption: t("plan_monthly_caption") },
-    { id: "annual", name: t("plan_annual"), price: "$180", caption: t("plan_annual_caption") },
+    { id: "monthly", name: t("plan_monthly"), price: "¥2,000", caption: t("plan_monthly_caption") },
+    { id: "annual", name: t("plan_annual"), price: "¥19,200", caption: t("plan_annual_caption") },
   ];
 
   return (

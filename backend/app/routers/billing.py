@@ -88,6 +88,8 @@ def checkout(body: CheckoutBody, current_user: dict = Depends(get_current_user),
         customer=row.stripe_customer_id,
         line_items=[{"price": price, "quantity": 1}],
         allow_promotion_codes=True,  # ← the promo-code field on Stripe's page
+        # A 100%-off promo (e.g. the demo code) then needs no card at all.
+        payment_method_collection="if_required",
         client_reference_id=uid,
         subscription_data={"metadata": {"user_id": uid}},
         success_url=f"{settings.app_url}/upgrade?checkout=success",
