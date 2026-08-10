@@ -125,7 +125,13 @@ def _apply_subscription(db, sub: dict):
     if not row and customer_id:
         row = db.query(Subscription).filter(Subscription.stripe_customer_id == customer_id).first()
     if not row:
-        return
+        # Subscription created out-of-band (e.g. admin/API, not via our
+        # /checkout which pre-creates the row). Create it if we can identify
+        # the user from metadata.
+        if not uid:
+            return
+        row = Subscription(user_id=uid, status="none")
+        db.add(row)
     row.stripe_subscription_id = sub.get("id")
     row.stripe_customer_id = customer_id or row.stripe_customer_id
     row.status = sub.get("status") or row.status

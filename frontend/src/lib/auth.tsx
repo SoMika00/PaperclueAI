@@ -83,9 +83,12 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
   const { t, locale, toggle: toggleLocale } = useLocale();
   const pathname = usePathname();
   const router = useRouter();
+  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const KNOWN_PREFIXES = [
@@ -111,7 +114,21 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setInfo(null);
     setLoading(true);
+    if (mode === "signup") {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name } },
+      });
+      setLoading(false);
+      if (error) { setError(error.message); return; }
+      // If the project requires email confirmation there is no session yet.
+      if (data.session) router.replace("/home");
+      else setInfo(t("signup_check_email"));
+      return;
+    }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) { setError(error.message); return; }
@@ -129,10 +146,22 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
           {locale === "en" ? "日本語" : "English"}
         </button>
         <img src="/paperclue-logo.png" alt="PaperClue" className="mx-auto h-9 w-auto" />
-        <h1 className="font-serif text-xl font-semibold mt-3">{t("signin_title")}</h1>
+        <h1 className="font-serif text-xl font-semibold mt-3">
+          {mode === "signup" ? t("signup_title") : t("signin_title")}
+        </h1>
         <p className="text-sm text-inkmut dark:text-dark-inkmut mt-1 mb-5">
-          {t("signin_subtitle")}
+          {mode === "signup" ? t("signup_subtitle") : t("signin_subtitle")}
         </p>
+        {mode === "signup" && (
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={t("signup_name_placeholder")}
+            className="w-full rounded-lg border border-line dark:border-dark-line bg-surface2 dark:bg-dark-surface2 dark:text-dark-ink px-3 py-2 text-sm mb-2"
+            required
+          />
+        )}
         <input
           type="email"
           value={email}
@@ -150,8 +179,22 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
           required
         />
         {error && <p className="text-xs text-red-600 mb-3">{error}</p>}
+        {info && <p className="text-xs text-manuscript mb-3">{info}</p>}
         <button type="submit" disabled={loading} className="btn btn-primary w-full justify-center">
-          {loading ? t("signin_loading") : t("signin_button")}
+          {loading
+            ? mode === "signup" ? t("signup_loading") : t("signin_loading")
+            : mode === "signup" ? t("signup_button") : t("signin_button")}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setMode(mode === "signup" ? "signin" : "signup");
+            setError(null);
+            setInfo(null);
+          }}
+          className="mt-4 text-xs text-inkmut dark:text-dark-inkmut hover:text-ink dark:hover:text-dark-ink"
+        >
+          {mode === "signup" ? t("signup_have_account") : t("signup_no_account")}
         </button>
       </form>
     </div>
