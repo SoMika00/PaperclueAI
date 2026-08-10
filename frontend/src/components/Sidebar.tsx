@@ -20,9 +20,11 @@ import {
   ShieldCheck,
   Sparkles,
   SpellCheck2,
+  Crown,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { useLocale } from "@/lib/i18n";
+import { usePremium } from "@/lib/entitlement";
 
 const GLOBAL = [
   { href: "/home", key: "nav_home" as const, icon: Home },
@@ -62,6 +64,7 @@ export default function Sidebar({
   const pathname = usePathname();
   const { profile } = useAuth();
   const { t } = useLocale();
+  const { active: premium } = usePremium();
   const items = profile?.role === "institution_admin"
     ? [
         { href: "/admin", key: "nav_institution" as const, icon: ShieldCheck },
@@ -148,6 +151,22 @@ export default function Sidebar({
             );
           })}
         </>
+      )}
+
+      {profile?.role !== "institution_admin" && (
+        <Link
+          href="/upgrade"
+          className={`mx-2 mt-auto mb-1 flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-semibold transition-colors ${
+            pathname.startsWith("/upgrade")
+              ? "bg-brand-soft text-brand-deep dark:bg-dark-surface2 dark:text-white"
+              : premium
+              ? "text-inkmut hover:bg-surface2 hover:text-ink dark:text-dark-inkmut dark:hover:bg-dark-surface2 dark:hover:text-dark-ink"
+              : "text-brand-deep hover:bg-brand-soft dark:text-brand dark:hover:bg-dark-surface2"
+          }`}
+        >
+          <Crown className="h-4 w-4" />
+          {premium ? t("nav_manage_plan") : t("nav_upgrade")}
+        </Link>
       )}
     </nav>
   );
