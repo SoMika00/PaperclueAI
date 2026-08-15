@@ -12,7 +12,7 @@ export default function FaqAccordion() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="w-full max-w-3xl mx-auto px-6 py-20">
+    <section className="w-full max-w-3xl mx-auto px-6 py-16 sm:py-24">
       <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-center mb-10">
         {k("lp_faq_title")}
       </h2>

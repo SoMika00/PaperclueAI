@@ -31,7 +31,7 @@ export default function SiteFooter() {
 
   return (
     <footer className="border-t border-line dark:border-dark-line bg-paper dark:bg-dark-surface">
-      <div className="max-w-[1400px] mx-auto px-6 py-14">
+      <div className="max-w-6xl mx-auto px-6 py-14">
         <div className="grid gap-10 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-1">
@@ -105,13 +105,13 @@ export default function SiteFooter() {
           <p className="text-[12.5px] text-inkmut dark:text-dark-inkmut">{t("lp_footer_copyright")}</p>
           <div className="flex gap-6">
             <Link
-              href="/login"
+              href="/privacy"
               className="text-[12.5px] text-inkmut dark:text-dark-inkmut transition-colors hover:text-brand-deep"
             >
               {t("lp_footer_privacy")}
             </Link>
             <Link
-              href="/login"
+              href="/terms"
               className="text-[12.5px] text-inkmut dark:text-dark-inkmut transition-colors hover:text-brand-deep"
             >
               {t("lp_footer_terms")}

@@ -24,7 +24,7 @@ export default function ComparisonTable() {
   const k = (s: string) => t(s as DictKey);
 
   return (
-    <section className="w-full max-w-[1400px] mx-auto px-6 py-20">
+    <section className="w-full max-w-5xl mx-auto px-6 py-16 sm:py-24">
       <div className="max-w-3xl mx-auto text-center mb-12">
         <span className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand-deep">
           <BadgeCheck className="h-6 w-6" />

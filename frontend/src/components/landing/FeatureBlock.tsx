@@ -35,10 +35,16 @@ export default function FeatureBlock({
       </div>
 
       <div className="grid lg:grid-cols-12 gap-8 items-center">
-        {/* Showcase image */}
+        {/* Showcase image — framed and contained so screenshots never upscale
+            past their native size or crop awkwardly. */}
         <div className={`lg:col-span-5 ${reversed ? "lg:order-2" : ""}`}>
-          <div className="card overflow-hidden">
-            <img src={image} alt={imageAlt} className="w-full h-auto object-cover" />
+          <div className="card overflow-hidden bg-surface2/60 dark:bg-dark-surface2/40 p-2">
+            <img
+              src={image}
+              alt={imageAlt}
+              loading="lazy"
+              className="mx-auto w-full max-h-[300px] rounded-md object-contain"
+            />
           </div>
         </div>
 

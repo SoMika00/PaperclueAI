@@ -98,7 +98,11 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
   const isKnownRoute = KNOWN_PREFIXES.some(
     (p) => pathname === p || pathname.startsWith(p + "/")
   );
-  const isPublicRoute = pathname === "/" || pathname === "/login";
+  const isPublicRoute =
+    pathname === "/" ||
+    pathname === "/login" ||
+    pathname === "/privacy" ||
+    pathname === "/terms";
 
   if (!isPublicRoute && !isKnownRoute && ready) {
     return <>{children}</>; // let Next.js render its not-found boundary

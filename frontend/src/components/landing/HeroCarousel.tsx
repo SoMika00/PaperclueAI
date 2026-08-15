@@ -41,7 +41,7 @@ export default function HeroCarousel() {
 
       {/* Content overlay (tracks the active slide title) */}
       <div className="relative z-10 flex h-full items-end">
-        <div className="w-full max-w-[1400px] mx-auto px-6 sm:px-10 pb-14 sm:pb-20">
+        <div className="w-full max-w-6xl mx-auto px-6 sm:px-8 pb-14 sm:pb-20">
           <div className="max-w-3xl">
             <span className="inline-block text-[11px] font-semibold uppercase tracking-wide text-brand bg-brand-soft/95 border border-brand/40 rounded-full px-3 py-1 mb-5">
               {t("landing_demo_badge")}

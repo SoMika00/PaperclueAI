@@ -38,7 +38,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-ivory dark:bg-dark-bg text-ink dark:text-dark-ink transition-colors">
       {/* Top bar */}
       <header className="sticky top-0 z-30 border-b border-line dark:border-dark-line bg-ivory/80 dark:bg-dark-bg/80 backdrop-blur-sm">
-        <div className="flex items-center justify-between px-4 sm:px-6 py-[15px] max-w-[1400px] mx-auto">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-[15px] max-w-6xl mx-auto">
           <img src="/paperclue-logo.png" alt="PaperClue" className="h-8 w-auto" />
           <div className="flex items-center gap-3">
             <button
@@ -65,7 +65,7 @@ export default function LandingPage() {
       <HeroCarousel />
 
       {/* How it works */}
-      <section id="features" className="w-full max-w-[1400px] mx-auto px-6 py-20">
+      <section id="features" className="w-full max-w-6xl mx-auto px-6 py-16 sm:py-24">
         <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-center mb-14">
           {t("lp_how_title")}
         </h2>

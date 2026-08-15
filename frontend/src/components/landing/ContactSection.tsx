@@ -8,7 +8,7 @@ export default function ContactSection() {
 
   return (
     <section id="lp-contact" className="w-full bg-surface2/60 dark:bg-dark-surface/40">
-      <div className="max-w-[1400px] mx-auto px-6 py-20">
+      <div className="max-w-6xl mx-auto px-6 py-16 sm:py-24">
         <div className="max-w-2xl mx-auto text-center mb-12">
           <h2 className="font-serif text-2xl sm:text-3xl font-semibold">{t("lp_contact_title")}</h2>
           <p className="text-inkmut dark:text-dark-inkmut mt-3 text-[15px] leading-relaxed">
