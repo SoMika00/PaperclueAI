@@ -24,7 +24,7 @@ export default function HeroCarousel() {
   }, [next]);
 
   return (
-    <section className="relative w-full h-[68vh] min-h-[440px] max-h-[720px] overflow-hidden bg-ink">
+    <section className="relative w-full h-[90vh] min-h-[520px] overflow-hidden bg-ink">
       {SLIDES.map((slide, i) => (
         <div
           key={slide.image}
