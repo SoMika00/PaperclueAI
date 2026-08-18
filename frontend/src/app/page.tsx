@@ -5,10 +5,12 @@
    own theme. Everything is wrapped in `pc-marketing` so that theme's CSS
    variables and Inter font apply here only — the logged-in app keeps the
    navy/orange design system. Login-only app: feature CTAs route to /login. */
+import { useState } from "react";
 import { Toaster } from "sonner";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import MarketingI18nProvider from "@/lib/i18n-marketing";
-import { UnauthorizedNavbar } from "@/components/marketing/unauthorized-navbar";
+import { Navbar } from "@/components/marketing/navbar";
 import { HeroSection } from "@/components/marketing/hero-section";
 import { FeatureSection } from "@/components/marketing/feature-section";
 import { ComparisonSection } from "@/components/marketing/comparison-section";
@@ -21,7 +23,7 @@ function Home() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <UnauthorizedNavbar />
+      <Navbar />
 
       {/* Hero Section */}
       <HeroSection />
@@ -80,12 +82,16 @@ function Home() {
 }
 
 export default function LandingPage() {
+  // The ported navbar uses react-query; give the marketing tree its own client.
+  const [queryClient] = useState(() => new QueryClient());
   return (
-    <MarketingI18nProvider>
-      <div className="pc-marketing">
-        <Home />
-        <Toaster position="top-center" />
-      </div>
-    </MarketingI18nProvider>
+    <QueryClientProvider client={queryClient}>
+      <MarketingI18nProvider>
+        <div className="pc-marketing">
+          <Home />
+          <Toaster position="top-center" />
+        </div>
+      </MarketingI18nProvider>
+    </QueryClientProvider>
   );
 }

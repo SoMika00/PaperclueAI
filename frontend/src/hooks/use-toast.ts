@@ -1,20 +1,31 @@
-/* Shim for the ported marketing components. They call the original app's
-   toast API — `toast.success({ title, description })` / `.error({...})` — so
-   expose that exact shape and forward to sonner (mounted on marketing pages). */
+/* Shim for the ported marketing components. They use BOTH `toast({...})` and
+   `toast.success({ title, description })`, so expose a callable with those
+   helpers attached, forwarding to sonner (mounted on the marketing pages). */
 import { toast as sonnerToast } from "sonner";
 
-type ToastArgs = { title?: string; description?: string };
+type ToastArgs = {
+  title?: string;
+  description?: string;
+  variant?: "default" | "destructive";
+};
 
-const render = (
+const show = (
   fn: (msg: string, opts?: { description?: string }) => unknown,
   { title, description }: ToastArgs
 ) => fn(title ?? "", description ? { description } : undefined);
 
-export const toast = {
-  success: (args: ToastArgs) => render(sonnerToast.success, args),
-  error: (args: ToastArgs) => render(sonnerToast.error, args),
-  info: (args: ToastArgs) => render(sonnerToast.info, args),
-};
+function base(args: ToastArgs) {
+  return show(
+    args.variant === "destructive" ? sonnerToast.error : sonnerToast,
+    args
+  );
+}
+
+export const toast = Object.assign(base, {
+  success: (args: ToastArgs) => show(sonnerToast.success, args),
+  error: (args: ToastArgs) => show(sonnerToast.error, args),
+  info: (args: ToastArgs) => show(sonnerToast.info, args),
+});
 
 export function useToast() {
   return { toast };
