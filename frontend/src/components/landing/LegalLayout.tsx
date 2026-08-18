@@ -27,25 +27,25 @@ export default function LegalLayout({
   const { t } = useLocale();
 
   return (
-    <div className="min-h-screen bg-ivory dark:bg-dark-bg text-ink dark:text-dark-ink transition-colors">
+    <div className="min-h-screen font-inter bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <SiteNav />
 
       {/* Content */}
       <main className="max-w-3xl mx-auto px-6 py-14 sm:py-20">
-        <h1 className="font-serif text-3xl sm:text-4xl font-semibold">{title}</h1>
-        <p className="text-[13px] text-inkmut dark:text-dark-inkmut mt-2">{updated}</p>
-        <p className="text-[15px] leading-relaxed mt-6 text-ink/90 dark:text-dark-ink">{intro}</p>
+        <h1 className="font-inter text-3xl sm:text-4xl font-semibold">{title}</h1>
+        <p className="text-[13px] text-slate-600 dark:text-slate-300 mt-2">{updated}</p>
+        <p className="text-[15px] leading-relaxed mt-6 text-slate-700 dark:text-slate-200">{intro}</p>
 
         <div className="mt-8 space-y-8">
           {sections.map((s, i) => (
             <section key={i}>
-              <h2 className="font-serif text-xl font-semibold">
+              <h2 className="font-inter text-xl font-semibold">
                 {i + 1}. {s.heading}
               </h2>
               {s.body.map((p, j) => (
                 <p
                   key={j}
-                  className="text-[14.5px] leading-relaxed mt-3 text-inkmut dark:text-dark-inkmut"
+                  className="text-[14.5px] leading-relaxed mt-3 text-slate-600 dark:text-slate-300"
                 >
                   {p}
                 </p>
@@ -54,8 +54,8 @@ export default function LegalLayout({
           ))}
         </div>
 
-        <div className="mt-12 border-t border-line dark:border-dark-line pt-6">
-          <Link href="/" className="text-[13px] text-brand-deep hover:underline">
+        <div className="mt-12 border-t border-slate-200 dark:border-slate-800 pt-6">
+          <Link href="/" className="text-[13px] text-pcblue hover:underline">
             ← {t("legal_back_home")}
           </Link>
         </div>

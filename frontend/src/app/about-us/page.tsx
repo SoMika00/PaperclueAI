@@ -78,41 +78,41 @@ export default function AboutPage() {
   const c = locale === "ja" ? CONTENT.ja : CONTENT.en;
 
   return (
-    <div className="min-h-screen bg-ivory dark:bg-dark-bg text-ink dark:text-dark-ink transition-colors">
+    <div className="min-h-screen font-inter bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <SiteNav />
 
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-line dark:border-dark-line bg-gradient-to-br from-brand-soft/60 to-ivory dark:from-dark-surface dark:to-dark-bg">
+      <section className="relative overflow-hidden border-b border-slate-200 dark:border-slate-800 bg-gradient-to-br from-[#eaf1ff] to-slate-50 dark:from-[#1b2865]/40 dark:to-slate-950">
         <div className="max-w-4xl mx-auto px-6 py-20 sm:py-28 text-center">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-brand-deep bg-brand-soft border border-brand/40 rounded-full px-3 py-1 mb-6">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-pcblue bg-pcblue-light border border-pcblue/40 dark:bg-pcblue/15 rounded-full px-3 py-1 mb-6">
             <Sparkles className="h-3.5 w-3.5" />
             PaperClue
           </span>
-          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight">
+          <h1 className="font-inter text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight">
             {c.heroTitle}
           </h1>
-          <p className="text-inkmut dark:text-dark-inkmut mt-5 text-[16px]">{c.heroSubtitle}</p>
+          <p className="text-slate-600 dark:text-slate-300 mt-5 text-[16px]">{c.heroSubtitle}</p>
         </div>
       </section>
 
       {/* Mission */}
       <section className="max-w-4xl mx-auto px-6 py-16 sm:py-20">
-        <h2 className="font-serif text-2xl sm:text-3xl font-semibold">{c.missionTitle}</h2>
-        <p className="text-[15px] leading-relaxed mt-5 text-inkmut dark:text-dark-inkmut">
+        <h2 className="font-inter text-2xl sm:text-3xl font-semibold">{c.missionTitle}</h2>
+        <p className="text-[15px] leading-relaxed mt-5 text-slate-600 dark:text-slate-300">
           {c.missionDesc}
         </p>
         <p className="text-[15px] font-semibold mt-6">{c.approachTitle}</p>
         <div className="grid gap-3 sm:grid-cols-2 mt-4">
           {c.features.map((f) => (
             <div key={f} className="card p-4 flex items-start gap-2.5">
-              <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-brand-soft text-brand-deep">
+              <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-pcblue-light text-pcblue dark:bg-pcblue/15">
                 <Check className="h-3 w-3" />
               </span>
               <span className="text-[14px] leading-snug">{f}</span>
             </div>
           ))}
         </div>
-        <p className="text-[15px] leading-relaxed mt-6 text-inkmut dark:text-dark-inkmut">
+        <p className="text-[15px] leading-relaxed mt-6 text-slate-600 dark:text-slate-300">
           {c.conclusion}
         </p>
         <div className="mt-8">
@@ -124,9 +124,9 @@ export default function AboutPage() {
       </section>
 
       {/* Core Vision Pillars */}
-      <section className="bg-surface2/60 dark:bg-dark-surface/40 border-y border-line dark:border-dark-line">
+      <section className="bg-slate-100/60 dark:bg-slate-900/40 border-y border-slate-200 dark:border-slate-800">
         <div className="max-w-5xl mx-auto px-6 py-16 sm:py-20">
-          <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-center mb-12">
+          <h2 className="font-inter text-2xl sm:text-3xl font-semibold text-center mb-12">
             {c.visionTitle}
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
@@ -134,11 +134,11 @@ export default function AboutPage() {
               const Icon = PILLAR_ICONS[i] ?? Award;
               return (
                 <div key={p.title} className="card card-hover p-8">
-                  <span className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand-deep">
+                  <span className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-pcblue-light text-pcblue dark:bg-pcblue/15">
                     <Icon className="h-6 w-6" />
                   </span>
-                  <h3 className="font-serif text-xl font-semibold">{p.title}</h3>
-                  <p className="text-[14px] leading-relaxed text-inkmut dark:text-dark-inkmut mt-3">
+                  <h3 className="font-inter text-xl font-semibold">{p.title}</h3>
+                  <p className="text-[14px] leading-relaxed text-slate-600 dark:text-slate-300 mt-3">
                     {p.desc}
                   </p>
                 </div>
@@ -150,12 +150,12 @@ export default function AboutPage() {
 
       {/* CTA */}
       <section className="max-w-3xl mx-auto px-6 py-16 sm:py-24 text-center">
-        <h2 className="font-serif text-2xl sm:text-3xl font-semibold">{c.ctaTitle}</h2>
-        <p className="text-[15px] leading-relaxed mt-4 text-inkmut dark:text-dark-inkmut">
+        <h2 className="font-inter text-2xl sm:text-3xl font-semibold">{c.ctaTitle}</h2>
+        <p className="text-[15px] leading-relaxed mt-4 text-slate-600 dark:text-slate-300">
           {c.ctaDesc}
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-3 mt-8">
-          <Link href="/login" className="btn btn-primary inline-flex px-6 py-2.5 text-[15px]">
+          <Link href="/login" className="btn inline-flex px-6 py-2.5 text-[15px] bg-gradient-to-r from-[#4361ee] to-[#3953af] text-white shadow-sm hover:brightness-110">
             {c.getStarted}
             <ArrowRight className="h-4 w-4" />
           </Link>

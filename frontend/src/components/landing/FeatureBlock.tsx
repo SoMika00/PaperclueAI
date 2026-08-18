@@ -31,8 +31,8 @@ export default function FeatureBlock({
   return (
     <div className="mb-24 last:mb-0">
       <div className="max-w-2xl mx-auto text-center mb-10">
-        <h3 className="font-serif text-2xl sm:text-3xl font-semibold">{t(titleKey)}</h3>
-        <p className="text-inkmut dark:text-dark-inkmut mt-4 text-[15px] leading-relaxed">
+        <h3 className="font-inter text-2xl sm:text-3xl font-semibold">{t(titleKey)}</h3>
+        <p className="text-slate-600 dark:text-slate-300 mt-4 text-[15px] leading-relaxed">
           {t(descKey)}
         </p>
       </div>
@@ -53,12 +53,12 @@ export default function FeatureBlock({
           {features.map((f) => (
             <div key={f.titleKey} className="card card-hover p-4">
               <div className="flex items-start gap-2.5">
-                <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-brand-soft text-brand-deep">
+                <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-pcblue-light text-pcblue dark:bg-pcblue/15">
                   <Check className="h-3 w-3" />
                 </span>
                 <div>
                   <div className="font-semibold text-[14px] leading-snug">{t(f.titleKey)}</div>
-                  <p className="text-[12.5px] text-inkmut dark:text-dark-inkmut mt-1 leading-relaxed">
+                  <p className="text-[12.5px] text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
                     {t(f.descKey)}
                   </p>
                 </div>
@@ -69,7 +69,7 @@ export default function FeatureBlock({
       </div>
 
       <div className="text-center mt-10">
-        <Link href="/login" className="btn btn-primary inline-flex px-5 py-2.5 text-[15px]">
+        <Link href="/login" className="btn inline-flex px-5 py-2.5 text-[15px] bg-gradient-to-r from-[#4361ee] to-[#3953af] text-white shadow-sm hover:brightness-110">
           {t(ctaKey)}
           <ArrowRight className="h-4 w-4" />
         </Link>

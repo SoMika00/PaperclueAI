@@ -28,6 +28,34 @@ const config: Config = {
         aigray: { DEFAULT: "#8A8A94", soft: "#F1F5F9" },
         danger: "#E5484D",
         warn: "#E0951A",
+        // Marketing-only BLUE theme (original paperclue.ai). Used exclusively on
+        // the public landing/legal pages — the logged-in app keeps navy/orange.
+        pcblue: {
+          DEFAULT: "#4361ee",
+          light: "#eaf1ff",
+          dark: "#1b2865",
+          "dark-light": "rgba(67,97,238,.15)",
+        },
+        pcblue2: {
+          DEFAULT: "#3953af",
+          light: "#eaf1ff",
+          dark: "#1b2865",
+          "dark-light": "rgba(67,97,238,.15)",
+        },
+        // Slate scale — marketing neutrals (headings/body/surfaces/borders).
+        slate: {
+          50: "#f8fafc",
+          100: "#f1f5f9",
+          200: "#e2e8f0",
+          300: "#cbd5e1",
+          400: "#94a3b8",
+          500: "#64748b",
+          600: "#475569",
+          700: "#334155",
+          800: "#1e293b",
+          900: "#0f172a",
+          950: "#020617",
+        },
         // Dark mode — our navy family.
         dark: {
           bg: "#0F1A30",
@@ -44,6 +72,9 @@ const config: Config = {
       fontFamily: {
         serif: ["var(--font-source-serif)", "Georgia", "serif"],
         sans: ["var(--font-plex-sans)", "-apple-system", "BlinkMacSystemFont", "system-ui", "sans-serif"],
+        // Marketing-only font (original paperclue.ai used Inter). Applied via
+        // `font-inter` on the public landing/legal pages only.
+        inter: ["var(--font-inter)", "-apple-system", "BlinkMacSystemFont", "system-ui", "sans-serif"],
       },
       boxShadow: {
         card: "0 1px 2px rgba(20,33,61,0.05), 0 1px 3px rgba(20,33,61,0.08)",

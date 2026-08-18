@@ -15,7 +15,7 @@ export default function PaymentMethods() {
   const { t } = useLocale();
   return (
     <div className="flex flex-col gap-3 my-8">
-      <p className="text-center text-[14px] text-inkmut dark:text-dark-inkmut">
+      <p className="text-center text-[14px] text-slate-600 dark:text-slate-300">
         {t("lp_pay_note")}
       </p>
       <div className="flex flex-wrap gap-3 items-center justify-center">

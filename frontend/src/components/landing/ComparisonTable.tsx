@@ -26,11 +26,11 @@ export default function ComparisonTable() {
   return (
     <section className="w-full max-w-5xl mx-auto px-6 py-16 sm:py-24">
       <div className="max-w-3xl mx-auto text-center mb-12">
-        <span className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-soft text-brand-deep">
+        <span className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-pcblue-light text-pcblue dark:bg-pcblue/15">
           <BadgeCheck className="h-6 w-6" />
         </span>
-        <h2 className="font-serif text-2xl sm:text-3xl font-semibold">{k("lp_cmp_title")}</h2>
-        <p className="text-inkmut dark:text-dark-inkmut mt-3 text-[15px] leading-relaxed">
+        <h2 className="font-inter text-2xl sm:text-3xl font-semibold">{k("lp_cmp_title")}</h2>
+        <p className="text-slate-600 dark:text-slate-300 mt-3 text-[15px] leading-relaxed">
           {k("lp_cmp_subtitle")}
         </p>
       </div>
@@ -39,26 +39,26 @@ export default function ComparisonTable() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[720px] text-sm">
             <thead>
-              <tr className="border-b border-line dark:border-dark-line bg-surface2 dark:bg-dark-surface2 text-left">
+              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 text-left">
                 <th className="px-6 py-5 w-1/3 align-top">
                   <div className="font-semibold text-[15px]">{k("lp_cmp_col_feature")}</div>
-                  <div className="text-[12px] text-inkmut dark:text-dark-inkmut font-normal mt-0.5">
+                  <div className="text-[12px] text-slate-600 dark:text-slate-300 font-normal mt-0.5">
                     {k("lp_cmp_col_feature_sub")}
                   </div>
                 </th>
                 <th className="px-6 py-5 w-1/3 text-center align-top">
-                  <div className="font-semibold text-[15px] text-inkmut dark:text-dark-inkmut">
+                  <div className="font-semibold text-[15px] text-slate-600 dark:text-slate-300">
                     {k("lp_cmp_col_generic")}
                   </div>
-                  <div className="text-[12px] text-inkmut dark:text-dark-inkmut font-normal mt-0.5">
+                  <div className="text-[12px] text-slate-600 dark:text-slate-300 font-normal mt-0.5">
                     {k("lp_cmp_col_generic_sub")}
                   </div>
                 </th>
                 <th className="px-6 py-5 w-1/3 text-center align-top">
-                  <div className="font-semibold text-[15px] text-brand-deep">
+                  <div className="font-semibold text-[15px] text-pcblue">
                     {k("lp_cmp_col_pc")}
                   </div>
-                  <div className="text-[12px] text-brand-deep/80 font-normal mt-0.5">
+                  <div className="text-[12px] text-pcblue/80 font-normal mt-0.5">
                     {k("lp_cmp_col_pc_sub")}
                   </div>
                 </th>
@@ -68,11 +68,11 @@ export default function ComparisonTable() {
               {ROWS.map(({ n, status }) => (
                 <tr
                   key={n}
-                  className="border-b border-line/60 dark:border-dark-line/60 last:border-0 hover:bg-surface2/60 dark:hover:bg-dark-surface2/40 transition-colors"
+                  className="border-b border-slate-200/60 dark:border-slate-800/60 last:border-0 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 transition-colors"
                 >
                   <td className="px-6 py-4 align-top">
                     <div className="font-semibold text-[14px]">{k(`lp_cmp_r${n}_feat`)}</div>
-                    <div className="text-[12px] text-inkmut dark:text-dark-inkmut mt-0.5">
+                    <div className="text-[12px] text-slate-600 dark:text-slate-300 mt-0.5">
                       {k(`lp_cmp_r${n}_sub`)}
                     </div>
                   </td>

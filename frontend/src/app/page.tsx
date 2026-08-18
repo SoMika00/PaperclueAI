@@ -40,7 +40,7 @@ export default function LandingPage() {
   const { t } = useLocale();
 
   return (
-    <div className="min-h-screen bg-ivory dark:bg-dark-bg text-ink dark:text-dark-ink transition-colors">
+    <div className="min-h-screen font-inter bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <SiteNav />
 
       {/* Hero carousel */}
@@ -48,7 +48,7 @@ export default function LandingPage() {
 
       {/* How it works */}
       <section id="features" className="w-full max-w-6xl mx-auto px-6 py-16 sm:py-24">
-        <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-center mb-14">
+        <h2 className="font-inter text-3xl sm:text-4xl font-semibold text-center mb-14">
           {t("lp_how_title")}
         </h2>
         <FeatureBlock

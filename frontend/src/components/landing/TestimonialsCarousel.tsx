@@ -33,7 +33,7 @@ export default function TestimonialsCarousel() {
 
   return (
     <section className="w-full max-w-6xl mx-auto px-6 py-16 sm:py-24">
-      <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-center mb-10">
+      <h2 className="font-inter text-2xl sm:text-3xl font-semibold text-center mb-10">
         {t("lp_testi_title")}
       </h2>
 
@@ -48,17 +48,17 @@ export default function TestimonialsCarousel() {
               return (
                 <div key={item.nameKey} className="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 px-3">
                   <div className="card p-6 h-full flex flex-col">
-                    <Quote className="h-6 w-6 text-brand-deep" />
-                    <p className="text-[14px] leading-relaxed text-inkmut dark:text-dark-inkmut italic mt-3 flex-grow">
+                    <Quote className="h-6 w-6 text-pcblue" />
+                    <p className="text-[14px] leading-relaxed text-slate-600 dark:text-slate-300 italic mt-3 flex-grow">
                       &ldquo;{t(item.contentKey)}&rdquo;
                     </p>
                     <div className="flex items-center gap-3 mt-5">
-                      <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-brand-soft text-brand-deep font-semibold text-[13px]">
+                      <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full bg-pcblue-light text-pcblue dark:bg-pcblue/15 font-semibold text-[13px]">
                         {initials(name)}
                       </span>
                       <div>
                         <div className="font-semibold text-[14px]">{name}</div>
-                        <div className="text-[12px] text-inkmut dark:text-dark-inkmut">
+                        <div className="text-[12px] text-slate-600 dark:text-slate-300">
                           {t(item.roleKey)}
                         </div>
                       </div>
@@ -73,14 +73,14 @@ export default function TestimonialsCarousel() {
         <button
           onClick={prev}
           aria-label="Previous testimonials"
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 sm:-translate-x-4 flex h-9 w-9 items-center justify-center rounded-full bg-paper dark:bg-dark-surface border border-line dark:border-dark-line shadow-card transition-colors hover:bg-surface2 dark:hover:bg-dark-surface2"
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 sm:-translate-x-4 flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
         <button
           onClick={next}
           aria-label="Next testimonials"
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 sm:translate-x-4 flex h-9 w-9 items-center justify-center rounded-full bg-paper dark:bg-dark-surface border border-line dark:border-dark-line shadow-card transition-colors hover:bg-surface2 dark:hover:bg-dark-surface2"
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 sm:translate-x-4 flex h-9 w-9 items-center justify-center rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-card transition-colors hover:bg-slate-100 dark:hover:bg-slate-800"
         >
           <ChevronRight className="h-4 w-4" />
         </button>
@@ -93,7 +93,7 @@ export default function TestimonialsCarousel() {
             onClick={() => setStart(i)}
             aria-label={`Go to testimonial group ${i + 1}`}
             className={`h-2.5 rounded-full transition-all duration-300 ${
-              start === i ? "w-6 bg-brand" : "w-2.5 bg-line dark:bg-dark-line hover:bg-inkmut"
+              start === i ? "w-6 bg-pcblue" : "w-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-400"
             }`}
           />
         ))}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, Source_Serif_4 } from "next/font/google";
+import { IBM_Plex_Sans, Source_Serif_4, Inter } from "next/font/google";
 import "./globals.css";
 import { AuthProvider, SignInGate } from "@/lib/auth";
 import { ThemeProvider } from "@/lib/theme";
@@ -17,6 +17,13 @@ const sourceSerif = Source_Serif_4({
   style: ["normal", "italic"],
   variable: "--font-source-serif",
 });
+// Marketing-only font (original paperclue.ai). Exposed as a CSS variable and
+// applied via `font-inter` on the public pages only; the app stays Plex/Serif.
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "PaperClue — every claim traced to a real source",
@@ -28,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${plexSans.variable} ${sourceSerif.variable}`}
+      className={`${plexSans.variable} ${sourceSerif.variable} ${inter.variable}`}
       suppressHydrationWarning
     >
       <body>

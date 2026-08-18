@@ -24,7 +24,7 @@ export default function HeroCarousel() {
   }, [next]);
 
   return (
-    <section className="relative w-full h-[90vh] min-h-[520px] overflow-hidden bg-ink">
+    <section className="relative w-full h-[90vh] min-h-[520px] overflow-hidden bg-slate-900">
       {SLIDES.map((slide, i) => (
         <div
           key={slide.image}
@@ -34,8 +34,8 @@ export default function HeroCarousel() {
           aria-hidden={i !== current}
         >
           <img src={slide.image} alt="" className="absolute inset-0 h-full w-full object-cover" />
-          {/* Navy-tinted gradient overlay keeps text legible and on-brand */}
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/45 to-ink/25" />
+          {/* Slate/blue-tinted gradient overlay keeps text legible and on-brand */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-[#1b2865]/45 to-slate-950/25" />
         </div>
       ))}
 
@@ -43,15 +43,15 @@ export default function HeroCarousel() {
       <div className="relative z-10 flex h-full items-end">
         <div className="w-full max-w-6xl mx-auto px-6 sm:px-8 pb-14 sm:pb-20">
           <div className="max-w-3xl">
-            <span className="inline-block text-[11px] font-semibold uppercase tracking-wide text-brand bg-brand-soft/95 border border-brand/40 rounded-full px-3 py-1 mb-5">
+            <span className="inline-block text-[11px] font-semibold uppercase tracking-wide text-pcblue bg-[#eaf1ff]/95 border border-pcblue/40 rounded-full px-3 py-1 mb-5">
               {t("landing_demo_badge")}
             </span>
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight text-white">
+            <h1 className="font-inter text-3xl sm:text-4xl lg:text-5xl font-semibold leading-tight text-white">
               {t(SLIDES[current].titleKey)}
             </h1>
             <Link
               href="/login"
-              className="btn btn-primary mt-7 inline-flex px-6 py-2.5 text-[15px]"
+              className="btn mt-7 inline-flex px-6 py-2.5 text-[15px] bg-gradient-to-r from-[#4361ee] to-[#3953af] text-white shadow-sm hover:brightness-110"
             >
               {t("landing_hero_cta")}
             </Link>
@@ -83,7 +83,7 @@ export default function HeroCarousel() {
             onClick={() => setCurrent(i)}
             aria-label={`Go to slide ${i + 1}`}
             className={`h-2.5 rounded-full transition-all duration-300 ${
-              i === current ? "w-6 bg-brand" : "w-2.5 bg-white/50 hover:bg-white/80"
+              i === current ? "w-6 bg-pcblue" : "w-2.5 bg-white/50 hover:bg-white/80"
             }`}
           />
         ))}

@@ -13,7 +13,7 @@ export default function FaqAccordion() {
 
   return (
     <section className="w-full max-w-3xl mx-auto px-6 py-16 sm:py-24">
-      <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-center mb-10">
+      <h2 className="font-inter text-2xl sm:text-3xl font-semibold text-center mb-10">
         {k("lp_faq_title")}
       </h2>
       <div className="space-y-3">
@@ -24,11 +24,11 @@ export default function FaqAccordion() {
               <button
                 onClick={() => setOpen(isOpen ? null : i)}
                 aria-expanded={isOpen}
-                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-surface2/60 dark:hover:bg-dark-surface2/40"
+                className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-slate-100/60 dark:hover:bg-slate-800/40"
               >
                 <span className="font-semibold text-[15px] leading-snug">{k(`lp_faq_q${n}`)}</span>
                 <ChevronDown
-                  className={`h-4 w-4 flex-none text-inkmut dark:text-dark-inkmut transition-transform duration-300 ${
+                  className={`h-4 w-4 flex-none text-slate-600 dark:text-slate-300 transition-transform duration-300 ${
                     isOpen ? "rotate-180" : ""
                   }`}
                 />
@@ -39,7 +39,7 @@ export default function FaqAccordion() {
                 }`}
               >
                 <div className="overflow-hidden">
-                  <p className="px-5 pb-5 pt-0 text-[14px] leading-relaxed text-inkmut dark:text-dark-inkmut">
+                  <p className="px-5 pb-5 pt-0 text-[14px] leading-relaxed text-slate-600 dark:text-slate-300">
                     {k(`lp_faq_a${n}`)}
                   </p>
                 </div>

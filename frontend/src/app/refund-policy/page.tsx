@@ -173,36 +173,36 @@ export default function RefundPolicyPage() {
   const c = locale === "ja" ? CONTENT.ja : CONTENT.en;
 
   return (
-    <div className="min-h-screen bg-ivory dark:bg-dark-bg text-ink dark:text-dark-ink transition-colors">
+    <div className="min-h-screen font-inter bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <SiteNav />
 
       <main className="max-w-3xl mx-auto px-6 py-14 sm:py-20">
-        <h1 className="font-serif text-3xl sm:text-4xl font-semibold">{c.title}</h1>
-        <p className="text-[15px] leading-relaxed mt-6 text-ink/90 dark:text-dark-ink">{c.intro}</p>
+        <h1 className="font-inter text-3xl sm:text-4xl font-semibold">{c.title}</h1>
+        <p className="text-[15px] leading-relaxed mt-6 text-slate-700 dark:text-slate-200">{c.intro}</p>
 
         <div className="mt-8 space-y-8">
           {c.sections.map((s) => (
             <section key={s.title}>
-              <h2 className="font-serif text-xl font-semibold">{s.title}</h2>
+              <h2 className="font-inter text-xl font-semibold">{s.title}</h2>
               {s.before?.map((p, i) => (
-                <p key={i} className="text-[14.5px] leading-relaxed mt-3 text-inkmut dark:text-dark-inkmut">
+                <p key={i} className="text-[14.5px] leading-relaxed mt-3 text-slate-600 dark:text-slate-300">
                   {p}
                 </p>
               ))}
               {s.listIntro && (
-                <p className="text-[14.5px] leading-relaxed mt-3 text-inkmut dark:text-dark-inkmut">
+                <p className="text-[14.5px] leading-relaxed mt-3 text-slate-600 dark:text-slate-300">
                   {s.listIntro}
                 </p>
               )}
               {s.list && (
-                <ul className="list-disc pl-6 mt-2 space-y-1.5 text-[14.5px] leading-relaxed text-inkmut dark:text-dark-inkmut">
+                <ul className="list-disc pl-6 mt-2 space-y-1.5 text-[14.5px] leading-relaxed text-slate-600 dark:text-slate-300">
                   {s.list.map((li, i) => (
                     <li key={i}>{li}</li>
                   ))}
                 </ul>
               )}
               {s.after?.map((p, i) => (
-                <p key={i} className="text-[14.5px] leading-relaxed mt-3 text-inkmut dark:text-dark-inkmut">
+                <p key={i} className="text-[14.5px] leading-relaxed mt-3 text-slate-600 dark:text-slate-300">
                   {p}
                 </p>
               ))}
@@ -210,8 +210,8 @@ export default function RefundPolicyPage() {
           ))}
         </div>
 
-        <div className="mt-12 border-t border-line dark:border-dark-line pt-6">
-          <Link href="/" className="text-[13px] text-brand-deep hover:underline">
+        <div className="mt-12 border-t border-slate-200 dark:border-slate-800 pt-6">
+          <Link href="/" className="text-[13px] text-pcblue hover:underline">
             ← {t("legal_back_home")}
           </Link>
         </div>

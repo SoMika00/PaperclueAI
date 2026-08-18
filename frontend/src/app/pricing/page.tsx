@@ -29,94 +29,48 @@ const CONTENT_EN = {
   popular: "Most Popular",
   plans: [
     {
-      name: "Free",
-      price: "¥0",
-      description: "Basic features for academic research",
-      features: [
-        "Limited AI risk assessments",
-        "Limited citation accuracy check",
-        "Basic formatting options",
-        "Basic Mind Map features",
-        "Only ten credits available",
-      ],
-      cta: "Get Started",
-    },
-    {
-      name: "Prime",
-      price: "¥1,550",
-      description: "Get academic reviews with one-time access",
-      features: [
-        "Up to 3 document reviews",
-        "Up to 3 journal-specific formatting checks",
-        "Up to 3 citation accuracy checks",
-        "Limited AI risk assessment",
-        "Basic Mind Map features",
-        "Priority support",
-      ],
-      cta: "Get Prime",
-    },
-    {
       name: "Premium",
       price: "¥2,200",
       period: "month",
-      description: "Enjoy more features and flexibility with Premium Plan",
-      introOffer: "First month only ¥1,100",
-      regularPrice: "¥2,200/month thereafter",
+      description: "For an individual researcher",
       features: [
-        "AI humanizer",
-        "Advanced grammar checks",
-        "AI risk assessment",
-        "Citation accuracy checks",
-        "Unlimited research papers summaries",
-        "Full Mind Map capabilities",
-        "Priority support",
+        "Quick Tools — Paper Insights, Proofreader, Journal Match, Manuscript Review",
+        "In-workspace manuscript review with cited evidence",
+        "Journal formatting + DOCX export",
+        "Research mind maps from a question, paper or collection",
       ],
-      cta: "Upgrade to Premium",
+      cta: "Get Premium",
     },
     {
       name: "Pro",
       price: "¥5,500",
       period: "month",
-      description: "Comprehensive tools built for dedicated researchers",
-      introOffer: "First month only ¥3,300",
-      regularPrice: "¥5,500/month thereafter",
+      description: "For power users",
+      popular: true,
       features: [
-        "Unlimited research papers reviews",
-        "Unlimited thesis reviews",
-        "Unlimited presentation reviews",
-        "Journal-specific formatting",
-        "AI humanizer",
-        "Advanced grammar checks",
-        "AI risk assessment",
-        "Citation accuracy checks",
-        "Unlimited research papers summaries",
-        "Full Mind Map capabilities",
-        "Priority support",
+        "Everything in Premium",
+        "Quick Tools — Paper Insights, Proofreader, Journal Match, Manuscript Review",
+        "In-workspace manuscript review with cited evidence",
+        "Journal formatting + DOCX export",
+        "Research mind maps from a question, paper or collection",
+        "Priority processing + support",
       ],
-      cta: "Upgrade to Pro",
+      cta: "Get Pro",
     },
     {
       name: "Team",
       price: "¥22,000",
       period: "month",
-      description: "Powerful tools for research teams",
-      popular: true,
+      description: "For a lab or department",
       features: [
-        "Up to 7 team members",
-        "Unlimited research papers reviews",
-        "Unlimited research proposals reviews",
-        "Unlimited thesis reviews",
-        "Unlimited presentation reviews",
-        "Journal-specific formatting",
-        "Advanced grammar checks",
-        "AI humanizer",
-        "AI risk assessment",
-        "Citation accuracy checks",
-        "Unlimited research papers summaries",
-        "Full Mind Map capabilities",
-        "Priority support",
+        "Everything in Pro",
+        "Quick Tools — Paper Insights, Proofreader, Journal Match, Manuscript Review",
+        "In-workspace manuscript review with cited evidence",
+        "Journal formatting + DOCX export",
+        "Research mind maps from a question, paper or collection",
+        "Shared access for your group",
       ],
-      cta: "Upgrade to Team",
+      cta: "Get Team",
     },
   ] as Plan[],
   faqTitle: "Frequently Asked Questions",
@@ -146,94 +100,48 @@ const CONTENT_JA = {
   popular: "人気",
   plans: [
     {
-      name: "無料",
-      price: "¥0",
-      description: "学術研究のための基本機能",
-      features: [
-        "AIリスク評価（制限あり）",
-        "引用精度チェック（制限あり）",
-        "基本的なフォーマット機能",
-        "基本的なマインドマップ機能",
-        "利用可能クレジットは10件まで",
-      ],
-      cta: "無料で始める",
-    },
-    {
-      name: "プライム",
-      price: "¥1,550",
-      description: "ワンタイムアクセスで学術レビューを受けられます",
-      features: [
-        "最大3件の文書レビュー",
-        "最大3件のジャーナル別フォーマットチェック",
-        "最大3件の引用精度チェック",
-        "限定的なAIリスク評価",
-        "基本的なマインドマップ機能",
-        "優先サポート",
-      ],
-      cta: "プライムを取得",
-    },
-    {
       name: "プレミアム",
       price: "¥2,200",
       period: "月",
-      description: "プレミアムプランで、より多くの機能と柔軟性を",
-      introOffer: "初月のみ ¥1,100",
-      regularPrice: "2か月目以降 ¥2,200／月",
+      description: "個人の研究者向け",
       features: [
-        "AIヒューマナイザー",
-        "高度な文法チェック",
-        "AIリスク評価",
-        "引用精度チェック",
-        "無制限の研究論文要約",
-        "マインドマップの全機能",
-        "優先サポート",
+        "クイックツール — 論文インサイト、校正、ジャーナルマッチ、原稿レビュー",
+        "根拠付きのワークスペース内原稿レビュー",
+        "ジャーナル整形とDOCXエクスポート",
+        "課題・論文・コレクションからのリサーチマインドマップ",
       ],
-      cta: "プレミアムにアップグレード",
+      cta: "プレミアムを取得",
     },
     {
       name: "プロ",
       price: "¥5,500",
       period: "月",
-      description: "熱心な研究者のための総合ツール",
-      introOffer: "初月のみ ¥3,300",
-      regularPrice: "2か月目以降 ¥5,500／月",
+      description: "ヘビーユーザー向け",
+      popular: true,
       features: [
-        "研究論文レビュー 無制限",
-        "論文レビュー 無制限",
-        "プレゼンテーションレビュー 無制限",
-        "ジャーナル別フォーマット",
-        "AIヒューマナイザー",
-        "高度な文法チェック",
-        "AIリスク評価",
-        "引用精度チェック",
-        "研究論文要約 無制限",
-        "マインドマップの全機能",
-        "優先サポート",
+        "プレミアムのすべて",
+        "クイックツール — 論文インサイト、校正、ジャーナルマッチ、原稿レビュー",
+        "根拠付きのワークスペース内原稿レビュー",
+        "ジャーナル整形とDOCXエクスポート",
+        "課題・論文・コレクションからのリサーチマインドマップ",
+        "優先処理とサポート",
       ],
-      cta: "プロにアップグレード",
+      cta: "プロを取得",
     },
     {
       name: "チーム",
       price: "¥22,000",
       period: "月",
-      description: "研究チーム向けのコラボレーションツール",
-      popular: true,
+      description: "研究室・部門向け",
       features: [
-        "最大7名のチームメンバー",
-        "研究論文の無制限レビュー",
-        "研究提案書の無制限レビュー",
-        "論文・卒業論文の無制限レビュー",
-        "プレゼンテーションの無制限レビュー",
-        "ジャーナル別フォーマット対応",
-        "高度な文法チェック",
-        "AIヒューマナイザー",
-        "AIリスク評価",
-        "引用精度チェック",
-        "研究論文の無制限サマリー作成",
-        "マインドマップの全機能",
-        "優先サポート",
+        "プロのすべて",
+        "クイックツール — 論文インサイト、校正、ジャーナルマッチ、原稿レビュー",
+        "根拠付きのワークスペース内原稿レビュー",
+        "ジャーナル整形とDOCXエクスポート",
+        "課題・論文・コレクションからのリサーチマインドマップ",
+        "グループでの共有アクセス",
       ],
-      cta: "問い合わせる",
+      cta: "チームを取得",
     },
   ] as Plan[],
   faqTitle: "よくある質問",
@@ -260,31 +168,31 @@ function PlanCard({ plan, popularLabel }: { plan: Plan; popularLabel: string }) 
   return (
     <div
       className={`card p-6 flex flex-col relative ${
-        plan.popular ? "ring-2 ring-brand shadow-lift" : ""
+        plan.popular ? "ring-2 ring-pcblue shadow-lift" : ""
       }`}
     >
       {plan.popular && (
-        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand px-3 py-1 text-[11px] font-semibold text-ink">
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-[#4361ee] to-[#3953af] px-3 py-1 text-[11px] font-semibold text-white">
           {popularLabel}
         </span>
       )}
-      <h3 className="font-serif text-xl font-semibold">{plan.name}</h3>
+      <h3 className="font-inter text-xl font-semibold">{plan.name}</h3>
       <div className="flex items-baseline gap-1 mt-3">
         <span className="text-3xl font-bold">{plan.price}</span>
-        {plan.period && <span className="text-[14px] text-inkmut dark:text-dark-inkmut">/{plan.period}</span>}
+        {plan.period && <span className="text-[14px] text-slate-600 dark:text-slate-300">/{plan.period}</span>}
       </div>
       {plan.introOffer && (
         <p className="text-[14px] font-semibold text-manuscript mt-2">{plan.introOffer}</p>
       )}
       {plan.regularPrice && (
-        <p className="text-[12.5px] text-inkmut dark:text-dark-inkmut">{plan.regularPrice}</p>
+        <p className="text-[12.5px] text-slate-600 dark:text-slate-300">{plan.regularPrice}</p>
       )}
-      <p className="text-[13.5px] text-inkmut dark:text-dark-inkmut mt-3">{plan.description}</p>
+      <p className="text-[13.5px] text-slate-600 dark:text-slate-300 mt-3">{plan.description}</p>
 
       <ul className="space-y-2.5 mt-5 mb-6 flex-grow">
         {plan.features.map((f) => (
           <li key={f} className="flex items-start gap-2.5">
-            <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-brand-soft text-brand-deep">
+            <span className="mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded-full bg-pcblue-light text-pcblue dark:bg-pcblue/15">
               <Check className="h-3 w-3" />
             </span>
             <span className="text-[13.5px] leading-snug">{f}</span>
@@ -292,7 +200,7 @@ function PlanCard({ plan, popularLabel }: { plan: Plan; popularLabel: string }) 
         ))}
       </ul>
 
-      <Link href="/login" className="btn btn-primary w-full justify-center mt-auto">
+      <Link href="/login" className="btn w-full justify-center mt-auto bg-gradient-to-r from-[#4361ee] to-[#3953af] text-white shadow-sm hover:brightness-110">
         {plan.cta}
         <ArrowRight className="h-4 w-4" />
       </Link>
@@ -305,13 +213,13 @@ export default function PricingPage() {
   const c = locale === "ja" ? CONTENT_JA : CONTENT_EN;
 
   return (
-    <div className="min-h-screen bg-ivory dark:bg-dark-bg text-ink dark:text-dark-ink transition-colors">
+    <div className="min-h-screen font-inter bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <SiteNav />
 
       <main className="max-w-6xl mx-auto px-6 py-16 sm:py-20">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="font-serif text-3xl sm:text-4xl font-semibold">{c.title}</h1>
-          <p className="text-inkmut dark:text-dark-inkmut mt-3 text-[15px]">{c.subtitle}</p>
+          <h1 className="font-inter text-3xl sm:text-4xl font-semibold">{c.title}</h1>
+          <p className="text-slate-600 dark:text-slate-300 mt-3 text-[15px]">{c.subtitle}</p>
           <p className="text-[14px] font-semibold mt-2">{c.taxInfo}</p>
         </div>
 
@@ -329,19 +237,19 @@ export default function PricingPage() {
 
         {/* Refund policy link */}
         <div className="text-center mt-2">
-          <Link href="/refund-policy" className="text-[14px] text-brand-deep hover:underline">
+          <Link href="/refund-policy" className="text-[14px] text-pcblue hover:underline">
             {c.refundLink}
           </Link>
         </div>
 
         {/* FAQ */}
         <div className="max-w-3xl mx-auto mt-16 card p-8">
-          <h2 className="font-serif text-2xl font-semibold mb-6">{c.faqTitle}</h2>
+          <h2 className="font-inter text-2xl font-semibold mb-6">{c.faqTitle}</h2>
           <div className="space-y-6">
             {c.faqs.map((faq) => (
               <div key={faq.q}>
                 <h3 className="font-semibold text-[15px] mb-1.5">{faq.q}</h3>
-                <p className="text-[14px] leading-relaxed text-inkmut dark:text-dark-inkmut">{faq.a}</p>
+                <p className="text-[14px] leading-relaxed text-slate-600 dark:text-slate-300">{faq.a}</p>
               </div>
             ))}
           </div>
@@ -349,7 +257,7 @@ export default function PricingPage() {
 
         {/* Enterprise CTA */}
         <div className="text-center mt-16">
-          <p className="text-inkmut dark:text-dark-inkmut mb-4 text-[15px]">{c.customDesc}</p>
+          <p className="text-slate-600 dark:text-slate-300 mb-4 text-[15px]">{c.customDesc}</p>
           <a
             href="mailto:contact@paperclue.ai"
             className="btn btn-outline inline-flex px-6 py-2.5 text-[15px]"

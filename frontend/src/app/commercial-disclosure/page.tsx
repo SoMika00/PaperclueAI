@@ -76,17 +76,17 @@ export default function CommercialDisclosurePage() {
   const c = locale === "ja" ? CONTENT.ja : CONTENT.en;
 
   return (
-    <div className="min-h-screen bg-ivory dark:bg-dark-bg text-ink dark:text-dark-ink transition-colors">
+    <div className="min-h-screen font-inter bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <SiteNav />
 
       <main className="max-w-3xl mx-auto px-6 py-14 sm:py-20">
-        <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-center mb-10">{c.title}</h1>
+        <h1 className="font-inter text-3xl sm:text-4xl font-semibold text-center mb-10">{c.title}</h1>
 
-        <div className="card divide-y divide-line dark:divide-dark-line overflow-hidden">
+        <div className="card divide-y divide-slate-200 dark:divide-slate-800 overflow-hidden">
           {c.rows.map((row) => (
             <div key={row.label} className="grid grid-cols-1 sm:grid-cols-3 gap-2 px-5 py-4">
               <div className="font-semibold text-[14px]">{row.label}</div>
-              <div className="sm:col-span-2 text-[14px] text-inkmut dark:text-dark-inkmut leading-relaxed">
+              <div className="sm:col-span-2 text-[14px] text-slate-600 dark:text-slate-300 leading-relaxed">
                 {row.value}
                 {row.points && (
                   <ol className="list-decimal pl-5 space-y-1">
@@ -100,8 +100,8 @@ export default function CommercialDisclosurePage() {
           ))}
         </div>
 
-        <div className="mt-12 border-t border-line dark:border-dark-line pt-6">
-          <Link href="/" className="text-[13px] text-brand-deep hover:underline">
+        <div className="mt-12 border-t border-slate-200 dark:border-slate-800 pt-6">
+          <Link href="/" className="text-[13px] text-pcblue hover:underline">
             ← {t("legal_back_home")}
           </Link>
         </div>

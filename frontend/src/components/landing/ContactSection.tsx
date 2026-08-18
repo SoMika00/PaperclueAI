@@ -25,13 +25,13 @@ export default function ContactSection() {
     setForm((f) => ({ ...f, [k]: e.target.value }));
 
   const inputClass =
-    "w-full rounded-lg border border-line dark:border-dark-line bg-surface2 dark:bg-dark-surface2 dark:text-dark-ink px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-brand";
+    "w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-100 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-pcblue";
   const labelClass = "block text-[13px] font-medium mb-1.5";
 
   return (
-    <section id="lp-contact" className="w-full bg-surface2/60 dark:bg-dark-surface/40">
+    <section id="lp-contact" className="w-full bg-slate-100/60 dark:bg-slate-900/40">
       <div className="max-w-6xl mx-auto px-6 py-16 sm:py-24">
-        <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-center mb-12">
+        <h2 className="font-inter text-2xl sm:text-3xl font-semibold text-center mb-12">
           {t("lp_contact_title")}
         </h2>
 
@@ -39,12 +39,12 @@ export default function ContactSection() {
           {/* Contact details */}
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-brand-soft text-brand-deep">
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-pcblue-light text-pcblue dark:bg-pcblue/15">
                 <MapPin className="h-5 w-5" />
               </span>
               <div>
                 <div className="font-semibold text-[15px]">{t("lp_contact_addr_title")}</div>
-                <p className="text-[14px] text-inkmut dark:text-dark-inkmut mt-1 leading-relaxed">
+                <p className="text-[14px] text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
                   {t("lp_contact_addr_l1")}
                   <br />
                   {t("lp_contact_addr_l2")}
@@ -52,26 +52,26 @@ export default function ContactSection() {
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-brand-soft text-brand-deep">
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-pcblue-light text-pcblue dark:bg-pcblue/15">
                 <Mail className="h-5 w-5" />
               </span>
               <div>
                 <div className="font-semibold text-[15px]">{t("lp_contact_email_title")}</div>
                 <a
                   href={`mailto:${email}`}
-                  className="text-[14px] text-brand-deep hover:underline mt-1 inline-block break-all"
+                  className="text-[14px] text-pcblue hover:underline mt-1 inline-block break-all"
                 >
                   {email}
                 </a>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-brand-soft text-brand-deep">
+              <span className="flex h-11 w-11 flex-none items-center justify-center rounded-full bg-pcblue-light text-pcblue dark:bg-pcblue/15">
                 <Phone className="h-5 w-5" />
               </span>
               <div>
                 <div className="font-semibold text-[15px]">{t("lp_contact_phone_title")}</div>
-                <p className="text-[14px] text-inkmut dark:text-dark-inkmut mt-1">
+                <p className="text-[14px] text-slate-600 dark:text-slate-300 mt-1">
                   {t("lp_contact_phone")}
                 </p>
               </div>
@@ -97,7 +97,7 @@ export default function ContactSection() {
                 <label htmlFor="c-message" className={labelClass}>{t("lp_contact_form_message")}</label>
                 <textarea id="c-message" required rows={4} value={form.message} onChange={set("message")} className={inputClass} />
               </div>
-              <button type="submit" className="btn btn-primary w-full justify-center">
+              <button type="submit" className="btn w-full justify-center bg-gradient-to-r from-[#4361ee] to-[#3953af] text-white shadow-sm hover:brightness-110">
                 <Mail className="h-4 w-4" />
                 {t("lp_contact_form_submit")}
               </button>
