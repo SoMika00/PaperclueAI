@@ -1,13 +1,13 @@
 "use client";
-/* Public marketing landing page — no auth required. Faithful recreation of the
-   original paperclue.ai home, rebuilt in the redesign design system. All CTAs
-   route to /login (this is a login-only app; there is no public signup). */
+/* Public marketing landing page — no auth required. All CTAs route to /login
+   (this is a login-only app; there is no public signup). */
+import Link from "next/link";
+import { Moon, Sun } from "lucide-react";
 import { useLocale, type DictKey } from "@/lib/i18n";
-import SiteNav from "@/components/landing/SiteNav";
+import { useTheme } from "@/lib/theme";
 import HeroCarousel from "@/components/landing/HeroCarousel";
 import FeatureBlock from "@/components/landing/FeatureBlock";
 import ComparisonTable from "@/components/landing/ComparisonTable";
-import TestimonialsCarousel from "@/components/landing/TestimonialsCarousel";
 import FaqAccordion from "@/components/landing/FaqAccordion";
 import ContactSection from "@/components/landing/ContactSection";
 import SiteFooter from "@/components/landing/SiteFooter";
@@ -30,18 +30,36 @@ const MIND_MAP_FEATURES: { titleKey: DictKey; descKey: DictKey }[] = [
   { titleKey: "lp_mm_f6_title", descKey: "lp_mm_f6_desc" },
 ];
 
-// Cloudinary demo videos (autoplay/muted/loop when scrolled into view)
-const PROOFREADER_VIDEO =
-  "https://res.cloudinary.com/di98mpcja/video/upload/v1756089401/proofreader_vrusej.mp4";
-const MINDMAP_VIDEO =
-  "https://res.cloudinary.com/di98mpcja/video/upload/v1756089454/mind_map_qzbdeb.mp4";
-
 export default function LandingPage() {
-  const { t } = useLocale();
+  const { t, locale, toggle } = useLocale();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-ivory dark:bg-dark-bg text-ink dark:text-dark-ink transition-colors">
-      <SiteNav />
+      {/* Top bar */}
+      <header className="sticky top-0 z-30 border-b border-line dark:border-dark-line bg-ivory/80 dark:bg-dark-bg/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-[15px] max-w-6xl mx-auto">
+          <img src="/paperclue-logo.png" alt="PaperClue" className="h-8 w-auto" />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center h-7 w-7 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={toggle}
+              className="text-xs font-semibold text-inkmut dark:text-dark-inkmut hover:text-ink dark:hover:text-dark-ink"
+            >
+              {locale === "en" ? "日本語" : "English"}
+            </button>
+            <Link href="/login" className="btn btn-primary">
+              {t("landing_login_button")}
+            </Link>
+          </div>
+        </div>
+      </header>
 
       {/* Hero carousel */}
       <HeroCarousel />
@@ -56,27 +74,22 @@ export default function LandingPage() {
           descKey="lp_rm_desc"
           features={RES_MIRROR_FEATURES}
           ctaKey="lp_rm_cta"
-          video={PROOFREADER_VIDEO}
           image="/img/citation_checker.png"
-          imageAlt="Research Refiner demo"
+          imageAlt="Research Refiner"
         />
         <FeatureBlock
           titleKey="lp_mm_title"
           descKey="lp_mm_desc"
           features={MIND_MAP_FEATURES}
           ctaKey="lp_mm_cta"
-          video={MINDMAP_VIDEO}
           image="/img/mindmap.png"
-          imageAlt="Mind Map demo"
+          imageAlt="Mind Map"
           reversed
         />
       </section>
 
       {/* Comparison */}
       <ComparisonTable />
-
-      {/* Testimonials */}
-      <TestimonialsCarousel />
 
       {/* FAQ */}
       <FaqAccordion />

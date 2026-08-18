@@ -4,8 +4,9 @@
    column + the site footer. Content is passed in as structured sections so each
    page can supply EN/JA copy by locale without bloating the i18n dictionary. */
 import Link from "next/link";
+import { Moon, Sun } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
-import SiteNav from "@/components/landing/SiteNav";
+import { useTheme } from "@/lib/theme";
 import SiteFooter from "@/components/landing/SiteFooter";
 
 export interface LegalSection {
@@ -24,11 +25,37 @@ export default function LegalLayout({
   intro: string;
   sections: LegalSection[];
 }) {
-  const { t } = useLocale();
+  const { t, locale, toggle } = useLocale();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-ivory dark:bg-dark-bg text-ink dark:text-dark-ink transition-colors">
-      <SiteNav />
+      {/* Top bar (mirrors the landing) */}
+      <header className="sticky top-0 z-30 border-b border-line dark:border-dark-line bg-ivory/80 dark:bg-dark-bg/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-[15px] max-w-6xl mx-auto">
+          <Link href="/">
+            <img src="/paperclue-logo.png" alt="PaperClue" className="h-8 w-auto" />
+          </Link>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center h-7 w-7 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={toggle}
+              className="text-xs font-semibold text-inkmut dark:text-dark-inkmut hover:text-ink dark:hover:text-dark-ink"
+            >
+              {locale === "en" ? "日本語" : "English"}
+            </button>
+            <Link href="/login" className="btn btn-primary">
+              {t("landing_login_button")}
+            </Link>
+          </div>
+        </div>
+      </header>
 
       {/* Content */}
       <main className="max-w-3xl mx-auto px-6 py-14 sm:py-20">

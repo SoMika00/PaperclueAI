@@ -102,7 +102,12 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
     pathname === "/" ||
     pathname === "/login" ||
     pathname === "/privacy" ||
-    pathname === "/terms";
+    pathname === "/terms" ||
+    pathname === "/about-us" ||
+    pathname === "/pricing" ||
+    pathname === "/blog" ||
+    pathname === "/commercial-disclosure" ||
+    pathname === "/refund-policy";
 
   if (!isPublicRoute && !isKnownRoute && ready) {
     return <>{children}</>; // let Next.js render its not-found boundary

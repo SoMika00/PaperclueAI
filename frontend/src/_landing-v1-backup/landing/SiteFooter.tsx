@@ -3,29 +3,21 @@
 import Link from "next/link";
 import { Twitter, Linkedin, Youtube } from "lucide-react";
 import { useLocale, type DictKey } from "@/lib/i18n";
-import PaymentMethods from "@/components/landing/PaymentMethods";
 
-const PLATFORM: { key: DictKey; href: string }[] = [
-  { key: "lp_footer_mindmap", href: "/login" },
-  { key: "lp_footer_resmirror", href: "/login" },
-  { key: "lp_footer_journal", href: "/login" },
-  { key: "lp_footer_insight", href: "/login" },
-  { key: "lp_footer_pricing", href: "/pricing" },
-  { key: "lp_footer_blog", href: "/blog" },
+const PLATFORM: DictKey[] = [
+  "lp_footer_mindmap",
+  "lp_footer_resmirror",
+  "lp_footer_journal",
+  "lp_footer_insight",
+  "lp_footer_pricing",
+  "lp_footer_blog",
 ];
 
 const COMPANY: { key: DictKey; href: string }[] = [
-  { key: "lp_footer_about", href: "/about-us" },
+  { key: "lp_footer_about", href: "/login" },
   { key: "lp_footer_team", href: "/login" },
   { key: "lp_footer_careers", href: "/login" },
-  { key: "lp_footer_contact", href: "/#lp-contact" },
-];
-
-const LEGAL: { key: DictKey; href: string }[] = [
-  { key: "lp_footer_privacy", href: "/privacy" },
-  { key: "lp_footer_terms", href: "/terms" },
-  { key: "commercialDisclosure_link", href: "/commercial-disclosure" },
-  { key: "refundPolicy_link", href: "/refund-policy" },
+  { key: "lp_footer_contact", href: "#lp-contact" },
 ];
 
 const SOCIAL = [
@@ -67,10 +59,10 @@ export default function SiteFooter() {
           <div>
             <h3 className="font-semibold text-[14px] mb-4">{t("lp_footer_platform")}</h3>
             <ul className="space-y-2.5">
-              {PLATFORM.map(({ key, href }) => (
+              {PLATFORM.map((key) => (
                 <li key={key}>
                   <Link
-                    href={href}
+                    href="/login"
                     className="text-[13px] text-inkmut dark:text-dark-inkmut transition-colors hover:text-brand-deep"
                   >
                     {t(key)}
@@ -86,12 +78,12 @@ export default function SiteFooter() {
             <ul className="space-y-2.5">
               {COMPANY.map(({ key, href }) => (
                 <li key={key}>
-                  <Link
+                  <a
                     href={href}
                     className="text-[13px] text-inkmut dark:text-dark-inkmut transition-colors hover:text-brand-deep"
                   >
                     {t(key)}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -109,23 +101,21 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        {/* Supported payment options */}
-        <div className="mt-12 border-t border-line dark:border-dark-line pt-8">
-          <PaymentMethods />
-        </div>
-
-        <div className="mt-4 flex flex-col gap-4 border-t border-line dark:border-dark-line pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-4 border-t border-line dark:border-dark-line pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[12.5px] text-inkmut dark:text-dark-inkmut">{t("lp_footer_copyright")}</p>
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
-            {LEGAL.map(({ key, href }) => (
-              <Link
-                key={href}
-                href={href}
-                className="text-[12.5px] text-inkmut dark:text-dark-inkmut transition-colors hover:text-brand-deep"
-              >
-                {t(key)}
-              </Link>
-            ))}
+          <div className="flex gap-6">
+            <Link
+              href="/privacy"
+              className="text-[12.5px] text-inkmut dark:text-dark-inkmut transition-colors hover:text-brand-deep"
+            >
+              {t("lp_footer_privacy")}
+            </Link>
+            <Link
+              href="/terms"
+              className="text-[12.5px] text-inkmut dark:text-dark-inkmut transition-colors hover:text-brand-deep"
+            >
+              {t("lp_footer_terms")}
+            </Link>
           </div>
         </div>
       </div>
