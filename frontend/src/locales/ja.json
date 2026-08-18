@@ -1,0 +1,1131 @@
+{
+  "common": {
+    "or": "または",
+    "toggleTheme": "テーマ切り替え",
+    "light": "ライトモード",
+    "dark": "ダークモード",
+    "system": "システム",
+    "free": "無料",
+    "paid": "有料",
+    "cancel": "キャンセル",
+    "create": "作成",
+    "delete": "削除",
+    "download": "ダウンロード",
+    "loading": "読み込み中...",
+    "accept": "受け入れる",
+    "reject": "拒否する",
+    "skip": "スキップ",
+    "previous": "前へ",
+    "new": "新規",
+    "show": "表示",
+    "hide": "非表示",
+    "reset": "リセット",
+    "next": "次へ",
+    "all": "全て",
+    "info": "情報",
+    "upgradePlanMessage": "無料クレジットをすべて使用しました！続行するには、プランをアップグレードしてください。",
+    "notFound": "見つかりません",
+    "success": "成功",
+    "failedToGetPdfUrl": "PDFのURLの取得に失敗しました",
+    "failedToGenerateMindMapInvalidResponse": "マインドマップの生成に失敗しました - 無効な応答構造",
+    "pleaseEnterPdfUrlToValidate": "PDFのURLを入力して検証してください",
+    "pdfUrlValidationFailed": "PDFのURLの検証に失敗しました",
+    "failedToParseFile": "ファイルの解析に失敗しました",
+    "documentAnalysis": "文書分析",
+    "failedToGenerateMindMapFromDocument": "文書からマインドマップの生成に失敗しました",
+    "error": {
+      "fetchFailed": "エラー",
+      "fetchFailedDescription": "データの取得中に問題が発生しました",
+      "checkoutFailed": "チェックアウトエラー",
+      "checkoutFailedDescription": "データの取得中に問題が発生しました"
+    }
+  },
+  "nav": {
+    "myTeam": "チーム",
+    "features": "機能",
+    "blog": "ブログ",
+    "mindMap": "マインドマップ",
+    "proofreader": "研究精査ツール",
+    "paperInsights": "論文インサイト",
+    "pricing": "料金",
+    "login": "ログイン / 登録",
+    "logout": "ログアウト",
+    "profile": "プロフィール",
+    "manageSubscription": "サブスクリプション管理",
+    "admin": "管理画面",
+    "journalFormatting": "ジャーナルフォーマット"
+  },
+  "blog": {
+    "loading": "記事を読み込み中...",
+    "backToBlog": "ブログに戻る",
+    "tags": "タグ",
+    "like": "いいね",
+    "comment": "コメント",
+    "save": "保存",
+    "share": "共有",
+    "copied": "コピーしました！",
+    "shareArticle": "この記事を共有する",
+    "aboutAuthor": "著者について",
+    "relatedArticles": "関連記事",
+    "categories": "カテゴリー",
+    "subscribeNewsletter": "ニュースレターに登録する",
+    "newsletterDescription": "最新の研究のヒントとアカデミックライティングのアドバイスをメールでお届けします。",
+    "emailPlaceholder": "メールアドレス",
+    "subscribe": "登録する",
+    "title": "ブログ",
+    "subtitle": "研究と論文執筆のための洞察とヒント",
+    "allPosts": "すべての投稿",
+    "recentPosts": "最近の投稿",
+    "readMore": "続きを読む",
+    "minRead": "分で読める",
+    "filterBy": "フィルター",
+    "category": "カテゴリー",
+    "searchPlaceholder": "記事を検索...",
+    "featuredArticle": "注目記事",
+    "latestArticles": "最新記事",
+    "noArticlesFound": "条件に一致する記事が見つかりませんでした。",
+    "resetFilters": "フィルターをリセット"
+  },
+  "home": {
+    "hero": {
+      "title": "卓越した研究を可能に",
+      "subtitle": "研究論文レビューをより魅力的な体験に変える",
+      "getStarted": "無料で始める",
+      "watchDemo": "デモを見る"
+    },
+    "features": {
+      "title": "使い方",
+      "mindMap": {
+        "title": "マインドマップ",
+        "description": "このツールは特に学部生向けに作られており、文献レビューを簡単にし、学術論文から重要な概念や要点を効率よく選べます",
+        "feature1": "ノードベースの視覚化",
+        "feature2": "AIによる簡単な要約",
+        "feature3": "キーワード＆コンセプトの抽出",
+        "feature4": "文脈理解",
+        "feature5": "効率的な研究検索方法",
+        "feature6": "出版物リスト",
+        "cta": "マインドマップへ",
+        "featureDescriptions": {
+          "feature1": "動的で繋がりのあるノードを通じて、研究ネットワークを視覚的に表示します。",
+          "feature2": "異なる分野の研究を探ることで、さまざまな分野のつながりを見つけることができます",
+          "feature3": "学術論文からキーワードや重要な概念を自動で取り出します。",
+          "feature4": "PDFをアップロードするだけで、学術内容を詳しく分析し内容をわかりやすく理解できるようにします。",
+          "feature5": "テーマや方法、引用の関係を使って、関連する研究を見つけ出します。",
+          "feature6": "特定のキーワードに基づいて、出版物のリストを自動で作成します。"
+        }
+      },
+      "resMirror": {
+        "title": "研究精査ツール",
+        "description": "より高品質な査読プロセス、改善された明確さ、ジャーナル ガイドラインの完全な遵守を求める教授、研究者、大学院生にとって、このセクションは学術的なニーズを満たすように設計されています。",
+        "feature2": "引用精度テスト",
+        "feature6": "ジャーナル別のフォーマット調整",
+        "feature5": "実用的なフィードバック付きの論文レビュー",
+        "feature1": "AI生成コンテンツの検出",
+        "feature3": "論文向けの高度なチェック",
+        "feature8": "明確さと簡潔さの向上",
+        "feature7": "AIフィードバック要約",
+        "feature9": "カスタムスタイルガイド連携",
+        "feature4": "バージョン履歴と変更追跡",
+        "featureDescriptions": {
+          "feature2": "引用が正確で、適切に整えられ、正しく出典とリンクされていることを確認し、学術的な信頼性を確保します。",
+          "feature6": "投稿先ジャーナルのフォーマット要件に合わせて、自動でレイアウトを整えます。",
+          "feature5": "自動ピアレビューを通して、研究の長所と短所を特定し、そこから学びを得られます。",
+          "feature1": "洗練された、人間的な添削を受け、改善すべき点を明らかにします。",
+          "feature3": "文法上の誤りをチェックし、的を絞った修正を受け取り、学術的な文章を改善するための重要な領域を特定します。",
+          "feature8": "冗長表現を削減し、読みやすい高品質な文章に仕上げます",
+          "feature7": "提案された編集点と文章評価を一目で把握できるレポートを生成します。",
+          "feature9": "お好みの校正ルールを取り込み、一貫した文書スタイルを実現します。",
+          "feature4": "元の論文とAI強化版の違いから学びます。"
+        },
+        "cta": "研究精査ツールへ"
+      }
+    },
+    "extension": {
+      "new": "近日公開",
+      "title": "研究ワークフローを強化",
+      "description": "Chrome拡張機能で学術サイト閲覧中にPaperClue機能へ即時アクセス",
+      "cta": "Chrome拡張機能をダウンロード"
+    },
+    "testimonials": {
+      "title": "研究者の声",
+      "testimonial1": {
+        "name": "サラ・チェン博士",
+        "role": "生物学教授",
+        "content": "Paperclueは文献レビューのアプローチ方法を変革しました。マインドマップ機能は、見逃していたかもしれない概念のつながりを見つけるのに役立ちます。"
+      },
+      "testimonial2": {
+        "name": "ジェームズ・ウィルソン",
+        "role": "博士課程候補生",
+        "content": "研究精査ツール者は編集作業の時間を大幅に節約してくれました。投稿先ジャーナルのフォーマットの問題を特定してくれました。"
+      },
+      "testimonial3": {
+        "name": "田中恵子博士",
+        "role": "研究科学者",
+        "content": "非ネイティブスピーカーとして、Paperclueは投稿前に原稿を洗練するのに非常に役立ちました。"
+      }
+    },
+    "faq": {
+      "title": "よくある質問",
+      "question4": "PaperClueマインドマップとは何ですか？",
+      "answer4": "PaperClueマインドマップは、研究者が興味のあるテーマに集中できるよう設計されたツールです。高度なAIが論文から重要なキーワードや概念を自動で抽出・要約し、ノードとリンクによって視覚的に整理します。その結果、膨大な文献を読み込むことなく、アイデア同士の関連性をひと目で把握でき、研究プロセスを効率化します。",
+      "question5": "PaperClueのマインドマップは、Google Scholarや他の研究者が一般的に使用するプラットフォームとどのように異なりますか？",
+      "answer5": "Google Scholarがキーワード検索をもとに幅広い論文リストを返すのに対し、PaperClueのマインドマップは特定のキーワードを中心に関連文献を自動でグルーピングし、可視化します。つまり、特定のテーマに絞り込んで'何が重要か'を直感的に掴みやすい点が大きく異なります。",
+      "question6": "マインドマップ上で検索結果を保存し、定期的に最新動向を受け取ることはできますか？",
+      "answer6": "はい。マインドマップでは一度設定した検索条件を保存でき、キーワードやノードに新着論文が追加された際には自動で通知を受け取れます。これにより、研究分野の最新トレンドを逃さずフォローできます。",
+      "question1": "研究精査ツールとは何ですか？どのように論文執筆を支援するのですか？ ",
+      "answer1": "PaperClueの主要機能である研究精査ツールでは、論文や学位論文の文章をAIが自動解析し、文法誤り・表現のくせ・構成の乱れなどを検出します。即座に具体的な修正案やスタイル提案を提示し、学術出版にふさわしいクオリティへと仕上げる機能です。",
+      "question2": "PaperClueの研究精査ツールは、従来の手動校正とどのように異なりますか？",
+      "answer2": "PaperClueの研究精査ツールは高い精度と一貫性を維持しつつ、手動での校正に通常数週間かかる作業時間をわずか数分に短縮します。迅速さ、正確さ、そして手頃な価格が従来の手同校生徒の違いであり、研究精査ツールの強みです。",
+      "question3": "従来の校正を研究精査ツールに置き換えることの利点は何ですか？",
+      "answer3": "研究精査ツールは従来の校正と同等の精度を保ちながら、より迅速で一貫性のあるフィードバックを低価格で提供します。時間が重要な現代において、AIは品質を犠牲にすることなく編集作業を効率化します。 文法、トーン、明瞭さに関するリアルタイムな提案により、AIは文章のメカニズムではなく、アイデアに焦点を合わせます。これは、短時間で高い基準を満たし、今日の急速に進化する研究に合わせたワークフローを実現します。",
+      "question7": "私の研究データは適切に保護されていますか？",
+      "answer7": "はい。お客様の研究データはすべて暗号化して保管し、本人の許可なしに第三者と共有することは一切ありません。データの取り扱いについては、当社プライバシーポリシーおよび情報保護方針に基づいて厳重に管理しています。"
+    },
+    "footer": {
+      "description": "あなたの研究と執筆を支えるAIアシスタント",
+      "platform": "プラットフォーム",
+      "company": "会社",
+      "subscribe": {
+        "title": "購読",
+        "description": "新機能と学術論文執筆のヒントに関する最新情報を受け取る",
+        "placeholder": "メールアドレス",
+        "button": "購読",
+        "success": "購読しました",
+        "successDescription": "新機能と学術論文執筆のヒントに関する最新情報を受け取る",
+        "error": "購読に失敗しました",
+        "errorDescription": "再度お試しください"
+      },
+      "copyright": "© 2025 Paperclue. All rights reserved.",
+      "privacy": "プライバシーポリシー",
+      "terms": "利用規約",
+      "platformItems": {
+        "mindMap": "マインドマップ",
+        "resMirror": "研究精査ツール者",
+        "journalFormatting": "ジャーナルフォーマット",
+        "paperInsight": "論文インサイト",
+        "chromeExtension": "Chrome拡張機能",
+        "pricing": "料金",
+        "blog": "ブログ"
+      },
+      "companyItems": {
+        "about": "会社概要",
+        "team": "チーム",
+        "careers": "採用情報",
+        "contact": "お問い合わせ"
+      }
+    },
+    "contact": {
+      "title": "お問い合わせ",
+      "address": {
+        "title": "住所",
+        "line1": "広島県東広島市西条朝日町7-45",
+        "line2": "〒739-0012"
+      },
+      "email": {
+        "title": "メール",
+        "address": "contact@paperclue.com"
+      },
+      "phone": {
+        "title": "電話",
+        "number": "082-424-0000"
+      },
+      "form": {
+        "name": "お名前",
+        "email": "メールアドレス",
+        "message": "メッセージ",
+        "submit": "送信する",
+        "subject": "件名"
+      }
+    }
+  },
+  "paperInsights": {
+    "title": "論文インサイト",
+    "description": "AIを活用して分析結果を得たり、品質スコアや改善提案を通じて、研究論文を総合的に分析します。",
+    "features": {
+      "qualityScoring": {
+        "title": "品質スコアリング",
+        "description": "段落ごとの詳細なスコアによる品質評価"
+      },
+      "sectionAnalysis": {
+        "title": "セクション分析",
+        "description": "各セクションの強みと弱みを明確化"
+      },
+      "aiInsights": {
+        "title": "AIインサイト",
+        "description": "原稿改善のための有益な提案"
+      }
+    },
+    "upload": {
+      "title": "研究論文をアップロード",
+      "description": "論文をドラッグ＆ドロップするか、クリックして選択してください",
+      "dropHere": "ここに論文をドロップしてください",
+      "chooseFile": "ファイルを選択",
+      "uploadingTitle": "論文をアップロード中",
+      "complete": "完了",
+      "errorMessage": "有効なPDF、DOC、またはDOCXファイル（最大10MB）をアップロードしてください",
+      "supportedFormats": "対応形式: PDF",
+      "maxFileSize": "最大ファイルサイズ: 10MB"
+    }
+  },
+  "mindMap": {
+    "title": "マインドマップ作成スタジオ",
+    "selectMap": "マップを選択",
+    "filters": "フィルター",
+    "save": "マップを保存",
+    "newArea": "新しいトピック",
+    "newAreaPlaceHolder": "研究テーマを入力してください",
+    "areaName": "研究テーマ",
+    "newKeyword": "新しいキーワード",
+    "newConcept": "新しいコンセプト",
+    "atGlance": "マップ概要",
+    "bookmarkedPapers": "ブックマークされた論文",
+    "newMap": "新規マップ",
+    "addKeyword": "キーワードを追加",
+    "createNew": "新規作成",
+    "name": "名前",
+    "add": "追加",
+    "createArea": "研究テーマを設定する",
+    "extractPapers": "論文を抽出",
+    "byAuthor": "著者別",
+    "byJournal": "ジャーナル別",
+    "openInWindow": "ウィンドウで開く",
+    "relevantKeywords": "関連キーワードを",
+    "goToPaper": "論文へ移動",
+    "publications": {
+      "title": "関連出版物",
+      "save": "保存"
+    },
+    "generatePublications": "出版物リストを生成",
+    "summarize": "要約する",
+    "concept": "コンセプト",
+    "explanation": "説明",
+    "deleteMap": "このマップを削除しますか？この操作は元に戻すことはできません。",
+    "noMaps": "マップが見つかりません。",
+    "keywordsFound": "キーワードが見つかりました",
+    "keywordsFoundDescription": "このトピックのキーワードが見つかりました",
+    "papersFound": "論文が見つかりました",
+    "papersFoundDescription": "このトピックの論文が見つかりました",
+    "rateLimitError": "レート制限",
+    "rateLimitErrorDescription": "数秒後に再試行してください",
+    "failedToSearchPapers": "論文の検索に失敗しました",
+    "failedToSearchPapersDescription": "数秒後に再試行してください",
+    "contentSummarized": "コンテンツが要約されました",
+    "contentSummarizedDescription": "コンテンツが正常に要約されました",
+    "failedToSummarizeContent": "コンテンツの要約に失敗しました",
+    "failedToSummarizeContentDescription": "別のトピックで再試行してください",
+    "mapSaved": "マップが保存されました",
+    "mapSavedDescription": "マップが保存されました。",
+    "mapDeleted": "マップが削除されました",
+    "mapDeletedDescription": "マップが完全に削除されました。",
+    "mindMapGeneratedSuccessfully": "PDFからマインドマップが正常に生成されました",
+    "failedToGenerateMindMap": "PDFからマインドマップの生成に失敗しました",
+    "researchPaperAnalysis": "研究論文分析",
+    "pdfAnalysis": "PDF分析",
+    "paperBookmarked": "論文がブックマークされました",
+    "paperBookmarkedDescription": "論文がブックマークされました",
+    "paperUnbookmarked": "論文のブックマークが解除されました",
+    "paperUnbookmarkedDescription": "論文のブックマークが解除されました",
+    "failedToGetRelatedKeywords": "関連キーワードの取得に失敗しました",
+    "similarPaperFound": "類似論文が見つかり、マインドマップに追加されました",
+    "failedToExtractSimilarPaper": "類似論文の抽出に失敗しました",
+    "pleaseEnterPdfUrl": "PDFのURLを入力してください",
+    "mindMapGeneratedFromDocument": "文書からマインドマップが正常に生成されました",
+    "pdfUrlValid": "PDFのURLが有効でアクセス可能です",
+    "failedToValidatePdfUrl": "PDFのURLの検証に失敗しました",
+    "failedToLoadSupportedSources": "サポートされているソース情報の読み込みに失敗しました",
+    "pleaseUploadFileFirst": "最初にファイルをアップロードしてください",
+    "fileUploadedSuccessfully": "ファイルが正常にアップロードされました",
+    "errorParsingFile": "ファイルの解析エラー",
+    "retrying": "再試行中...",
+    "warning": "警告",
+    "pleaseEnterValidTopic": "有効なトピックを入力してください",
+    "noKeywordsFound": "このトピックのキーワードが見つかりませんでした",
+    "failedToExtractConcepts": "コンセプトの抽出に失敗しました",
+    "failedToExplainText": "テキストの説明に失敗しました",
+    "defaultValues": {
+      "concept": "コンセプト",
+      "summaryOfPaper": "論文の要約",
+      "overview": "概要",
+      "noSummary": "要約なし",
+      "noDescription": "説明なし",
+      "noResponse": "応答なし",
+      "unknown": "不明",
+      "noAbstractAvailable": "要約が利用できません",
+      "untitled": "無題",
+      "noAuthors": "著者なし",
+      "unknownJournal": "不明なジャーナル",
+      "unknownYear": "不明な年",
+      "noReferencesAvailable": "参考文献が利用できません"
+    },
+    "pdfModal": {
+      "title": "文書からマインドマップを生成",
+      "description": "文書をアップロードするか、PDFのURLを入力して、主要な概念、要約、説明を含むマインドマップを自動生成します。",
+      "uploadMethod": "アップロード方法",
+      "uploadFile": "ファイルをアップロード",
+      "pdfUrl": "PDF URL",
+      "uploadDocument": "文書をアップロード",
+      "pdfUrlLabel": "PDF URL *",
+      "supportedSources": "サポートされているソース",
+      "validate": "検証",
+      "parsingDocument": "文書を解析中...",
+      "documentParsedSuccessfully": "文書が正常に解析されました",
+      "characters": "文字",
+      "dragDropReplace": "ここに別のファイルをドラッグ＆ドロップして置き換えることもできます。",
+      "clickOrDragDrop": "ここをクリックするか、文書をドラッグ＆ドロップしてください",
+      "supportedFormats": "サポートされている形式: PDF, DOC, DOCX, TXT",
+      "dragDropHint": "ここにファイルをドラッグ＆ドロップするか、クリックして選択してください",
+      "uploadPdf": "PDFをアップロード",
+      "generateMindMap": "マインドマップを生成"
+    }
+  },
+  "fileUpload": {
+    "title": "文書をアップロードまたはテキストを貼り付け",
+    "description": "ファイルをアップロードするか、テキストを直接貼り付けてください",
+    "placeholder": "ここにテキストを貼り付けてください...",
+    "tabs": {
+      "pasteText": "テキストを貼り付け",
+      "uploadFile": "ファイルをアップロード"
+    },
+    "textInput": {
+      "label": "テキストを入力してください"
+    },
+    "uploadArea": {
+      "title": "文書をアップロードするにはクリックしてください",
+      "supportedFormats": "サポートされている形式: DOC, DOCX, TXT",
+      "maxFileSize": "最大ファイルサイズ: {{maxSize}}MB"
+    },
+    "parsing": "文書を解析中...",
+    "success": {
+      "title": "ファイルが正常にアップロードされました",
+      "description": "{{fileName}}が正常に解析されました",
+      "parsed": "✓ 文書が正常に解析されました ({{characterCount}}文字)"
+    },
+    "errors": {
+      "fileTooLarge": {
+        "title": "ファイルが大きすぎます",
+        "description": "ファイルサイズは{{maxSize}}MB未満である必要があります"
+      },
+      "unsupportedFileType": "サポートされていないファイル形式: {{fileName}}",
+      "parsingError": {
+        "title": "ファイル解析エラー",
+        "description": "ファイルの解析に失敗しました"
+      }
+    }
+  },
+  "resMirror": {
+    "title": "研究精査ツール",
+    "journalFormatAlignment": {
+      "title": "ジャーナルフォーマット最適化",
+      "description": "原稿をアップロードし、対象ジャーナルを選択してフォーマット整合を開始してください。",
+      "uploadTitle": "原稿をアップロード",
+      "uploadDescription": "研究論文をアップロードし、対象ジャーナルを選択してフォーマット整合を開始してください。"
+    },
+    "journalSelection": {
+      "title": "対象ジャーナルを選択",
+      "description": "投稿予定のジャーナルを選択してください",
+      "searchPlaceholder": "ジャーナルを検索...",
+      "webSearchTitle": "ウェブでジャーナルを検索",
+      "databaseSearchTitle": "データベースでジャーナルを検索",
+      "tryWithSample": "サンプルで試す",
+      "webSearchPlaceholder": "ジャーナル名またはISSNを入力...",
+      "searching": "検索中...",
+      "searchWeb": "ウェブで検索",
+      "searchResults": "検索結果",
+      "webResult": "ウェブ結果",
+      "noJournalsFound": "ジャーナルが見つかりません",
+      "noJournalsDescription": "検索条件に一致するジャーナルが見つかりません。ウェブでこのジャーナルを検索してみてください。",
+      "publisher": "出版社",
+      "clickToViewDetails": "詳細を表示するにはクリック",
+      "useThisJournal": "このジャーナルを使用",
+      "noResults": "検索条件に一致するジャーナルが見つかりません。ウェブでこのジャーナルを検索してみてください。",
+      "journalDetails": "ジャーナル詳細",
+      "webSearchResult": "ウェブ検索結果",
+      "databaseResult": "データベース結果",
+      "viewFormattingGuide": "フォーマットガイドを表示",
+      "selectJournalToViewDetails": "ジャーナルを選択して詳細とフォーマットガイドラインを表示"
+    },
+    "manualFormat": {
+      "title": "手動フォーマット設定",
+      "configureDescription": "カスタムフォーマットパラメータを設定",
+      "usingJournalDescription": "{{journal}}のフォーマットガイドラインを使用中",
+      "selectDescription": "ジャーナルを選択するか、ウェブで検索するか、手動設定を有効にしてください"
+    },
+    "aiHumanizer": {
+      "title": "AI生成コンテンツ検出・自然化ツール",
+      "description": "文章をチェックしてAI生成コンテンツ特有のリスクを評価し、より自然で人間らしい文章へと修正し、学術的な論文の完成度を高めます。",
+      "pasteText": "ここにテキストを貼り付けてください",
+      "textPlaceholder": "AI検出と自然化のためにテキストを入力または貼り付けてください...",
+      "aiDetection": "AI検出",
+      "checking": "コンテンツを分析中...",
+      "noTextError": "テキストが入力されていません",
+      "noTextErrorDescription": "AI検出のためにテキストを入力してください。",
+      "reset": "リセット",
+      "analyzeContent": "コンテンツ分析",
+      "humanizeAll": "すべてのセクションを自然化",
+      "humanizingAll": "すべてのセクションを自然化中...",
+      "humanize": "自然化",
+      "humanizing": "自然化中...",
+      "humanized": "自然化済み",
+      "reject": "拒否",
+      "aiDetectionTab": "AI検出",
+      "humanizedTab": "自然化版",
+      "overallScore": "総合AIスコア",
+      "lowRisk": "低リスク",
+      "mediumRisk": "中リスク",
+      "highRisk": "高リスク",
+      "humanizerSettings": "自然化設定",
+      "preserveMeaning": "元の意味を保持",
+      "naturalTone": "自然なトーン",
+      "simplifyLanguage": "言語の簡素化",
+      "personalStyle": "個人的なスタイル",
+      "aiDetectionRiskLevels": "AI検出リスクレベル",
+      "lowRiskDescription": "低リスク (0-40%): 人間が書いたものとして通過する可能性が高い",
+      "mediumRiskDescription": "中リスク (40-70%): 一部のAI検出器で検出される可能性があります",
+      "highRiskDescription": "高リスク (70-100%): AI生成として識別される可能性が高い",
+      "downloadResults": "結果をダウンロード",
+      "aiHumanizer": "AI自然化ツール",
+      "tooltipDescription": "元の意味を保持しながら、AI生成として検出されにくくするためにコンテンツの自然化版を確認し、承認してください。"
+    },
+    "continueToAnalyze": "分析を続行",
+    "export": "エクスポート",
+    "newAnalysis": "新しい分析",
+    "upload": {
+      "title": "文書をアップロード",
+      "description": "原稿や論文をアップロードして、AI による分析と改善提案を受けましょう",
+      "dropText": "ここにファイルをドロップするか",
+      "supportedFormats": "クリックして選択 Wordとテキストファイル対応",
+      "browseFiles": "ファイルを参照"
+
+    },
+    "formatSelection": "対象ジャーナルまたは大学フォーマット",
+    "analysisOptions": "分析オプション",
+    "documentType": {
+      "label": "文書の種類",
+      "placeholder": "文書の種類を選択",
+      "thesis": "論文/学位論文",
+      "paper": "研究論文"
+    },
+    "citationFormat": {
+      "label": "引用形式",
+      "paperPlaceholder": "ジャーナル名を選択",
+      "universityPlaceholder": "大学のフォーマットを選択"
+    },
+    "advancedOptions": "高度なオプション",
+    "options": {
+      "grammar": "文法とスタイルのチェック",
+      "paraphrasing": "パラフレーミングの改善提案",
+      "formatting": "ジャーナルフォーマットの調整",
+      "aiDetection": "AI生成コンテンツ検出リスク評価",
+      "plagiarism": "盗用チェック",
+      "tablesFiguresAlignment": "対象形式に合わせた表と図の配置",
+      "conciseness": "簡潔さ（冗長な単語やフレーズの削除）",
+      "consistency": "一貫性（時制、数字、日付、略語のフォーマット）",
+      "toneAndVoice": "トーンと声（形式性、受動態と能動態）",
+      "structuralIntegrity": "構造的完全性（見出しと小見出し）",
+      "citationAccuracy": "引用の正確性",
+      "terminologyConsistency": "専門用語の一貫した使用",
+      "abbreviationUsage": "略語の適切な導入と使用",
+      "equationFormatting": "数式の適切なフォーマット",
+      "tableOfContents": "目次の正確性",
+      "appendicesFormatting": "付録の適切なフォーマット",
+      "footnotesEndnotes": "脚注/巻末注の正しいフォーマット",
+      "keywordOptimization": "索引付けのためのキーワード最適化",
+      "abstractCompleteness": "要約の完全性と明確さ",
+      "ethicalCompliance": "倫理的ガイドラインの遵守",
+      "aiProofreader": "研究精査ツール",
+      "submissionReadiness": "投稿準備状態チェッカー",
+      "flowAndTransitions": "文章の流れと接続",
+      "equationsAndSymbols": "数式と記号",
+      "hyphenationAndCaps": "ハイフンと大文字の使用",
+      "consistencyInTerms": "用語の一貫性",
+      "aiHumanizer": "AI文章の自然化"
+    },
+    "grammarChecker": {
+      "title": "文法チェッカー",
+      "description": "文書の文法エラーをチェックし、適切な修正を受け取り、改善すべき領域を発見して、ライティング スキルを強化します。",
+      "pasteText": "ここにテキストを貼り付けてください",
+      "textPlaceholder": "文法エラーをチェックするテキストを入力または貼り付けてください...",
+      "grammarCheck": "文法チェック",
+      "checking": "文法をチェック中...",
+      "noTextError": "テキストが入力されていません",
+      "noTextErrorDescription": "文法エラーをチェックするためにテキストを入力してください。",
+      "reset": "リセット",
+      "original": "オリジナル",
+      "document": "ドキュメント",
+      "issues": "問題点",
+      "improvedVersion": "AI改良版",
+      "sentenceStructure": "文節構造",
+      "citationFormat": "引用形式",
+      "enhancement": "改善",
+      "suggestion": "提案",
+      "minor": "軽微",
+      "grammarError": "文法エラー",
+      "reason": "理由",
+      "grammarCheckSuccess": "文法チェックが完了しました",
+      "grammarCheckSuccessDescription": "文書の文法エラーを確認し、書き直します。",
+      "grammarCheckError": "文法チェックに失敗しました",
+      "grammarCheckErrorDescription": "時間をおいて再度お試しください",
+      "aiDetectionSuccess": "AI検出が完了しました",
+      "aiDetectionSuccessDescription": "文書のAI生成コンテンツを検出し、書き直します。",
+      "aiDetectionError": "AI検出に失敗しました",
+      "aiDetectionErrorDescription": "時間をおいて再度お試しください",
+      "humanizeSuccess": "自然化が完了しました",
+      "humanizeSuccessDescription": "文書を自然化します。",
+      "humanizeError": "自然化に失敗しました",
+      "humanizeErrorDescription": "時間をおいて再度お試しください"
+    },
+    "submit": "AI分析を依頼",
+    "analyzing": "文書を分析中...",
+    "original": "オリジナル文書",
+    "improved": "AI改善版",
+    "document": "文書",
+    "issues": "問題点",
+    "download": "ダウンロード",
+    "acceptAll": "すべて承認",
+    "rejectAll": "すべて拒否",
+    "previous": "前へ",
+    "next": "次へ"
+  },
+  "pricing": {
+    "title": "シンプルな料金体系",
+    "subtitle": "ニーズに合ったプランを選択",
+    "monthly": "月額請求",
+    "annually": "年額請求",
+    "save": "20%割引",
+    "popular": "人気",
+    "taxExcluded": "(税別)",
+    "taxInfo": "すべての料金には消費税が含まれています。",
+    "plans": {
+      "free": {
+        "name": "無料",
+        "price": "¥0",
+        "description": "学術研究のための基本機能",
+        "features": [
+          "AIリスク評価（制限あり）",
+          "引用精度チェック（制限あり）",
+          "基本的なフォーマット機能",
+          "基本的なマインドマップ機能",
+          "利用可能クレジットは10件まで"
+        ],
+        "cta": "無料で始める"
+      },
+      "premium": {
+        "name": "プレミアム",
+        "price": "¥2,200",
+        "period": "月",
+        "description": "プレミアムプランで、より多くの機能と柔軟性を",
+        "introOffer": "初月のみ ¥1,100",
+        "regularPrice": "2か月目以降 ¥2,200／月",
+        "features": [
+          "AIヒューマナイザー",
+          "高度な文法チェック",
+          "AIリスク評価",
+          "引用精度チェック",
+          "無制限の研究論文要約",
+          "マインドマップの全機能",
+          "優先サポート"
+        ],
+        "cta": "プレミアムにアップグレード"
+      },
+      "pro": {
+        "name": "プロ",
+        "price": "¥5,500",
+        "period": "月",
+        "description": "熱心な研究者のための総合ツール",
+        "introOffer": "初月のみ ¥3,300",
+        "regularPrice": "2か月目以降 ¥5,500／月",
+        "features": [
+          "研究論文レビュー 無制限",
+          "論文レビュー 無制限",
+          "プレゼンテーションレビュー 無制限",
+          "ジャーナル別フォーマット",
+          "AIヒューマナイザー",
+          "高度な文法チェック",
+          "AIリスク評価",
+          "引用精度チェック",
+          "研究論文要約 無制限",
+          "マインドマップの全機能",
+          "優先サポート"
+        ],
+        "cta": "プロにアップグレード"
+      },
+      "team": {
+        "name": "チーム",
+        "price": "¥22,000",
+        "period": "月",
+        "description": "研究チーム向けのコラボレーションツール",
+        "features": [
+          "最大7名のチームメンバー",
+          "研究論文の無制限レビュー",
+          "研究提案書の無制限レビュー",
+          "論文・卒業論文の無制限レビュー",
+          "プレゼンテーションの無制限レビュー",
+          "ジャーナル別フォーマット対応",
+          "高度な文法チェック",
+          "AIヒューマナイザー",
+          "AIリスク評価",
+          "引用精度チェック",
+          "研究論文の無制限サマリー作成",
+          "マインドマップの全機能",
+          "優先サポート"
+        ],
+        "cta": "問い合わせる"
+      },
+      "prime": {
+        "name": "プライム",
+        "price": "¥1,550",
+        "description": "ワンタイムアクセスで学術レビューを受けられます",
+        "features": [
+          "最大3件の文書レビュー",
+          "最大3件のジャーナル別フォーマットチェック",
+          "最大3件の引用精度チェック",
+          "限定的なAIリスク評価",
+          "基本的なマインドマップ機能",
+          "優先サポート"
+        ],
+        "cta": "プライムを取得"
+      }
+    },
+    "faq": {
+      "title": "よくある質問",
+      "question1": "プレミアムチームプランとは何ですか？研究グループにどのようなメリットがありますか？",
+      "answer1": "PaperClueのプレミアムチームプランは、教授、学生、研究グループ向けに特別に設計されたサブスクリプションオプションです。メインアカウント所有者（通常は教授）が、コスト効率の良いプレミアムサブスクリプションの下で学生や研究室メンバーのアカウントを追加・管理できます。これにより、マインドマップツールや研究精査ツールなどのプレミアム機能へのアクセスを、割引されたユーザー単価で全チームメンバーに提供でき、研究チーム全体の生産性とコラボレーションを向上させるのに理想的です。",
+      "question2": "後でプランを変更できますか？",
+      "answer2": "はい、いつでもプランのアップグレード/ダウングレードが可能です。 ・アップグレード時：日割りで差額を請求 ・ダウングレード時：日割りでクレジットをアカウントに付与",
+      "question3": "学術割引はありますか？",
+      "answer3": "はい、学生・教育者・学術機関向けの割引をご用意しています。学生証や在籍証明をサポートチームまでご提出いただくと、割引コードを発行します。",
+      "question4": "文書アップロードに制限はありますか？",
+      "answer4": "・無料プラン：週1件、1文書あたり最大5ページ ・プロプラン：件数無制限、1文書あたり最大100ページ ・チームプラン：件数無制限、1文書あたり最大500ページ",
+      "question5": "盗用検出はどれくらい正確ですか？",
+      "answer5": "数百万件の学術論文、ウェブサイト、出版物と照合し、98％以上の精度で完全一致と類似箇所の両方を検出します。"
+    },
+    "custom": {
+      "description": "組織向けのカスタムソリューションが必要ですか？",
+      "cta": "問い合わせる"
+    }
+  },
+  "auth": {
+    "login": "ログイン",
+    "signup": "登録",
+    "email": "メールアドレス",
+    "password": "パスワード",
+    "forgotPass": "パスワードを忘れた方はこちら",
+    "forgotPassword": {
+      "title": "パスワードをリセット",
+      "checkEmail": "メールを確認してください",
+      "description": "メールアドレスを入力してください。パスワードリセット用のリンクをお送りします。",
+      "emailSent": "パスワードリセットの手順を記載したメールをお送りしました。",
+      "emailPlaceholder": "name@example.com",
+      "emailLabel": "メールアドレス",
+      "sendResetLink": "リセットリンクを送信",
+      "sending": "送信中...",
+      "tryAnotherEmail": "別のメールアドレスを試す",
+      "backToLogin": "ログインに戻る",
+      "returnToLogin": "ログインに戻る",
+      "checkSpam": "メールが受信トレイに表示されない場合は、迷惑メールフォルダをご確認ください。",
+      "emailRequired": "メールアドレスは必須です",
+      "requestFailed": "リクエストに失敗しました",
+      "resetEmailSent": "リセットメールを送信しました",
+      "resetEmailSentDescription": "パスワードリセットの手順を記載したメールをご確認ください",
+      "unexpectedError": "予期せぬエラーが発生しました。もう一度お試しください。"
+    },
+    "resetPassword": {
+      "title": "パスワードをリセット",
+      "description": "新しいパスワードを入力してください。",
+      "newPassword": "新しいパスワード",
+      "confirmNewPassword": "新しいパスワード（確認）",
+      "passwordPlaceholder": "••••••••",
+      "passwordRequired": "パスワードは必須です",
+      "passwordLength": "パスワードは8文字以上必要です",
+      "confirmPasswordRequired": "パスワードの確認が必要です",
+      "passwordsDoNotMatch": "パスワードが一致しません",
+      "passwordLengthHint": "パスワードは8文字以上必要です",
+      "resetting": "リセット中...",
+      "resetPassword": "パスワードをリセット",
+      "invalidLink": "無効なリセットリンク",
+      "invalidLinkDescription": "パスワードリセットリンクが無効または期限切れです。",
+      "resetFailed": "パスワードリセットに失敗しました",
+      "resetFailedDescription": "パスワードのリセットに失敗しました。リンクの期限が切れている可能性があります。",
+      "resetSuccessful": "パスワードリセットが完了しました",
+      "resetSuccessfulDescription": "パスワードが正常にリセットされました。",
+      "unexpectedError": "予期せぬエラーが発生しました。もう一度お試しください。",
+      "requestNewLink": "新しいリンクをリクエスト",
+      "returnToLogin": "ログインに戻る",
+      "logIn": "ログイン"
+    },
+    "continueWith": "または次で続行",
+    "firstName": "名",
+    "lastName": "姓",
+    "confirmPassword": "パスワード確認",
+    "createAccount": "アカウント作成",
+    "signupWith": "または次で登録",
+    "agreement": "登録することで、以下に同意したこと",
+    "terms": "利用規約",
+    "and": "および",
+    "privacy": "プライバシーポリシー",
+    "verifyEmail": {
+      "title": "メール認証",
+      "verifying": "メールアドレスを認証中...",
+      "verified": "メールアドレスの認証が完了しました",
+      "failed": "メール認証に失敗しました",
+      "invalidLink": "無効な認証リンクです",
+      "success": "成功",
+      "successDescription": "メールアドレスの認証が完了しました。",
+      "error": "エラー",
+      "errorDescription": "メール認証に失敗しました",
+      "unexpectedError": "メール認証中にエラーが発生しました",
+      "continueToLogin": "ログインへ進む",
+      "returnToLogin": "ログインに戻る",
+      "createNewAccount": "新規アカウント作成"
+    }
+  },
+  "infoPolicy": {
+    "title": "利用規約",
+    "introduction": "本利用規約（以下「本規約」）は、PaperClue株式会社（以下「当社」）が提供する www.paperclue.ai（以下「本サービス」）の利用に関する、当社と利用者（以下「ユーザー」）との間の権利義務を定めるものです。ユーザーは、本サービスを利用することにより、本規約に同意したものとみなされます。",
+    "sections": {
+      "purpose": {
+        "title": "1. 目的",
+        "content": "本利用規約（以下「本規約」）は、PaperClue株式会社（以下「当社」）が提供する www.paperclue.ai（以下「本サービス」）の利用に関する、当社と利用者（以下「ユーザー」）との間の権利義務を定めるものです。ユーザーは、本サービスを利用することにより、本規約に同意したものとみなされます。"
+      },
+      "scope": {
+        "title": "2. 適用範囲",
+        "content": "本規約は、アカウント登録の有無を問わず、すべてのユーザーに適用されます。特定機能の利用に際しては、別途定める規約が適用される場合があります。"
+      },
+      "accountRegistration": {
+        "title": "3. アカウント登録",
+        "items": [
+          "ユーザーは、登録時に正確かつ最新の情報を提供しなければなりません。",
+          "ユーザーは、ログイン情報を自己の責任で管理し、第三者と共有してはなりません。",
+          "アカウントを通じて行われた全ての行為は、当該ユーザーの責任とみなされます。"
+        ]
+      },
+      "prohibitedActs": {
+        "title": "4. 禁止行為",
+        "intro": "ユーザーは、以下の行為を行ってはなりません。",
+        "items": [
+          "当社または第三者の知的財産権を侵害する行為",
+          "法令に違反する目的での利用",
+          "本サービスの運営を妨害または妨害しようとする行為",
+          "虚偽または誤解を招く情報の提供"
+        ]
+      },
+      "intellectualProperty": {
+        "title": "5. 知的財産権",
+        "content": "本サービスに関する著作権、商標権、その他の知的財産権は、当社またはライセンサーに帰属します。ユーザーは、事前の書面による承諾なく、本サービスの全部または一部を複製、改変、配布することはできません。"
+      },
+      "disclaimer": {
+        "title": "6. 免責事項",
+        "items": [
+          "当社は、本サービスの出力内容の正確性、完全性、信頼性について一切保証しません。",
+          "当社は、本サービスの利用または利用不能により生じたいかなる損害についても責任を負いません。",
+          "ユーザーは、自己の責任において本サービスを利用するものとします。"
+        ]
+      },
+      "serviceModifications": {
+        "title": "7. サービスの変更・中断",
+        "content": "当社は、保守、セキュリティ、運営上の理由により、事前通知なく本サービスを変更、中断、または終了することができます。"
+      },
+      "governingLaw": {
+        "title": "8. 準拠法および管轄",
+        "content": "本規約は日本法に準拠します。本規約に関して生じる紛争は、広島地方裁判所を第一審の専属的合意管轄裁判所とします。"
+      },
+      "changes": {
+        "title": "9. 規約の変更",
+        "content": "当社は、必要に応じて本規約を変更することができます。変更後の規約は本サービス上に掲載された時点で効力を生じ、ユーザーが継続して利用した場合は変更後の規約に同意したものとみなされます。"
+      },
+      "contact": {
+        "title": "10. お問い合わせ",
+        "content": "本規約または本サービスに関するお問い合わせは、以下までご連絡ください。",
+        "email": "contact@paperclue.ai"
+      }
+    }
+  },
+  "privacyPolicy": {
+    "title": "プライバシーポリシー",
+    "introduction": {
+      "welcome": "PaperClue.ai（以下、「当社」といいます。）は、研究と学術的な執筆をサポートするAIアシスタントです。",
+      "company": "当社、株式会社PaperClueは、広島県に本社を置くソフトウェアサービス企業です。日本企業として、「個人情報の保護に関する法律（APPI）」を遵守し、お客様の個人情報を適切に保護することに努めています。",
+      "interest": "この度は当ウェブサイトにご関心をお寄せいただき、ありがとうございます。お客様のデータ保護は、当社の最優先事項の一つです。",
+      "outline": "本プライバシーポリシーは、当社のAI搭載リサーチアシスタントプラットフォームをご利用いただく際に、お客様の情報をどのように収集、使用、共有、保護するかについて説明するものです。PaperClue.aiにアクセスまたは使用することにより、本ポリシーに記載された取り扱いに同意したものとみなされます。"
+    },
+    "sections": {
+      "basicPolicy": {
+        "title": "1. 個人情報保護に関する基本方針",
+        "content": "PaperClue.aiは、以下に示す目的を達成するために必要な範囲でのみ個人情報を収集および利用します。違法または非倫理的な行為を助長・誘発するような利用は行いません。"
+      },
+      "definition": {
+        "title": "2. 個人情報の定義",
+        "intro": "個人情報とは、特定の個人を識別するために使用され得るあらゆるデータを指し、以下を含みますが、これに限定されるものではありません：",
+        "items": {
+          "item1": "氏名、住所、生年月日、性別、職業、電話番号、メールアドレス等",
+          "item2": "単独では個人を識別できない情報であっても、他の情報と容易に組み合わせることにより個人を識別できる情報"
+        },
+        "compliance": "これら情報は、適用されるデータ保護法を完全に遵守して取り扱っています。"
+      },
+      "management": {
+        "title": "3. 個人情報の管理",
+        "content": "当社は、お客様の個人情報とデータを安全に守ることに努めます。無断アクセス、紛失、損傷、改ざん、または漏洩を防止するために、安全なシステムの維持、強力な管理体制の構築、セキュリティアプリケーションの活用、従業員への包括的なトレーニングの提供など、さまざまな対策を実施しています。これらの対策により、お客様の個人データの厳格かつ効果的に管理します。"
+      },
+      "collection": {
+        "title": "4. 個人情報の収集と利用",
+        "content": "当社は、適法かつ公正な手段で個人情報を収集し、業務遂行に必要な範囲でのみ利用します。"
+      },
+      "disclosure": {
+        "title": "5. 第三者への情報開示",
+        "intro": "当社は、以下の場合を除き、個人情報を第三者に開示することはありません：",
+        "items": {
+          "item1": "対象となる個人が明示的な同意を与えた場合。",
+          "item2": "法律により開示が要求される場合。",
+          "item3": "個人情報がその取り扱いを委託された第三者に提供される場合。",
+          "item4": "情報が意図された目的の範囲内で指定された受取人と共有される場合。",
+          "item5": "人命、身体、または財産を保護する必要があり、個人の同意を得ることが困難な場合。",
+          "item6": "公衆衛生の向上または子供の健全な発展のために特に必要であり、個人の同意を得ることが困難な場合。",
+          "item7": "国家または地方自治体が法的義務を果たすために協力が必要な場合。"
+        }
+      },
+      "appropriateManagement": {
+        "title": "6. 個人情報の安全管理措置",
+        "content": "当社は、合理的な予防措置を講じ、不正アクセス、漏洩等を防止する安全管理措置を実施します。"
+      },
+      "compliance": {
+        "title": "7. 法令遵守",
+        "content": "私たちは、保有する個人情報に適用される日本の法律およびその他の規制を遵守し、本ポリシーの内容を定期的に見直し、改善に努めます。"
+      },
+      "transfer": {
+        "title": "8. 第三者提供・共同利用",
+        "content": "当社は、法令で定める場合を除き、顧客の同意なく個人情報を第三者へ提供しません。"
+      },
+      "safetyMeasures": {
+        "title": "9. 個人情報の安全対策",
+        "content": "当社は、個人情報の正確性と安全性を確保するため、徹底したセキュリティ対策を実施します。"
+      },
+      "procedures": {
+        "title": "10. 個人データの開示、訂正等の手続き",
+        "content": "以下のメールアドレスにて、当社が保有する個人データの開示または訂正をリクエストする場合は、メールでご連絡ください。郵送、ファックス、電話でのリクエストは受け付けておりません。リクエスト後、当社が指定した方法および資料を使用して、本人確認を行う場合があることをご了承ください。"
+      },
+      "changes": {
+        "title": "11. このプライバシーポリシーの変更",
+        "content": "当該ウェブページにて、情報保護方針の改定を随時お知らせします。"
+      },
+      "contact": {
+        "title": "連絡先情報",
+        "content": "個人情報に関するお問い合わせは、以下のアドレスまでご連絡ください："
+      }
+    }
+  },
+  "profile": {
+    "title": "プロフィール",
+    "description": "アカウント設定と環境設定を管理",
+    "profileInfo": {
+      "title": "プロフィール情報",
+      "description": "個人情報を更新",
+      "firstName": "名",
+      "lastName": "姓",
+      "email": "メールアドレス",
+      "saveChanges": "変更を保存",
+      "saving": "保存中..."
+    },
+    "accountInfo": {
+      "title": "アカウント情報",
+      "description": "アカウントの詳細とステータスを確認",
+      "startFrom": "開始日",
+      "endTo": "終了日",
+      "joined": "登録日",
+      "role": "権限",
+      "accountStatus": "アカウントステータス",
+      "emailVerification": "メール認証",
+      "subscriptionStatus": "サブスクリプション状況",
+      "subscription": "サブスクリプション",
+      "activeSubscription": "有効なサブスクリプション",
+      "noSubscription": "未加入",
+      "verified": "認証済み",
+      "notVerified": "未認証",
+      "active": "有効",
+      "inactive": "無効"
+    },
+    "security": {
+      "title": "セキュリティ設定",
+      "description": "アカウントのセキュリティを保つためにパスワードを更新",
+      "currentPassword": "現在のパスワード",
+      "newPassword": "新しいパスワード",
+      "confirmPassword": "新しいパスワード（確認）",
+      "updatePassword": "パスワードを更新",
+      "updating": "更新中..."
+    }
+  },
+  "commercialDisclosure": {
+    "title": "特定商取引法に基づく表記",
+    "linkText": "特定商取引法に基づく表記",
+    "legalName": {
+      "label": "販売業者",
+      "value": "Paper Clue 株式会社"
+    },
+    "address": {
+      "label": "所在地",
+      "value": "〒739-0012 広島県東広島市西条朝日町7-45"
+    },
+    "cooperateNumber": {
+      "label": "法人番号",
+      "value": "5420001064890"
+    },
+    "phone": {
+      "label": "電話番号",
+      "value": "070-9315-6622",
+      "hours": "Hours 09:00 - 17:00 (excluding weekends and holidays)"
+    },
+    "hours": {
+      "label": "営業時間",
+      "value": "09:00 - 17:00 (土日祝日を除く)"
+    },
+    "email": {
+      "label": "メールアドレス",
+      "value": "contact@paperclue.ai"
+    },
+    "headOfOperations": {
+      "label": "運営統括責任者",
+      "value": "Nisar Ahmad Taliman　（ニサール・アフマド・タリマン）"
+    },
+    "price": {
+      "label": "販売価格",
+      "value": "サービスページ等の料金表にて、プラン毎に表示される金額"
+    },
+    "requiredFee": {
+      "label": "商品代金以外の必要料金",
+      "value": "送料、取引手数料、事務手数料はかかりません。"
+    },
+    "paymentMethods": {
+      "label": "お支払い方法",
+      "value": "クレジットカード、デビットカード、または国内銀行振込"
+    },
+    "paymentPeriod": {
+      "label": "お支払い時期",
+      "point1": "クレジットカードまたはデビットカードでのお支払いは即時に処理されます。",
+      "point2": "銀行振込の場合は、ご注文日から3日以内にお振込みください。"
+    },
+    "refundPolicy": {
+      "label": "返金ポリシー",
+      "point1": "月額および年額の購読料は、未使用期間や早期解約の場合を含め、返金はできません。",
+      "point2": "購読は、事前のキャンセルがない限り、各請求サイクルの終了時に自動的に更新されます。",
+      "point3": "購読者は、アカウント設定からいつでもキャンセルできます。サービスへのアクセスは、現在の請求サイクルの終了まで引き続きご利用いただけます。"
+    }
+},
+"refundPolicy": {
+    "title": "返金ポリシー – Paper Clue AI",
+    "linkText": "返金ポリシー",
+    "introduction": "PaperClue.ai（以下「当社」）は、研究および学術執筆を支援するAIアシスタントです。当社、Paper Clue Inc. は、日本の広島県に本社を置くソフトウェアサービス提供会社です。",
+    "sections": {
+      "securePayments": {
+        "title": "1. 安全な決済",
+        "content1": "www.paperclue.aiでのすべての支払いは、Stripeを通じて安全に処理されます。Stripeは、世界的に信頼されているPCI-DSS準拠の決済プロセッサです。",
+        "content2": "Stripeは、決済情報を暗号化し、個人情報や金融情報が常に保護されるよう管理します。",
+        "content3": "当社は、クレジットカード情報をサーバーに保存することはありません。",
+        "acceptedMethods": "ご利用可能な支払い方法:",
+        "methods": [
+          "主要なクレジット・デビットカード（Visa、MasterCard、American Express、JCB、Discover、Diners Club）",
+          "Stripe対応のデジタルウォレット（Apple Pay、Google Payなど）",
+          "銀行振込（ワイヤートランスファー）"
+        ]
+      },
+      "eligibility": {
+        "title": "2. 返金の対象",
+        "intro": "以下の場合、返金の対象となる可能性があります：",
+        "conditions": [
+          "技術的または請求上のエラーにより、同一取引で二重請求が発生した場合",
+          "購入したサービス（Prime、Premium、Pro、Teamプランなど）が提供されなかった、またはアクセスできなかった場合",
+          "サブスクリプションの自動更新をキャンセルしたにもかかわらず課金された場合",
+          "当社サポートチームが、確認済みの技術的問題を7営業日以内に解決できなかった場合"
+        ]
+      },
+      "nonRefundable": {
+        "title": "3. 返金対象外の場合",
+        "intro": "以下の場合、返金は対象外です：",
+        "conditions": [
+          "AIのフィードバックや評価結果など、主観的な内容への不満",
+          "購入したサービスが既に利用、ダウンロード、またはアクセスされている場合",
+          "ユーザーが不正確または不完全な情報を提供した場合",
+          "サブスクリプション期間が開始され、部分的または全て利用済みの場合は、按分返金の対象外"
+        ]
+      },
+      "subscriptions": {
+        "title": "4. サブスクリプションおよび自動更新",
+        "conditions": [
+          "サブスクリプションは、次回請求日までにキャンセルされない限り自動更新されます。",
+          "アカウント設定から、または contact@paperclue.ai までご連絡いただくことで、いつでもキャンセル可能です。",
+          "キャンセル後も、支払い済み期間の終了まではサービスを利用可能です。",
+          "更新後の返金は、更新日から3日以内にキャンセルし、かつサービスを利用していない場合に限り適用されます。"
+        ]
+      },
+      "requestRefund": {
+        "title": "5. 返金の申請方法",
+        "intro": "返金を希望される場合は、contact@paperclue.ai までご連絡ください。",
+        "requirements": [
+          "注文IDまたは取引番号",
+          "ご購入時のメールアドレス",
+          "問題の簡単な説明"
+        ],
+        "response": "サポートチームが内容を確認し、5～7営業日以内にご返信いたします。"
+      },
+      "refundMethod": {
+        "title": "6. 返金方法と処理期間",
+        "conditions": [
+          "クレジットカード・デジタルウォレットでのお支払いは、Stripeを通じて元の支払い方法に返金されます。",
+          "銀行振込でのお支払いは、お支払いに使用した銀行口座に返金されます（確認後）。",
+          "処理期間は通常5～10営業日で、金融機関によって変動する場合があります。"
+        ]
+      },
+      "policyUpdates": {
+        "title": "7. ポリシーの更新",
+        "content": "Paper Clue AIは、本返金ポリシーを随時変更する権利を有します。変更があった場合、本ページにて更新内容と施行日を明示します。"
+      },
+      "governingLaw": {
+        "title": "8. 準拠法",
+        "content": "本返金ポリシーは日本の法律に準拠し、紛争が生じた場合は広島県の裁判所を専属的合意管轄とします。"
+      }
+    }
+  },
+  "about": {
+    "hero": {
+      "title": "日本の学術レビューを効率よく、正確にサポートします",
+      "subtitle": "日本の学術レビューを効率よく、正確にサポートします。"
+    },
+    "mission": {
+      "title": "広島大学発のイノベーション",
+      "description": "広島大学の優秀な学生や卒業生のチームが開発した「PaperClue（ペーパークルー）」は、学術研究における学生の自主的な取り組みを支援し、生産性を向上させることを目的とした革新的なプラットフォームです。また、ChatGPTなどのAIツールへの過度な依存を減らすことにも力を入れています。",
+      "approachTitle": "PaperClueによる学術ライティングの新しいアプローチ：",
+      "features": [
+        "誤りを学びのチャンスとして活かす",
+        "教員が学生に、投稿できるレベルの研究成果を提供できるようサポート",
+        "エラー修正と共に、教育的なフィードバックを提供",
+        "コストパフォーマンスに優れ、従来の10分の1の費用で利用可能",
+        "学生主体で設計され、積極的な学びを促進",
+        "複雑な学術文献の理解を助け、分かりやすい表現を実現"
+      ],
+      "conclusion": "PaperClueは、従来の時間とコストがかかり、ストレスを伴った論文や修士論文のレビュー工程を、「修正」と「教育」を融合させた独自のアプローチで改善し、誰でもアクセスできる有益な学びのプロセスへと変革します。",
+      "joinTeamButton": "私たちのチームに参加しませんか"
+    },
+    "vision": {
+      "title": "基本理念",
+      "subtitle": "基本理念",
+      "pillars": {
+        "excellence": {
+          "title": "学術的卓越性",
+          "description": "正確性と信頼性を基盤とし、最高水準の学術基準を追求する。"
+        },
+        "efficiency": {
+          "title": "効率性と明確性",
+          "description": "品質を損なうことなく効率を高め、明快で価値ある成果を実現する。"
+        },
+        "empowerment": {
+          "title": "AIによる価値創造",
+          "description": "AIを代替ではなくパートナーとして位置づけ、利用者の成長と学習を支援する。"
+        }
+      }
+    },
+    "cta": {
+      "title": "私たちのチームに参加しませんか",
+      "description": "私たちは、AI技術を活用して学術研究と執筆の未来を変えたいという情熱を持った方を求めています。現在募集中の職種をご確認の上、ぜひ私たちの挑戦に参加してください。",
+      "getStartedButton": "無料で始める",
+      "contactButton": "お問い合わせ"
+    }
+  }
+}

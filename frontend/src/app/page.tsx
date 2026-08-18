@@ -1,91 +1,91 @@
 "use client";
-/* Public marketing landing page — no auth required. Faithful recreation of the
-   original paperclue.ai home, rebuilt in the redesign design system. All CTAs
-   route to /login (this is a login-only app; there is no public signup). */
-import { useLocale, type DictKey } from "@/lib/i18n";
-import SiteNav from "@/components/landing/SiteNav";
-import HeroCarousel from "@/components/landing/HeroCarousel";
-import FeatureBlock from "@/components/landing/FeatureBlock";
-import ComparisonTable from "@/components/landing/ComparisonTable";
-import TestimonialsCarousel from "@/components/landing/TestimonialsCarousel";
-import FaqAccordion from "@/components/landing/FaqAccordion";
-import ContactSection from "@/components/landing/ContactSection";
-import SiteFooter from "@/components/landing/SiteFooter";
+/* Public marketing landing page — a VERBATIM port of the original paperclue.ai
+   home (src/app/(authorized)/page.tsx there): same sections, same order, same
+   copy (via the original locale JSON), and the original components with their
+   own theme. Everything is wrapped in `pc-marketing` so that theme's CSS
+   variables and Inter font apply here only — the logged-in app keeps the
+   navy/orange design system. Login-only app: feature CTAs route to /login. */
+import { Toaster } from "sonner";
+import { useTranslation } from "react-i18next";
+import MarketingI18nProvider from "@/lib/i18n-marketing";
+import { UnauthorizedNavbar } from "@/components/marketing/unauthorized-navbar";
+import { HeroSection } from "@/components/marketing/hero-section";
+import { FeatureSection } from "@/components/marketing/feature-section";
+import { ComparisonSection } from "@/components/marketing/comparison-section";
+import { FaqSection } from "@/components/marketing/faq-section";
+import { ContactSection } from "@/components/marketing/contact-section";
+import { Footer } from "@/components/marketing/footer";
 
-const RES_MIRROR_FEATURES: { titleKey: DictKey; descKey: DictKey }[] = [
-  { titleKey: "lp_rm_f1_title", descKey: "lp_rm_f1_desc" },
-  { titleKey: "lp_rm_f2_title", descKey: "lp_rm_f2_desc" },
-  { titleKey: "lp_rm_f3_title", descKey: "lp_rm_f3_desc" },
-  { titleKey: "lp_rm_f4_title", descKey: "lp_rm_f4_desc" },
-  { titleKey: "lp_rm_f5_title", descKey: "lp_rm_f5_desc" },
-  { titleKey: "lp_rm_f6_title", descKey: "lp_rm_f6_desc" },
-];
-
-const MIND_MAP_FEATURES: { titleKey: DictKey; descKey: DictKey }[] = [
-  { titleKey: "lp_mm_f1_title", descKey: "lp_mm_f1_desc" },
-  { titleKey: "lp_mm_f2_title", descKey: "lp_mm_f2_desc" },
-  { titleKey: "lp_mm_f3_title", descKey: "lp_mm_f3_desc" },
-  { titleKey: "lp_mm_f4_title", descKey: "lp_mm_f4_desc" },
-  { titleKey: "lp_mm_f5_title", descKey: "lp_mm_f5_desc" },
-  { titleKey: "lp_mm_f6_title", descKey: "lp_mm_f6_desc" },
-];
-
-// Cloudinary demo videos (autoplay/muted/loop when scrolled into view)
-const PROOFREADER_VIDEO =
-  "https://res.cloudinary.com/di98mpcja/video/upload/v1756089401/proofreader_vrusej.mp4";
-const MINDMAP_VIDEO =
-  "https://res.cloudinary.com/di98mpcja/video/upload/v1756089454/mind_map_qzbdeb.mp4";
-
-export default function LandingPage() {
-  const { t } = useLocale();
+function Home() {
+  const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen font-inter bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
-      <SiteNav />
+    <div className="flex flex-col min-h-screen">
+      <UnauthorizedNavbar />
 
-      {/* Hero carousel */}
-      <HeroCarousel />
+      {/* Hero Section */}
+      <HeroSection />
 
-      {/* How it works */}
-      <section id="features" className="w-full max-w-6xl mx-auto px-6 py-16 sm:py-24">
-        <h2 className="font-inter text-3xl sm:text-4xl font-semibold text-center mb-14">
-          {t("lp_how_title")}
-        </h2>
-        <FeatureBlock
-          titleKey="lp_rm_title"
-          descKey="lp_rm_desc"
-          features={RES_MIRROR_FEATURES}
-          ctaKey="lp_rm_cta"
-          video={PROOFREADER_VIDEO}
-          image="/img/citation_checker.png"
-          imageAlt="Research Refiner demo"
-        />
-        <FeatureBlock
-          titleKey="lp_mm_title"
-          descKey="lp_mm_desc"
-          features={MIND_MAP_FEATURES}
-          ctaKey="lp_mm_cta"
-          video={MINDMAP_VIDEO}
-          image="/img/mindmap.png"
-          imageAlt="Mind Map demo"
-          reversed
-        />
+      {/* How it Works Section */}
+      <section
+        className="pt-16 bg-white/90 dark:bg-[#0f1727] backdrop-blur-sm"
+        id="features"
+      >
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-16 dark:text-white">
+            {t("home.features.title")}
+          </h2>
+          {/* Research Mirror Feature */}
+          <FeatureSection
+            title={t("home.features.resMirror.title")}
+            description={t("home.features.resMirror.description")}
+            features={[1, 2, 3, 4, 5, 6].map((n) => ({
+              title: t(`home.features.resMirror.feature${n}`),
+              description: t(
+                `home.features.resMirror.featureDescriptions.feature${n}`
+              ),
+            }))}
+            ctaText={t("home.features.resMirror.cta")}
+            ctaLink="/proofreader"
+          />
+          {/* Mind Map Feature */}
+          <FeatureSection
+            title={t("home.features.mindMap.title")}
+            description={t("home.features.mindMap.description")}
+            features={[1, 2, 3, 4, 5, 6].map((n) => ({
+              title: t(`home.features.mindMap.feature${n}`),
+              description: t(
+                `home.features.mindMap.featureDescriptions.feature${n}`
+              ),
+            }))}
+            ctaText={t("home.features.mindMap.cta")}
+            ctaLink="/mind-map"
+          />
+        </div>
       </section>
 
-      {/* Comparison */}
-      <ComparisonTable />
+      {/* Comparison Section */}
+      <ComparisonSection />
 
-      {/* Testimonials */}
-      <TestimonialsCarousel />
+      {/* FAQ Section */}
+      <FaqSection />
 
-      {/* FAQ */}
-      <FaqAccordion />
-
-      {/* Contact */}
+      {/* Contact Section */}
       <ContactSection />
 
       {/* Footer */}
-      <SiteFooter />
+      <Footer />
     </div>
+  );
+}
+
+export default function LandingPage() {
+  return (
+    <MarketingI18nProvider>
+      <div className="pc-marketing">
+        <Home />
+        <Toaster position="top-center" />
+      </div>
+    </MarketingI18nProvider>
   );
 }

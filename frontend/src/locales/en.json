@@ -1,0 +1,1133 @@
+{
+  "common": {
+    "or": "or",
+    "toggleTheme": "Toggle theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "free": "Free",
+    "paid": "Paid",
+    "cancel": "Cancel",
+    "create": "Create",
+    "delete": "Delete",
+    "download": "Download",
+    "loading": "Loading...",
+    "accept": "Accept",
+    "reject": "Reject",
+    "skip": "Skip",
+    "new": "New",
+    "next": "Next",
+    "show": "Show",
+    "hide": "Hide",
+    "previous": "Previous",
+    "reset": "Reset",
+    "all": "All",
+    "info": "Info",
+    "upgradePlanMessage": "You've used all your free credits! To keep going, please upgrade your plan.",
+    "notFound": "Not Found",
+    "success": "Success",
+    "failedToGetPdfUrl": "Failed to get PDF URL",
+    "failedToGenerateMindMapInvalidResponse": "Failed to generate mind-map - invalid response structure",
+    "pleaseEnterPdfUrlToValidate": "Please enter a PDF URL to validate",
+    "pdfUrlValidationFailed": "PDF URL validation failed",
+    "failedToParseFile": "Failed to parse file",
+    "documentAnalysis": "Document Analysis",
+    "failedToGenerateMindMapFromDocument": "Failed to generate mind-map from document",
+    "errors": {
+      "fetchFailed": "Erorr",
+      "fetchFailedDescription": "Something went wrong while fetching data",
+      "checkoutFailed": "Checkout Error",
+      "checkoutFailedDescription": "Something went wrong while fetching data"
+    }
+  },
+  "nav": {
+    "myTeam": "My Team",
+    "features": "Features",
+    "blog": "Blog",
+    "mindMap": "Mind Map",
+    "proofreader": "Proofreader",
+    "paperInsights": "Paper Insights",
+    "pricing": "Pricing",
+    "login": "Login / Sign Up",
+    "logout": "Logout",
+    "profile": "Profile",
+    "manageSubscription": "Subscription management",
+    "admin": "Admin Dashboard",
+    "journalFormatting": "Journal Formatting"
+  },
+  "blog": {
+    "loading": "Loading article...",
+    "backToBlog": "Back to Blog",
+    "tags": "Tags",
+    "like": "Like",
+    "comment": "Comment",
+    "save": "Save",
+    "share": "Share",
+    "copied": "Copied!",
+    "shareArticle": "Share this article",
+    "aboutAuthor": "About the Author",
+    "relatedArticles": "Related Articles",
+    "categories": "Categories",
+    "subscribeNewsletter": "Subscribe to Our Newsletter",
+    "newsletterDescription": "Get the latest research tips and academic writing advice delivered to your inbox.",
+    "emailPlaceholder": "Your email address",
+    "subscribe": "Subscribe",
+    "title": "Blog",
+    "subtitle": "Insights and tips for academic research and writing",
+    "allPosts": "All Posts",
+    "recentPosts": "Recent Posts",
+    "readMore": "Read More",
+    "minRead": "min read",
+    "filterBy": "Filter by",
+    "category": "Category",
+    "searchPlaceholder": "Search articles...",
+    "featuredArticle": "Featured Article",
+    "latestArticles": "Latest Articles",
+    "noArticlesFound": "No Articles Found",
+    "resetFilters": "Reset Filters"
+  },
+  "home": {
+    "hero": {
+      "title": "Empowering Research Excellence",
+      "subtitle": "Transforming Research Paper Review into a More Engaging Experience",
+      "getStarted": "Start for Free",
+      "watchDemo": "Watch Demo"
+    },
+    "features": {
+      "title": "How It Works",
+      "mindMap": {
+        "title": "Mind Map",
+        "description": "Designed specifically for undergraduate students, this tool simplifies the literature review process and enables efficient extraction of key concepts and summaries from academic papers.",
+        "feature1": "Node-based visualization",
+        "feature2": "A Concise AI-generated Summary",
+        "feature3": "Keyword & Concept Extraction",
+        "feature4": "Contextual Understanding",
+        "feature5": "Intelligent Literature Discovery Methods",
+        "feature6": "Publication lists",
+        "cta": "Go to Mind Map",
+        "featureDescriptions": {
+          "feature1": "Visualize your research network through dynamic, interconnected nodes.",
+          "feature2": "Discover interdisciplinary connections by exploring research across diverse fields.",
+          "feature3": "Automated extraction of keywords and core concepts from scholarly publications.",
+          "feature4": "Delivers deep contextual analysis of academic content from PDFs.",
+          "feature5": "Uncovers related research through thematic, methodological, and citation-driven similarity.",
+          "feature6": "Automatically compile publication lists based on specific keywords."
+        }
+      },
+      "resMirror": {
+        "title": "Research Refiner",
+        "description": "Whether you're a professor, researcher, or graduate student seeking a higher-quality review process, improved clarity, and full compliance with journal guidelines, this section is designed to meet your academic needs.",
+        "feature2": "Citation Accuracy Test",
+        "feature6": "Journal-specific Formatting",
+        "feature5": "Paper Review with Actionable Feedback",
+        "feature1": "AI-content Analysis",
+        "feature3": "Grammar and Style Checks",
+        "feature8": "Clarity and Conciseness Enhancements",
+        "feature7": "AI Feedback Summary",
+        "feature9": "Custom Style Guide Integration",
+        "feature4": "Version History & Change Tracking",
+        "cta": "Go to Research Refiner",
+        "featureDescriptions": {
+          "feature2": "Ensure citations are accurate, well-formatted, and correctly linked for scholarly integrity.",
+          "feature6": "Easily adapt your paper to the exact formatting guidelines of your target journal.",
+          "feature5": "Identify and learn from the strengths and weaknesses in your research through automated peer review",
+          "feature1": "Receive a refined, human-like academic revision and uncover areas for improvement.",
+          "feature3": "Check grammatical errors, receive targeted corrections, and identify key areas to improve your academic writing.",
+          "feature8": "Elevate your academic performance with flawless, high-quality writing.",
+          "feature7": "Get AI-generated feedback with a summary of suggested edits and writing quality.",
+          "feature9": "Optimize your document with AI-driven guidance that meets academic standards.",
+          "feature4": "Learn from the differences between your original and the AI-enhanced version."
+        }
+      }
+    },
+    "extension": {
+      "new": "Comming Soon",
+      "title": "Boost Your Research Workflow",
+      "description": "Get instant access to Paperclue's features while browsing academic websites with our Chrome Extension",
+      "cta": "Download Chrome Extension"
+    },
+    "testimonials": {
+      "title": "What Researchers Say",
+      "testimonial1": {
+        "name": "Dr. Sarah Chen",
+        "role": "Professor of Biology",
+        "content": "Paperclue has transformed the way I approach literature reviews. The mind map feature helps me connect concepts I would have missed otherwise."
+      },
+      "testimonial2": {
+        "name": "James Wilson",
+        "role": "PhD Candidate",
+        "content": "The Research Refiner saved me countless hours of editing. It identified formatting issues for my target journal that I would have missed."
+      },
+      "testimonial3": {
+        "name": "Dr. Keiko Tanaka",
+        "role": "Research Scientist",
+        "content": "As a non-native English speaker, Paperclue has been invaluable for polishing my manuscripts before submission."
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "question4": "What is the PaperClue Mind Map, and how does it function?",
+      "answer4": "The Mind Map empowers scholars to focus on niche topics, facilitating the extraction of core ideas from research papers without the necessity of reading through entire articles. By utilizing advanced AI, PaperClue automatically synthesizes key concepts from papers, enabling users to swiftly grasp essential takeaways. Furthermore, the Mindmap visually organizes these insights, providing a clear representation of how various ideas and research findings are interconnected. This not only enhances the efficiency of the research process and saves time but also deepens the understanding of complex academic topics.",
+      "question5": "How does PaperClue's Mind Map differ from Google Scholar and other platforms commonly used by scholars and researchers?",
+      "answer5": "PaperClue's Mind Map offers a distinctive approach compared to Google Scholar and other academic platforms by offering a more focused, keyword-driven approach to research. Unlike Google Scholar, which retrieves a broad range of papers, PaperClue's Mindmap allows users to narrow down their research to specific keywords, making it easier to focus on niche topics. This focused approach helps researchers efficiently identify the most relevant papers, rather than sifting through extensive lists.",
+      "question6": "Is it possible to save my searches on the Mind Map and receive regular updates on emerging trends?",
+      "answer6": "Absolutely! The Mind Map lets you save searches and receive regular updates on emerging trends and publications, keeping you informed about the latest developments in your field.",
+      "question1": "What is the Research Refiner, and how does it operate to support academic writing?",
+      "answer1": "The Research Refiner, a core feature of PaperClue, is designed to help researchers and scholars elevate the quality of their academic writing. It delivers detailed feedback and intelligent suggestions to improve clarity, coherence, and adherence to academic standards, ensuring manuscripts meet the expectations of scholarly publishing.",
+      "question2": "How does PaperClue's Research Refiner differ from traditional manual proofreading?",
+      "answer2": "PaperClue's Research Refiner significantly reduces turnaround time from the typical couple of weeks required for manual proofreading to just a few minutes—while maintaining high precision and consistency. It offers a cost-effective solution without compromising on quality, making it ideal for researchers seeking speed, accuracy, and affordability.",
+      "question3": "What are the advantages of replacing traditional proofreading with AI-powered proofreading?",
+      "answer3": "AI-powered proofreading brings a transformative edge to modern academic and professional work. It matches the precision of traditional proofreading while delivering faster, more consistent feedback. In a world where time matters, AI streamlines editing without sacrificing quality. With real-time, adaptive suggestions on grammar, tone, and clarity, AI ensures focus on ideas—not mechanics. It's the smart way to meet high standards in less time, aligning your workflow with today's fast-paced demands.",
+      "question7": "Is my research data secure?",
+      "answer7": "Yes, we take data security seriously. Your research data is encrypted and we never share it with third parties. Kindly refer to our Privacy Policy and Information Protection Policy at the bottom of this page."
+    },
+    "footer": {
+      "description": "AI assistant for academic research and writing",
+      "platform": "Platform",
+      "company": "Company",
+      "address": "Address",
+      "subscribe": {
+        "title": "Subscribe",
+        "description": "Get updates on new features and academic writing tips",
+        "placeholder": "Your email",
+        "button": "Subscribe",
+        "success": "Subscribed successfully",
+        "successDescription": "You will receive updates on new features and academic writing tips",
+        "error": "Failed to subscribe",
+        "errorDescription": "Please try again later"
+      },
+      "copyright": "© 2025 Paperclue. All rights reserved.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "platformItems": {
+        "mindMap": "Mind Map",
+        "resMirror": "Research Refiner",
+        "journalFormatting": "Journal Formatting",
+        "paperInsight": "Paper Insight",
+        "chromeExtension": "Chrome Extension",
+        "pricing": "Pricing",
+        "blog": "Blog"
+      },
+      "companyItems": {
+        "about": "About",
+        "team": "Team",
+        "careers": "Careers",
+        "contact": "Contact"
+      }
+    },
+    "contact": {
+      "title": "Get in Touch",
+      "address": {
+        "title": "Address",
+        "line1": "7-45 Saijoasahimachi, Higashihiroshima",
+        "line2": "Hiroshima 739-0012, Japan"
+      },
+      "email": {
+        "title": "Email",
+        "address": "contact@paperclue.com"
+      },
+      "phone": {
+        "title": "Phone",
+        "number": "+81 82-424-0000"
+      },
+      "form": {
+        "name": "Your Name",
+        "email": "Your Email",
+        "message": "Your Message",
+        "submit": "Send Message",
+        "subject": "Subject"
+      }
+    }
+  },
+  "mindMap": {
+    "title": "Mind Mapping Studio",
+    "selectMap": "Select Map",
+    "filters": "Filters",
+    "save": "Save",
+    "newArea": "New Topic",
+    "newAreaPlaceHolder": "Enter research topic",
+    "areaName": "Research Topic",
+    "newKeyword": "New Keyword",
+    "newConcept": "New Concept",
+    "atGlance": "Map overview",
+    "bookmarkedPapers": "Bookmarked Papers",
+    "createNew": "Create New",
+    "newMap": "New Map",
+    "addKeyword": "Add Keyword",
+    "name": "Name",
+    "add": "Add",
+    "createArea": "Create a research topic",
+    "extractPapers": "Extract Papers",
+    "byAuthor": "By Author",
+    "byJournal": "By Journal",
+    "openInWindow": "Open in Window",
+    "relevantKeywords": "Relevant Keywords",
+    "goToPaper": "Go to Paper",
+    "publications": {
+      "title": "Related Publications",
+      "save": "Save"
+    },
+    "generatePublications": "Generate Publications List",
+    "summarize": "Summarize",
+    "concept": "Concept",
+    "explanation": "Explanation",
+    "deleteMap": "Are you sure you want to delete this map? This action cannot be undone.",
+    "noMaps": "No maps found.",
+    "keywordsFound": "Keywords found",
+    "keywordsFoundDescription": "Keywords found for this topic",
+    "papersFound": "Papers found",
+    "papersFoundDescription": "Papers found for this topic",
+    "rateLimitError": "Rate limit",
+    "rateLimitErrorDescription": "Please try again after a few seconds",
+    "failedToSearchPapers": "Failed to search papers",
+    "failedToSearchPapersDescription": "Please try again after a few seconds",
+    "contentSummarized": "Content summarized",
+    "contentSummarizedDescription": "Content summarized successfully",
+    "failedToSummarizeContent": "Failed to summarize content",
+    "failedToSummarizeContentDescription": "Please try again with a different topic",
+    "mapSaved": "Map Saved",
+    "mapSavedDescription": "The map has been saved.",
+    "mapDeleted": "Map Deleted",
+    "mapDeletedDescription": "The map has been permanently deleted.",
+    "mindMapGeneratedSuccessfully": "Mind-map generated successfully from PDF",
+    "failedToGenerateMindMap": "Failed to generate mind-map from PDF",
+    "researchPaperAnalysis": "Research Paper Analysis",
+    "pdfAnalysis": "PDF Analysis",
+    "paperBookmarked": "Paper bookmarked",
+    "paperBookmarkedDescription": "The paper has been bookmarked",
+    "paperUnbookmarked": "Paper unbookmarked",
+    "paperUnbookmarkedDescription": "The paper has been unbookmarked",
+    "failedToGetRelatedKeywords": "Failed to get related keywords",
+    "similarPaperFound": "Similar paper found and added to mind map",
+    "failedToExtractSimilarPaper": "Failed to extract similar paper",
+    "pleaseEnterPdfUrl": "Please enter a PDF URL",
+    "mindMapGeneratedFromDocument": "Mind-map generated successfully from document",
+    "pdfUrlValid": "PDF URL is valid and accessible",
+    "failedToValidatePdfUrl": "Failed to validate PDF URL",
+    "failedToLoadSupportedSources": "Failed to load supported sources information",
+    "pleaseUploadFileFirst": "Please upload a file first",
+    "fileUploadedSuccessfully": "File uploaded successfully",
+    "errorParsingFile": "Error parsing file",
+    "retrying": "Retrying...",
+    "warning": "Warning",
+    "pleaseEnterValidTopic": "Please enter a valid topic",
+    "noKeywordsFound": "No keywords found for this topic",
+    "failedToExtractConcepts": "Failed to extract the concepts",
+    "failedToExplainText": "Failed to explain the text",
+    "defaultValues": {
+      "concept": "Concept",
+      "summaryOfPaper": "Summary of paper",
+      "overview": "Overview",
+      "noSummary": "No summary",
+      "noDescription": "No description",
+      "noResponse": "No response",
+      "unknown": "Unknown",
+      "noAbstractAvailable": "No abstract available",
+      "untitled": "Untitled",
+      "noAuthors": "No authors",
+      "unknownJournal": "Unknown Journal",
+      "unknownYear": "Unknown Year",
+      "noReferencesAvailable": "No references available"
+    },
+    "pdfModal": {
+      "title": "Generate Mind-map from Document",
+      "description": "Upload a document or enter a PDF URL to automatically generate a mind-map with key concepts, summary, and explanations.",
+      "uploadMethod": "Upload Method",
+      "uploadFile": "Upload File",
+      "pdfUrl": "PDF URL",
+      "uploadDocument": "Upload Document",
+      "pdfUrlLabel": "PDF URL *",
+      "supportedSources": "Supported Sources",
+      "validate": "Validate",
+      "parsingDocument": "Parsing document...",
+      "documentParsedSuccessfully": "Document parsed successfully",
+      "characters": "characters",
+      "dragDropReplace": "You can also drag & drop another file here to replace.",
+      "clickOrDragDrop": "Click or drag & drop a document here",
+      "supportedFormats": "Supported formats: PDF, DOC, DOCX, TXT",
+      "dragDropHint": "Drag & drop your file here, or click to select",
+      "uploadPdf": "Upload a PDF",
+      "generateMindMap": "Generate Mind-map"
+    }
+  },
+  "fileUpload": {
+    "title": "Upload Document or Paste Text",
+    "description": "Upload a file or paste your text directly",
+    "placeholder": "Paste your text here...",
+    "tabs": {
+      "pasteText": "Paste Text",
+      "uploadFile": "Upload File"
+    },
+    "textInput": {
+      "label": "Enter your text"
+    },
+    "uploadArea": {
+      "title": "Click to upload a document",
+      "supportedFormats": "Supported formats: DOC, DOCX, TXT",
+      "maxFileSize": "Max file size: {{maxSize}}MB"
+    },
+    "parsing": "Parsing document...",
+    "success": {
+      "title": "File uploaded successfully",
+      "description": "Successfully parsed {{fileName}}",
+      "parsed": "✓ Document parsed successfully ({{characterCount}} characters)"
+    },
+    "errors": {
+      "fileTooLarge": {
+        "title": "File too large",
+        "description": "File size must be less than {{maxSize}}MB"
+      },
+      "unsupportedFileType": "Unsupported file type: {{fileName}}",
+      "parsingError": {
+        "title": "Error parsing file",
+        "description": "Failed to parse file"
+      }
+    }
+  },
+  "resMirror": {
+    "title": "Research Refiner",
+    "journalFormatAlignment": {
+      "title": "Journal Format Alignment",
+      "description": "Upload your manuscript and select your target journal to begin formatting alignment.",
+      "uploadTitle": "Upload Your Manuscript",
+      "uploadDescription": "Upload your research paper and select your target journal to begin formatting"
+    },
+    "journalSelection": {
+      "title": "Select Target Journal",
+      "description": "Choose the journal you plan to submit to",
+      "searchPlaceholder": "Search journals...",
+      "webSearchTitle": "Search Web for Journal",
+      "databaseSearchTitle": "Search Journal in Our Database",
+      "tryWithSample": "Try with Sample",
+      "webSearchPlaceholder": "Enter journal title or ISSN...",
+      "searching": "Searching...",
+      "searchWeb": "Search Web",
+      "searchResults": "Search Results",
+      "webResult": "Web Result",
+      "noJournalsFound": "No journals found",
+      "noJournalsDescription": "No journals match your search criteria. Try searching the web for this journal.",
+      "publisher": "Publisher",
+      "clickToViewDetails": "Click to view details",
+      "useThisJournal": "Use This Journal",
+      "noResults": "No results found, try searching the web for this journal.",
+      "journalDetails": "Journal Details",
+      "webSearchResult": "Web Search Result",
+      "databaseResult": "Database Result",
+      "viewFormattingGuide": "View Formatting Guide",
+      "selectJournalToViewDetails": "Select a journal to view its details and formatting guidelines"
+    },
+    "manualFormat": {
+      "title": "Manual Format Settings",
+      "configureDescription": "Configure custom formatting parameters",
+      "usingJournalDescription": "Using {{journal}} format guidelines",
+      "selectDescription": "Select a journal, search the web, or enable manual settings"
+    },
+    "continueToAnalyze": "Continue to Analyze",
+    "export": "Export",
+    "newAnalysis": "New Analysis",
+    "upload": {
+      "title": "Upload Your Document",
+      "description": "Upload your manuscript or thesis for AI-powered analysis and improvement suggestions",
+      "dropText": "Drop your file here or click to browse",
+      "supportedFormats": "Supports Word and Text files",
+      "browseFiles": "Browse Files"
+    },
+    "formatSelection": "Target Journal or University Format",
+    "analysisOptions": "Analysis Options",
+    "documentType": {
+      "label": "Type of Document",
+      "placeholder": "Select document type",
+      "thesis": "Thesis/Dissertation",
+      "paper": "Research Paper"
+    },
+    "citationFormat": {
+      "label": "Citation Format",
+      "paperPlaceholder": "select Name of the Journal",
+      "universityPlaceholder": "select the University Format"
+    },
+    "advancedOptions": "Advanced Options",
+    "options": {
+      "grammar": "Grammar and Style Check",
+      "paraphrasing": "Suggest Paraphrasing Improvements",
+      "formatting": "Journal Format Alignment",
+      "aiDetection": "AI-Content Detection Risk Assessment",
+      "plagiarism": "Plagiarism Check",
+      "tablesFiguresAlignment": "Tables and Figures Alignment According to Targeted Format",
+      "conciseness": "Conciseness (Remove Redundant Words or Phrases)",
+      "consistency": "Consistency (Tense, Formatting for Numbers, Dates, Abbreviations)",
+      "toneAndVoice": "Tone and Voice (Formality, Passive vs. Active Voice)",
+      "structuralIntegrity": "Structural Integrity (Headings and Subheadings)",
+      "citationAccuracy": "Citation Accuracy",
+      "terminologyConsistency": "Consistent Use of Technical Terms",
+      "abbreviationUsage": "Proper Introduction and Use of Abbreviations",
+      "equationFormatting": "Proper Formatting of Mathematical Equations",
+      "tableOfContents": "Accuracy of Table of Contents",
+      "appendicesFormatting": "Proper Formatting of Appendices",
+      "footnotesEndnotes": "Correct Formatting of Footnotes/Endnotes",
+      "keywordOptimization": "Optimization of Keywords for Indexing",
+      "abstractCompleteness": "Abstract Completeness and Clarity",
+      "ethicalCompliance": "Compliance with Ethical Guidelines",
+      "aiProofreader": "Research Refiner",
+      "submissionReadiness": "Submission Readiness Checker",
+      "flowAndTransitions": "Flow & Transitions",
+      "equationsAndSymbols": "Equations & Symbols",
+      "hyphenationAndCaps": "Hyphenation & Capitalization",
+      "consistencyInTerms": "Consistency in Terminology",
+      "aiHumanizer": "AI Humanizer"
+    },
+
+    "grammarChecker": {
+      "title": "Grammar Checker",
+      "description": "Check your document for grammatical errors, receive targeted corrections, and uncover areas for improvement to strengthen your writing skills.",
+      "pasteText": "Paste your text here",
+      "textPlaceholder": "Enter or paste your text to check for grammar errors...",
+      "grammarCheck": "Grammar Check",
+      "checking": "Checking grammar...",
+      "noTextError": "No text provided",
+      "noTextErrorDescription": "Please enter some text to check for grammar errors.",
+      "reset": "Reset",
+      "original": "Original",
+      "document": "Document",
+      "issues": "Issues",
+      "improvedVersion": "AI-Improved Version",
+      "sentenceStructure": "Sentence Structure",
+      "citationFormat": "Citation Format",
+      "enhancement": "Enhancement",
+      "suggestion": "Suggestion",
+      "minor": "Minor",
+      "grammarError": "Grammar Error",
+      "reason": "Reason",
+      "grammarCheckSuccess": "Grammar check completed successfully",
+      "grammarCheckSuccessDescription": "Check your document for grammar errors and improve your writing.",
+      "grammarCheckError": "Grammar check failed",
+      "grammarCheckErrorDescription": "Please try again later",
+      "aiDetectionSuccess": "AI detection completed successfully",
+      "aiDetectionSuccessDescription": "Check your document for AI detection and improve your writing.",
+      "aiDetectionError": "AI detection failed",
+      "aiDetectionErrorDescription": "Please try again later",
+      "humanizeSuccess": "Humanization completed successfully",
+      "humanizeSuccessDescription": "Humanize your document to improve your writing.",
+      "humanizeError": "Humanization failed",
+      "humanizeErrorDescription": "Please try again later"
+    },
+    "aiHumanizer": {
+      "title": "AI Content Detection & Humanizer",
+      "description": "Check your document to assess the risk of AI-generated contents and receive a more natural, human-like version to enhance your academic writing.",
+      "pasteText": "Paste your text here",
+      "textPlaceholder": "Enter or paste your text to analyze for AI detection and humanize...",
+      "aiDetection": "AI Detection",
+      "checking": "Analyzing content...",
+      "noTextError": "No text provided",
+      "noTextErrorDescription": "Please enter some text to analyze for AI detection.",
+      "reset": "Reset",
+      "analyzeContent": "Analyze Content",
+      "humanizeAll": "Humanize All Sections",
+      "humanizingAll": "Humanizing All Sections...",
+      "humanize": "Humanize",
+      "humanizing": "Humanizing...",
+      "humanized": "Humanized",
+      "reject": "Reject",
+      "aiDetectionTab": "AI Detection",
+      "humanizedTab": "Humanized Version",
+      "overallScore": "Overall AI Score",
+      "lowRisk": "Low AI Risk",
+      "mediumRisk": "Medium AI Risk",
+      "highRisk": "High AI Risk",
+      "humanizerSettings": "Humanizer Settings",
+      "preserveMeaning": "Preserve Original Meaning",
+      "naturalTone": "Natural Tone",
+      "simplifyLanguage": "Simplify Language",
+      "personalStyle": "Personal Style",
+      "aiDetectionRiskLevels": "AI Detection Risk Levels",
+      "lowRiskDescription": "Low Risk (0-40%): Likely to pass as human-written",
+      "mediumRiskDescription": "Medium Risk (40-70%): May be flagged by some AI detectors",
+      "highRiskDescription": "High Risk (70-100%): Likely to be identified as AI-generated",
+      "downloadResults": "Download Results",
+      "aiHumanizer": "AI Humanizer",
+      "tooltipDescription": "Review and accept humanized versions of your content to make it less detectable as AI-generated while preserving the original meaning."
+    },
+    "submit": "Submit for AI Review",
+    "analyzing": "Analyzing Document...",
+    "original": "Original Document",
+    "improved": "AI-Improved Version",
+    "document": "Document",
+    "issues": "Issues",
+    "download": "Download",
+    "acceptAll": "Accept All",
+    "rejectAll": "Reject All",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "paperInsights": {
+    "title": "Paper Insights",
+    "description": "Get comprehensive analysis of your research paper with AI-powered insights, quality scores, and improvement suggestions",
+    "features": {
+      "qualityScoring": {
+        "title": "Quality Scoring",
+        "description": "Paragraph-by-paragraph quality assessment with detailed scoring"
+      },
+      "sectionAnalysis": {
+        "title": "Section Analysis",
+        "description": "Strengths and weaknesses identified for each section"
+      },
+      "aiInsights": {
+        "title": "AI Insights",
+        "description": "Intelligent recommendations for improving your manuscript"
+      }
+    },
+    "upload": {
+      "title": "Upload Your Research Paper",
+      "description": "Drag and drop your paper, or click to browse",
+      "dropHere": "Drop your paper here",
+      "chooseFile": "Choose File",
+      "uploadingTitle": "Uploading Paper",
+      "complete": "complete",
+      "errorMessage": "Please upload a valid PDF, DOC, or DOCX file (max 10MB)",
+      "supportedFormats": "Supported formats: PDF",
+      "maxFileSize": "Maximum file size: 10MB"
+    }
+  },
+  "pricing": {
+    "title": "Simple, Transparent Pricing",
+    "subtitle": "Choose the plan that's right for your research needs",
+    "monthly": "Billed Monthly",
+    "annually": "Billed Annually",
+    "save": "Save 20%",
+    "popular": "Most Popular",
+    "loading": "Loading...",
+    "taxExcluded": "(Tax excluded)",
+    "taxInfo": "All prices include sales tax.",
+    "plans": {
+      "free": {
+        "name": "Free",
+        "price": "¥0",
+        "description": "Basic features for academic research",
+        "features": [
+          "Limited AI risk assessments",
+          "Limited citation accuracy check",
+          "Basic formatting options",
+          "Basic Mind Map features",
+          "Only ten credits available"
+        ],
+        "cta": "Get Started"
+      },
+      "premium": {
+        "name": "Premium",
+        "price": "¥2,200",
+        "period": "month",
+        "description": "Enjoy more features and flexibility with Premium Plan",
+        "introOffer": "First month only ¥1,100",
+        "regularPrice": "¥2,200/month thereafter",
+        "features": [
+          "AI humanizer",
+          "Advanced grammar checks",
+          "AI risk assessment",
+          "Citation accuracy checks",
+          "Unlimited research papers summaries",
+          "Full Mind Map capabilities",
+          "Priority support"
+        ],
+        "cta": "Upgrade to Premium"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "¥5,500",
+        "period": "month",
+        "description": "Comprehensive tools built for dedicated researchers",
+        "introOffer": "First month only ¥3,300",
+        "regularPrice": "¥5,500/month thereafter",
+        "features": [
+          "Unlimited research papers reviews",
+          "Unlimited thesis reviews",
+          "Unlimited presentation reviews",
+          "Journal-specific formatting",
+          "AI humanizer",
+          "Advanced grammar checks",
+          "AI risk assessment",
+          "Citation accuracy checks",
+          "Unlimited research papers summaries",
+          "Full Mind Map capabilities",
+          "Priority support"
+        ],
+        "cta": "Upgrade to Pro"
+      },
+      "team": {
+        "name": "Team",
+        "price": "¥22,000",
+        "period": "month",
+        "description": "Powerful tools for research teams",
+        "features": [
+          "Up to 7 team members",
+          "Unlimited research papers reviews",
+          "Unlimited research proposals reviews",
+          "Unlimited thesis reviews",
+          "Unlimited presentation reviews",
+          "Journal-specific formatting",
+          "Advanced grammar checks",
+          "AI humanizer",
+          "AI risk assessment",
+          "Citation accuracy checks",
+          "Unlimited research papers summaries",
+          "Full Mind Map capabilities",
+          "Priority support"
+        ],
+        "cta": "Upgrade to Team"
+      },
+      "prime": {
+        "name": "Prime",
+        "price": "¥1,550",
+        "description": "Get academic reviews with one-time access",
+        "features": [
+          "Up to 3 document reviews",
+          "Up to 3 journal-specific formatting checks",
+          "Up to 3 citation accuracy checks",
+          "Limited AI risk assessment",
+          "Basic Mind Map features",
+          "Priority support"
+        ],
+        "cta": "Get Prime"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "question1": "What is the Premium Team Plan, and how does it benefit research groups?",
+      "answer1": "The Premium Team Plan on PaperClue is a subscription option designed specifically for professors, students, and research groups. It allows one central account holder (typically a professor) to add and manage student or lab member accounts under a single, cost-effective premium subscription. This makes it easy to provide all team members with access to premium features—like the Mind Map tool, Research Refiner, and more—at a discounted per-user rate, ideal for enhancing productivity and collaboration across research teams.",
+      "question2": "Can I switch plans later?",
+      "answer2": "Yes, you can upgrade or downgrade your plan at any time. If you upgrade, you'll be charged the prorated difference. If you downgrade, you'll receive a prorated credit to your account.",
+      "question3": "Do you offer academic discounts?",
+      "answer3": "Yes, we offer special pricing for students, educators, and academic institutions. Contact our support team with proof of academic status to receive your discount code.",
+      "question4": "Is there a limit to document uploads?",
+      "answer4": "Free accounts can upload up to 5 pages per document and 1 document per week. Pro accounts have unlimited uploads with a 100-page limit per document. Team accounts have unlimited uploads with a 500-page limit per document.",
+      "question5": "How accurate is the plagiarism detection?",
+      "answer5": "Our plagiarism detection compares your document against millions of academic papers, websites, and publications with over 98% accuracy. It identifies both exact matches and similar content."
+    },
+    "custom": {
+      "description": "Need a custom solution for your institution?",
+      "cta": "Contact Our Enterprise Team"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "signup": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "forgotPass": "Forgot Password?",
+    "forgotPassword": {
+      "title": "Reset your password",
+      "checkEmail": "Check your email",
+      "description": "Enter your email address and we'll send you a link to reset your password.",
+      "emailSent": "We've sent you an email with instructions to reset your password.",
+      "emailPlaceholder": "name@example.com",
+      "emailLabel": "Email address",
+      "sendResetLink": "Send reset link",
+      "sending": "Sending...",
+      "tryAnotherEmail": "Try another email",
+      "backToLogin": "Back to login",
+      "returnToLogin": "Return to login",
+      "checkSpam": "If you don't see the email in your inbox, please check your spam folder.",
+      "emailRequired": "Email is required",
+      "requestFailed": "Request failed",
+      "resetEmailSent": "Reset email sent",
+      "resetEmailSentDescription": "Check your inbox for instructions to reset your password",
+      "unexpectedError": "An unexpected error occurred. Please try again."
+    },
+    "resetPassword": {
+      "title": "Reset your password",
+      "description": "Enter your new password below.",
+      "newPassword": "New Password",
+      "confirmNewPassword": "Confirm New Password",
+      "passwordPlaceholder": "••••••••",
+      "passwordRequired": "Password is required",
+      "passwordLength": "Password must be at least 8 characters",
+      "confirmPasswordRequired": "Please confirm your password",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "passwordLengthHint": "Password must be at least 8 characters long",
+      "resetting": "Resetting...",
+      "resetPassword": "Reset Password",
+      "invalidLink": "Invalid reset link",
+      "invalidLinkDescription": "The password reset link is invalid or has expired.",
+      "resetFailed": "Password reset failed",
+      "resetFailedDescription": "Failed to reset your password. The link may have expired.",
+      "resetSuccessful": "Password reset successful",
+      "resetSuccessfulDescription": "Your password has been reset successfully.",
+      "unexpectedError": "An unexpected error occurred. Please try again.",
+      "requestNewLink": "Request New Link",
+      "returnToLogin": "Return to login",
+      "logIn": "Log In"
+    },
+    "continueWith": "Or continue with",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "confirmPassword": "Confirm Password",
+    "createAccount": "Create Account",
+    "signupWith": "Or sign up with",
+    "agreement": "By signing up, you agree to our",
+    "terms": "Terms of Service",
+    "and": "and",
+    "privacy": "Privacy Policy",
+    "verifyEmail": {
+      "title": "Email Verification",
+      "verifying": "Verifying your email...",
+      "verified": "Your email has been verified",
+      "failed": "Email verification failed",
+      "invalidLink": "Invalid verification link",
+      "success": "Success",
+      "successDescription": "Your email has been verified successfully.",
+      "error": "Error",
+      "errorDescription": "Failed to verify email",
+      "unexpectedError": "An error occurred while verifying your email",
+      "continueToLogin": "Continue to Login",
+      "returnToLogin": "Return to Login",
+      "createNewAccount": "Create New Account"
+    }
+  },
+  "infoPolicy": {
+    "title": "Terms of Service",
+    "introduction": "These Terms of Use (\"Terms\") set forth the rights and obligations between PaperClue Inc. (\"Company\") and users (\"User\") in relation to the use of the services provided on www.paperclue.ai (\"Service\"). By using the Service, you agree to be bound by these Terms.",
+    "sections": {
+      "purpose": {
+        "title": "1. Purpose",
+        "content": "These Terms of Use (\"Terms\") set forth the rights and obligations between PaperClue Inc. (\"Company\") and users (\"User\") in relation to the use of the services provided on www.paperclue.ai (\"Service\"). By using the Service, you agree to be bound by these Terms."
+      },
+      "scope": {
+        "title": "2. Scope of Application",
+        "content": "These Terms apply to all Users, regardless of whether they have registered an account. Additional terms may apply for specific features."
+      },
+      "accountRegistration": {
+        "title": "3. Account Registration",
+        "items": [
+          "Users must provide accurate and up-to-date information when registering.",
+          "Users are responsible for managing their login credentials and must not share them with third parties.",
+          "Any activity under a User's account is deemed to be the responsibility of that User."
+        ]
+      },
+      "prohibitedActs": {
+        "title": "4. Prohibited Acts",
+        "intro": "Users must not:",
+        "items": [
+          "Infringe on the intellectual property rights of the Company or third parties.",
+          "Use the Service for unlawful purposes.",
+          "Disrupt or attempt to disrupt the Service's operations.",
+          "Provide false or misleading information."
+        ]
+      },
+      "intellectualProperty": {
+        "title": "5. Intellectual Property",
+        "content": "All copyrights, trademarks, and other intellectual property rights related to the Service belong to the Company or its licensors. Users may not reproduce, modify, or distribute any part of the Service without prior written consent."
+      },
+      "disclaimer": {
+        "title": "6. Disclaimer",
+        "items": [
+          "We have trained our AI to the maximum accuracy however, the Company makes no guarantees of definite accuracy, completeness, or reliability of the Service's outputs.",
+          "The Company is not liable for any loss or damage resulting from the use or inability to use the Service.",
+          "Users use the Service at their own risk."
+        ]
+      },
+      "serviceModifications": {
+        "title": "7. Service Modifications & Suspension",
+        "content": "The Company may modify, suspend, or terminate the Service without prior notice for maintenance, security, or operational reasons."
+      },
+      "governingLaw": {
+        "title": "8. Governing Law & Jurisdiction",
+        "content": "These Terms are governed by the laws of Japan. Any disputes arising from these Terms shall be subject to the exclusive jurisdiction of the Hiroshima District Court."
+      },
+      "changes": {
+        "title": "9. Changes to the Terms",
+        "content": "The Company may revise these Terms at its discretion. Updated Terms will be posted on the Service, and continued use constitutes acceptance of the revised Terms."
+      },
+      "contact": {
+        "title": "10. Contact",
+        "content": "For inquiries about these Terms or the Service, please contact:",
+        "email": "contact@paperclue.ai"
+      }
+    }
+  },
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "introduction": {
+      "welcome": "PaperClue.ai (“the Company”) is an AI assistant designed to support research and academic writing.",
+      "company": "Our company, PaperClue Inc., is a software service provider headquartered in Hiroshima Prefecture, Japan. As a Japanese corporation, we strictly comply with the Act on the Protection of Personal Information (APPI) and are committed to appropriately safeguarding the personal information of our customers.",
+      "interest": "We appreciate your interest in our website. Protecting your data is one of our highest priorities.",
+      "outline": "This Privacy Policy explains how we collect, use, share, and protect your information when you use our AI-powered research assistant platform. By accessing or using PaperClue.ai, you are deemed to have agreed to the practices described in this policy."
+    },
+    "sections": {
+      "basicPolicy": {
+        "title": "1. Basic Policy on Personal Information Protection",
+        "content": "PaperClue.ai collects and uses personal information only to the extent necessary to achieve the purposes described below. We will not use personal information in ways that encourage or facilitate illegal or unethical activities."
+      },
+      "definition": {
+        "title": "2. Definition of Personal Information",
+        "intro": "“Personal Information” refers to any data that can be used to identify an individual, including but not limited to:",
+        "items": {
+          "item1": "Name, address, date of birth, gender, occupation, telephone number, email address, etc.",
+          "item2": "Information that, although not identifying on its own, can be easily combined with other data to identify an individual."
+        },
+        "compliance": "All such information is handled in full compliance with applicable data protection laws."
+      },
+      "management": {
+        "title": "3. Management of Personal Information",
+        "content": "We take all reasonable measures to ensure the security of your personal information and data. These include maintaining secure systems, establishing robust management structures, implementing security applications, and providing comprehensive training to our employees. Such measures are designed to prevent unauthorized access, loss, damage, alteration, or leakage, and to manage personal data in a strict and effective manner."
+      },
+      "collection": {
+        "title": "4. Collection and Use of Personal Information",
+        "content": "We collect personal information by lawful and fair means and use it only within the scope necessary for our business operations."
+      },
+      "disclosure": {
+        "title": "5. Disclosure of Information to Third Parties",
+        "intro": "We do not disclose personal information to third parties except in the following cases:",
+        "items": {
+          "item1": "When explicit consent has been obtained from the individual concerned.",
+          "item2": "When disclosure is required by law.",
+          "item3": "When personal information is provided to a third party entrusted with handling the information.",
+          "item4": "When information is shared with designated recipients within the intended scope of use.",
+          "item5": "When necessary to protect human life, physical safety, or property and it is difficult to obtain the individual’s consent.",
+          "item6": "When necessary to improve public health or promote the sound growth of children and obtaining consent is difficult.",
+          "item7": "When cooperation with national or local authorities is required to fulfill legal obligations."
+        }
+      },
+      "appropriateManagement": {
+        "title": "6. Security Measures for Personal Information",
+        "content": "We take reasonable preventive measures and implement security management practices to protect personal information from unauthorized access, leakage, or other security risks."
+      },
+      "compliance": {
+        "title": "7. Compliance with Laws and Regulations",
+        "content": "We comply with all applicable Japanese laws and regulations regarding personal information in our possession, and we regularly review and improve the content of this policy."
+      },
+      "transfer": {
+        "title": "8. Provision to and Joint Use with Third Parties",
+        "content": "Except as permitted by law, we will not provide personal information to third parties without the customer’s consent."
+      },
+      "safetyMeasures": {
+        "title": "9. Measures to Ensure the Accuracy and Security of Personal Information",
+        "content": "We implement thorough security measures to maintain the accuracy and safety of personal information."
+      },
+      "procedures": {
+        "title": "10. Procedures for Disclosing, Correcting, etc. Personal Data",
+        "content": "If you wish to request disclosure or correction of personal data held by us, please contact us via the email address below. Requests by mail, fax, or telephone will not be accepted. Please note that we may require identity verification through designated procedures and documents before processing your request."
+      },
+      "changes": {
+        "title": "11. Changes to this Privacy Policy",
+        "content": "Any revisions to this Privacy Policy will be posted on this webpage."
+      },
+      "contact": {
+        "title": "Contact Information",
+        "content": "For inquiries regarding personal information, please contact us at:"
+      }
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "description": "Manage your account settings and preferences.",
+    "profileInfo": {
+      "title": "Profile Information",
+      "description": "Update your personal information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "saveChanges": "Save Changes",
+      "saving": "Saving..."
+    },
+    "accountInfo": {
+      "title": "Account Information",
+      "description": "View your account details and status",
+      "startFrom": "Start From",
+      "endTo": "End To",
+      "joined": "Joined",
+      "role": "Role",
+      "accountStatus": "Account Status",
+      "emailVerification": "Email Verification",
+      "subscriptionStatus": "Subscription Status",
+      "subscription": "Subscription",
+      "activeSubscription": "Active Subscription",
+      "noSubscription": "No Subscription",
+      "verified": "Verified",
+      "notVerified": "Not Verified",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "security": {
+      "title": "Security Settings",
+      "description": "Update your password to keep your account secure",
+      "currentPassword": "Current Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm New Password",
+      "updatePassword": "Update Password",
+      "updating": "Updating..."
+    }
+  },
+  "commercialDisclosure": {
+    "title": "Legal Notice under the Specified Commercial Transactions Act",
+    "linkText": "Commercial Disclosure",
+    "legalName": {
+      "label": "Legal Name",
+      "value": "Paper Clue Inc."
+    },
+    "address": {
+      "label": "Address",
+      "value": "7-45 Saijo Asahimachi, Higashihiroshima City, Hiroshima Prefecture, 739-0012, Japan"
+    },
+    "cooperateNumber": {
+      "label": "Cooperate Number",
+      "value": "5420001064890"
+    },
+    "phone": {
+      "label": "Phone number",
+      "value": "+81-70-9315-6622"
+    },
+    "hours": {
+      "label": "Business Hours",
+      "value": "9:00–17:00 (excluding weekends and public holidays)"
+    },
+    "email": {
+      "label": "Email address",
+      "value": "contact@paperclue.ai"
+    },
+    "headOfOperations": {
+      "label": "Head of Operations",
+      "value": "Nisar Ahmad Taliman"
+    },
+    "price": {
+      "label": "Price",
+      "value": "The price for each plan is displayed on the pricing table provided on our service pages."
+    },
+    "requiredFee": {
+      "label": "Additional fees",
+      "value": "No shipping fees, transaction fees, or administrative fees are charged."
+    },
+    "paymentMethods": {
+      "label": "Accepted payment methods",
+      "value": "Credit card, debit card, or domestic bank transfer."
+    },
+    "paymentPeriod": {
+      "label": "Payment Timing:",
+      "point1": "Payments by credit card or debit card are processed immediately.",
+      "point2": "For bank transfers, please remit payment within three (3) days of placing your order."
+    },
+    "refundPolicy": {
+      "label": "Refund Policy",
+      "point1": "Subscription fees (monthly or annual) are non-refundable, including in cases of unused subscription periods or early cancellation.",
+      "point2": "Subscriptions automatically renew at the end of each billing cycle unless canceled in advance.",
+      "point3": "Subscribers may cancel at any time via their account settings. Access to the service will continue until the end of the current billing cycle."
+    }
+  },
+  "refundPolicy": {
+    "title": "Refund Policy – Paper Clue AI",
+    "linkText": "Refund Policy",
+    "introduction": "PaperClue.ai (\"the Company\") is an AI assistant designed to support research and academic writing. Our company, Paper Clue Inc., is a software service provider headquartered in Hiroshima Prefecture, Japan.",
+    "sections": {
+      "securePayments": {
+        "title": "1. Secure Payments",
+        "content1": "All payments made on www.paperclue.ai are securely processed via Stripe, a globally trusted payment processor.",
+        "content2": "Stripe encrypts and safeguards your payment information to ensure that your personal and financial data remain protected at every stage of the transaction.",
+        "content3": "We never store your credit card details on our servers.",
+        "acceptedMethods": "Accepted payment methods include:",
+        "methods": [
+          "Major credit and debit cards (Visa, MasterCard, American Express, JCB, Discover, and Diners Club)",
+          "Digital wallets supported by Stripe (e.g., Apple Pay, Google Pay)",
+          "Bank transfer (wire transfer)"
+        ]
+      },
+      "eligibility": {
+        "title": "2. Eligibility for Refund",
+        "intro": "You may be eligible for a refund if:",
+        "conditions": [
+          "You were charged multiple times for the same transaction due to a technical or billing error.",
+          "The purchased service (based on Prime, Premium, Pro or Team Plan) was not delivered or inaccessible due to a verified system issue on our end.",
+          "You canceled a subscription renewal within the grace period but were still charged.",
+          "Our support team fails to resolve a verified technical issue within 14 business days after your report."
+        ]
+      },
+      "nonRefundable": {
+        "title": "3. Non-Refundable Situations",
+        "intro": "Refunds will not be granted in the following cases:",
+        "conditions": [
+          "Dissatisfaction with subjective outcomes (e.g., tone, ranking, or quality of AI feedback).",
+          "The purchased service has been accessed, downloaded, or used successfully.",
+          "Incorrect or incomplete information was provided by the user.",
+          "The refund request is submitted more than 7 days after purchase.",
+          "Subscription periods that have already started and been used (partially or fully) are not eligible for prorated refunds."
+        ]
+      },
+      "subscriptions": {
+        "title": "4. Subscriptions and Renewals",
+        "conditions": [
+          "Subscriptions renew automatically unless canceled before the next billing date.",
+          "You can cancel anytime via your account settings or by contacting contact@paperclue.ai.",
+          "Once canceled, your access will remain active until the end of the paid billing cycle.",
+          "Refunds for renewals will only be issued if the cancellation request is made within 3 days of renewal and you have not used the service during that period."
+        ]
+      },
+      "requestRefund": {
+        "title": "5. How to Request a Refund",
+        "intro": "To request a refund, please contact contact@paperclue.ai and include:",
+        "requirements": [
+          "Your order ID or transaction reference",
+          "The email address used for the purchase",
+          "A brief description of the issue"
+        ],
+        "response": "Our support team will review your request and respond within 5–7 business days."
+      },
+      "refundMethod": {
+        "title": "6. Refund Method and Processing Time",
+        "conditions": [
+          "Approved refunds will be issued to your original payment method via Stripe.",
+          "Processing typically takes 5–10 business days, depending on Stripe policy and your bank or card provider.",
+          "Bank transfer (wire transfer) - bank transfer refunds will be processed back to the original bank account after verification"
+        ]
+      },
+      "policyUpdates": {
+        "title": "7. Policy Updates",
+        "content": "Paper Clue AI reserves the right to modify this Refund Policy at any time. Updates will be posted on this page, and the effective date will be revised accordingly."
+      },
+      "governingLaw": {
+        "title": "8. Governing Law",
+        "content": "This Refund Policy is governed by the laws of Japan. Any disputes will be subject to the jurisdiction of the courts in Hiroshima Prefecture."
+      }
+    }
+  },
+  "about": {
+    "hero": {
+      "title": "We bring efficiency and precision to the review process in Japanese Academia",
+      "subtitle": "日本の学術レビューを効率よく、正確にサポートします。"
+    },
+    "mission": {
+      "title": "An innovation from Hiroshima University",
+      "description": "A team of talented students and alumni from Hiroshima University developed PaperClue, an innovative platform designed to enhance student engagement and productivity in academic research while reducing dependency on ChatGPT and other AI tools in academic writing.",
+      "approachTitle": "PaperClue's Transformative Approach to Academic Writing:",
+      "features": [
+        "Transforms mistakes into learning opportunities",
+        "Helps professors get submission ready research work from their students",
+        "Fixes errors and educates simultaneously",
+        "Cost-effective – Saves up to 10 times cost",
+        "Student-oriented and promotes active engagement",
+        "Facilitates clarity in complex academic literatures"
+      ],
+      "conclusion": "PaperClue transforms the traditionally slow, costly, and stressful review of research papers and theses into an accessible, educational experience through a unique \"Fixes and Educates\" approach.",
+      "joinTeamButton": "Join Our Team"
+    },
+    "vision": {
+      "title": "Core Vision Pillars",
+      "subtitle": "基本理念",
+      "pillars": {
+        "excellence": {
+          "title": "Academic Excellence",
+          "description": "Precision, credibility, and high scholarly standards."
+        },
+        "efficiency": {
+          "title": "Efficiency & Clarity",
+          "description": "Saving time without sacrificing quality."
+        },
+        "empowerment": {
+          "title": "Empowerment through AI",
+          "description": "AI as a partner, not a replacement, guiding users to improve and learn."
+        }
+      }
+    },
+    "cta": {
+      "title": "Join Our Team",
+      "description": "We are always looking for passionate individuals who share our vision of transforming academic research and writing through AI innovation. Explore our current opportunities and become part of our journey.",
+      "getStartedButton": "Get Started",
+      "contactButton": "Contact Us"
+    }
+  }
+}
