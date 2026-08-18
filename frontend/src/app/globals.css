@@ -159,4 +159,17 @@ mark.hl-citation { background: rgba(61, 125, 255, 0.35); color: transparent; }
 }
 .pc-marketing {
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  /* The original site sets NO body background (its `body { @apply bg-background }`
+     rule is commented out), so its page background is plain white — and its
+     sections are semi-transparent (bg-white/90, bg-slate-900/90), so the page
+     background shows through them. This app's body is bg-ivory (#FAFAFA), navy
+     in dark, which tinted every ported section. Repaint the marketing surface
+     to the original's colours; dark reuses the #0f1727 its own sections use. */
+  background-color: #ffffff;
+  color: #0f172a;
+  min-height: 100vh;
+}
+.dark .pc-marketing {
+  background-color: #0f1727;
+  color: #f8fafc;
 }
