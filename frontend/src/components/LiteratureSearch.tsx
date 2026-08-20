@@ -81,7 +81,7 @@ export default function LiteratureSearch({
             year_from: yearFrom ? parseInt(yearFrom, 10) : null,
           }),
         });
-        const t = await pollTask<{
+        const result = await pollTask<{
           papers: BrowsePaper[];
           report: string | null;
           warnings?: string[];
@@ -89,11 +89,11 @@ export default function LiteratureSearch({
           setTask({ step: u.step, progress: u.progress });
           if (u.result?.papers) setPapers(u.result.papers);
         });
-        if (t.status === "error") setError(t.error || "Search failed");
-        else if (t.result) {
-          setPapers(t.result.papers || []);
-          setReport(t.result.report);
-          if (t.result.warnings?.length) setNotice(t.result.warnings.join(" "));
+        if (result.status === "error") setError(result.error || t("search_failed"));
+        else if (result.result) {
+          setPapers(result.result.papers || []);
+          setReport(result.result.report);
+          if (result.result.warnings?.length) setNotice(result.result.warnings.join(" "));
         }
       } catch (e: any) {
         setError(e.message?.slice(0, 200));

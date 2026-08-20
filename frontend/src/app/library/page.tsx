@@ -86,7 +86,7 @@ export default function LibraryPage() {
                     <button
                       onClick={(e) => remove(e, p.id)}
                       className="btn btn-ghost p-1.5 self-start opacity-0 group-hover:opacity-100 hover:text-danger"
-                      title="Remove from library"
+                      title={t("lib_remove")}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
