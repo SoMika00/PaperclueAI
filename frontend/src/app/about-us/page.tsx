@@ -159,7 +159,7 @@ export default function AboutPage() {
             {c.getStarted}
             <ArrowRight className="h-4 w-4" />
           </Link>
-          <a href="/#lp-contact" className="btn btn-outline inline-flex px-6 py-2.5 text-[15px]">
+          <a href="/#contact" className="btn btn-outline inline-flex px-6 py-2.5 text-[15px]">
             {c.contact}
           </a>
         </div>

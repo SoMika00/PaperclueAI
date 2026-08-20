@@ -112,10 +112,10 @@ export function Footer() {
               </h3>
               <ul className="space-y-2">
                 {[
-                  { name: "resMirror", url: "/proofreader" },
-                  { name: "mindMap", url: "/mind-map" },
-                  { name: "paperInsight", url: "/paper-insights" },
-                  { name: "journalFormatting", url: "/journal-formatting" },
+                  { name: "resMirror", url: "/login" },
+                  { name: "mindMap", url: "/login" },
+                  { name: "paperInsight", url: "/login" },
+                  { name: "journalFormatting", url: "/login" },
                   // { name: "chromeExtension", url: "#chrome-extension" },
                   { name: "pricing", url: "/pricing" },
                   { name: "blog", url: "/blog" },
@@ -138,8 +138,8 @@ export function Footer() {
               <ul className="space-y-2">
                 {[
                   { name: "about", url: "/about-us" },
-                  { name: "team", url: "/team" },
-                  { name: "careers", url: "/careers" },
+                  { name: "team", url: "/login" },
+                  { name: "careers", url: "/login" },
                   { name: "contact", url: "/#contact" },
                 ].map((item) => (
                   <li key={item.name}>
@@ -164,7 +164,7 @@ export function Footer() {
                 <input
                   type="email"
                   placeholder={t("home.footer.subscribe.placeholder")}
-                  className="flex-1 rounded-l-md border border-r-0 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-theme_primary dark:bg-slate-800 dark:border-slate-700 dark:text-white"
+                  className="flex-1 rounded-l-md border border-r-0 border-slate-300 bg-white text-slate-900 px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-theme_primary dark:bg-slate-800 dark:border-slate-700 dark:text-white"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -188,13 +188,13 @@ export function Footer() {
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a
-              href="privacy"
+              href="/privacy"
               className="text-sm text-slate-500 hover:text-theme_primary transition-colors dark:text-slate-400 dark:hover:text-theme_primary"
             >
               {t("home.footer.privacy")}
             </a>
             <a
-              href="/term-service"
+              href="/terms"
               className="text-sm text-slate-500 hover:text-theme_primary transition-colors dark:text-slate-400 dark:hover:text-theme_primary"
             >
               {t("home.footer.terms")}

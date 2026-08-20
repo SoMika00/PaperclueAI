@@ -18,7 +18,7 @@ const COMPANY: { key: DictKey; href: string }[] = [
   { key: "lp_footer_about", href: "/about-us" },
   { key: "lp_footer_team", href: "/login" },
   { key: "lp_footer_careers", href: "/login" },
-  { key: "lp_footer_contact", href: "/#lp-contact" },
+  { key: "lp_footer_contact", href: "/#contact" },
 ];
 
 const LEGAL: { key: DictKey; href: string }[] = [

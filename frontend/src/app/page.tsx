@@ -48,7 +48,7 @@ function Home() {
               ),
             }))}
             ctaText={t("home.features.resMirror.cta")}
-            ctaLink="/proofreader"
+            ctaLink="/login"
           />
           {/* Mind Map Feature */}
           <FeatureSection
@@ -61,7 +61,7 @@ function Home() {
               ),
             }))}
             ctaText={t("home.features.mindMap.cta")}
-            ctaLink="/mind-map"
+            ctaLink="/login"
           />
         </div>
       </section>

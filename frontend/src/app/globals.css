@@ -173,3 +173,16 @@ mark.hl-citation { background: rgba(61, 125, 255, 0.35); color: transparent; }
   background-color: #0f1727;
   color: #f8fafc;
 }
+
+/* The ported marketing contact form (marketing/contact-section.tsx) and the
+   shadcn Input primitive (components/ui/input.tsx) use the original site's
+   `.form-input` class name — a Tailwind Forms-plugin utility that plugin isn't
+   installed here, so the class was previously undefined and the fields
+   rendered with only invisible default browser borders on the white
+   marketing background. Give it real, visible, theme-aware styling. */
+.form-input {
+  @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900
+         placeholder:text-slate-400 transition-colors
+         focus:outline-none focus:ring-2 focus:ring-pcblue focus:border-pcblue
+         dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-500;
+}
