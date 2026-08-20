@@ -49,6 +49,7 @@ function Home() {
             }))}
             ctaText={t("home.features.resMirror.cta")}
             ctaLink="/login"
+            videoKey="proofreader"
           />
           {/* Mind Map Feature */}
           <FeatureSection
@@ -62,6 +63,7 @@ function Home() {
             }))}
             ctaText={t("home.features.mindMap.cta")}
             ctaLink="/login"
+            videoKey="mindMap"
           />
         </div>
       </section>

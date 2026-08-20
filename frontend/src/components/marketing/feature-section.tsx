@@ -22,6 +22,12 @@ interface FeatureSectionProps {
   }>;
   ctaText: string;
   ctaLink?: string;
+  /* Which demo video/poster to show. Originally inferred from ctaLink (which
+     pointed at the real /proofreader or /mind-map feature route); now that
+     both CTAs point at /login (those routes don't exist pre-login in this
+     build), that inference always resolved to "mindMap". Pass this
+     explicitly instead so the Research Refiner section keeps its own demo. */
+  videoKey?: "proofreader" | "mindMap";
 }
 
 // Video Configuration - Choose your hosting approach
@@ -220,20 +226,24 @@ export function FeatureSection({
   features,
   ctaText,
   ctaLink = "#",
+  videoKey,
 }: FeatureSectionProps) {
   const { t } = useTranslation();
 
-  // Determine video source based on configuration and ctaLink
+  // Which demo to show: explicit videoKey prop, falling back to the old
+  // ctaLink-based inference for any caller that still passes a real route.
+  const resolvedVideoKey: "proofreader" | "mindMap" =
+    videoKey ?? (ctaLink === "/proofreader" ? "proofreader" : "mindMap");
+
   const getVideoSrc = () => {
-    const videoKey = ctaLink === "/proofreader" ? "proofreader" : "mindMap";
-    return VIDEO_CONFIG.mode === 'cloud' 
-      ? VIDEO_CONFIG.cloudUrls[videoKey as keyof typeof VIDEO_CONFIG.cloudUrls]
-      : VIDEO_CONFIG.localUrls[videoKey as keyof typeof VIDEO_CONFIG.localUrls];
+    return VIDEO_CONFIG.mode === 'cloud'
+      ? VIDEO_CONFIG.cloudUrls[resolvedVideoKey]
+      : VIDEO_CONFIG.localUrls[resolvedVideoKey];
   };
 
   const videoSrc = getVideoSrc();
-  const posterSrc = ctaLink === "/proofreader" ? citationImage : mindMapImage;
-  const videoAlt = ctaLink === "/proofreader" ? "Proofreader Demo" : "Mind Map Demo";
+  const posterSrc = resolvedVideoKey === "proofreader" ? citationImage : mindMapImage;
+  const videoAlt = resolvedVideoKey === "proofreader" ? "Proofreader Demo" : "Mind Map Demo";
 
   return (
     <div className="mb-24">
