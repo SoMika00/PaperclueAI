@@ -32,14 +32,18 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_
     return {"user_id": user_id, "claims": payload}
 
 
-def deny_institution_admins(current_user: dict = Depends(get_current_user), db=Depends(get_db)) -> dict:
-    """Router-level guard: institution admins manage their institution only —
-    they have no use for the research features (manuscripts, discover, mind
-    maps, library, university), so those endpoints are off-limits to them."""
+ADMIN_ROLES = ("institution_admin", "platform_admin")
+
+
+def deny_admin_roles(current_user: dict = Depends(get_current_user), db=Depends(get_db)) -> dict:
+    """Router-level guard: institution admins manage their institution only,
+    and platform admins manage the whole platform — neither has any use for
+    the research features (manuscripts, discover, mind maps, library,
+    university), so those endpoints are off-limits to both."""
     row = db.execute(
         text("select role from profiles where id = :uid"),
         {"uid": current_user["user_id"]},
     ).mappings().first()
-    if row and row["role"] == "institution_admin":
-        raise HTTPException(status_code=403, detail="Not available for institution admins")
+    if row and row["role"] in ADMIN_ROLES:
+        raise HTTPException(status_code=403, detail="Not available for admin accounts")
     return current_user

@@ -1,8 +1,9 @@
 "use client";
 /* Research-space shell: blue top bar + the constant left menu + content.
-   Institution admins only manage their institution — bounce them to /admin
-   if they land anywhere outside the admin surface (research features are
-   also blocked server-side; this just avoids a broken UI). */
+   Institution admins only manage their institution, and platform admins
+   only manage the whole platform — bounce each to its own admin surface if
+   they land anywhere outside it (research features are also blocked
+   server-side; this just avoids a broken UI). */
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Sidebar from "./Sidebar";
@@ -10,6 +11,7 @@ import TopBar from "./TopBar";
 import { useAuth } from "@/lib/auth";
 
 const ADMIN_ALLOWED_PREFIXES = ["/admin", "/settings/connections"];
+const SUPERADMIN_ALLOWED_PREFIXES = ["/superadmin"];
 
 export default function GlobalShell({ children }: { children: React.ReactNode }) {
   const { profile } = useAuth();
@@ -17,9 +19,13 @@ export default function GlobalShell({ children }: { children: React.ReactNode })
   const router = useRouter();
 
   useEffect(() => {
-    if (profile?.role !== "institution_admin") return;
-    if (ADMIN_ALLOWED_PREFIXES.some((p) => pathname.startsWith(p))) return;
-    router.replace("/admin");
+    if (profile?.role === "institution_admin") {
+      if (ADMIN_ALLOWED_PREFIXES.some((p) => pathname.startsWith(p))) return;
+      router.replace("/admin");
+    } else if (profile?.role === "platform_admin") {
+      if (SUPERADMIN_ALLOWED_PREFIXES.some((p) => pathname.startsWith(p))) return;
+      router.replace("/superadmin");
+    }
   }, [profile, pathname, router]);
 
   return (

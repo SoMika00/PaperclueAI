@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import {
   Bookmark,
   ClipboardCheck,
+  CreditCard,
   Database,
   FileOutput,
   FileSearch,
@@ -20,6 +21,8 @@ import {
   ShieldCheck,
   Sparkles,
   SpellCheck2,
+  Tag,
+  Users,
   Crown,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -32,6 +35,14 @@ const GLOBAL = [
   { href: "/mind-maps", key: "nav_mindmaps" as const, icon: Network },
   { href: "/library", key: "nav_library" as const, icon: Bookmark },
   { href: "/university", key: "nav_university" as const, icon: GraduationCap },
+];
+
+const SUPERADMIN_ITEMS = [
+  { href: "/superadmin", key: "nav_superadmin_dashboard" as const, icon: LayoutDashboard },
+  { href: "/superadmin/users", key: "nav_superadmin_users" as const, icon: Users },
+  { href: "/superadmin/blog", key: "nav_superadmin_blog" as const, icon: FileText },
+  { href: "/superadmin/subscriptions", key: "nav_superadmin_subscriptions" as const, icon: CreditCard },
+  { href: "/superadmin/promo-codes", key: "nav_superadmin_promo" as const, icon: Tag },
 ];
 
 /* One-shot document tools (Supabase edge functions) — no manuscript workspace
@@ -56,6 +67,17 @@ const FOCUS = [
   { seg: "versions", label: "Versions", icon: History },
 ];
 
+/* Highlights a nav item for its own route without also lighting up when a
+   more specific sibling (e.g. /superadmin/blog under the /superadmin
+   dashboard link) is the actual current page. */
+function isNavActive(pathname: string, href: string, siblings: { href: string }[]): boolean {
+  if (pathname === href) return true;
+  if (!pathname.startsWith(href + "/")) return false;
+  return !siblings.some(
+    (s) => s.href !== href && s.href.startsWith(href + "/") && pathname.startsWith(s.href)
+  );
+}
+
 export default function Sidebar({
   focus,
 }: {
@@ -65,17 +87,20 @@ export default function Sidebar({
   const { profile } = useAuth();
   const { t } = useLocale();
   const { active: premium } = usePremium();
-  const items = profile?.role === "institution_admin"
-    ? [
-        { href: "/admin", key: "nav_institution" as const, icon: ShieldCheck },
-        { href: "/settings/connections", key: "nav_connections" as const, icon: Database },
-      ]
-    : GLOBAL;
+  const items =
+    profile?.role === "institution_admin"
+      ? [
+          { href: "/admin", key: "nav_institution" as const, icon: ShieldCheck },
+          { href: "/settings/connections", key: "nav_connections" as const, icon: Database },
+        ]
+      : profile?.role === "platform_admin"
+      ? SUPERADMIN_ITEMS
+      : GLOBAL;
   return (
     <nav className="w-52 shrink-0 border-r border-line bg-paper flex flex-col py-3 overflow-y-auto panel-scroll dark:bg-dark-surface dark:border-dark-line">
       {items.map((n) => {
         const active =
-          pathname.startsWith(n.href) && !pathname.startsWith("/manuscripts");
+          isNavActive(pathname, n.href, items) && !pathname.startsWith("/manuscripts");
         const Icon = n.icon;
         return (
           <Link
@@ -93,7 +118,7 @@ export default function Sidebar({
         );
       })}
 
-      {profile?.role !== "institution_admin" && (
+      {profile?.role !== "institution_admin" && profile?.role !== "platform_admin" && (
         <>
           <div className="mx-4 mt-4 mb-1.5 border-t border-line pt-3 dark:border-dark-line">
             <div className="text-[10px] font-bold uppercase tracking-wider text-inkmut dark:text-dark-inkmut">
@@ -153,7 +178,7 @@ export default function Sidebar({
         </>
       )}
 
-      {profile?.role !== "institution_admin" && (
+      {profile?.role !== "institution_admin" && profile?.role !== "platform_admin" && (
         <Link
           href="/upgrade"
           className={`mx-2 mt-auto mb-1 flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-semibold transition-colors ${

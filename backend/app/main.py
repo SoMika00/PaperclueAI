@@ -5,11 +5,11 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from .auth import deny_institution_admins
+from .auth import deny_admin_roles
 from .db import Base, engine
-from .routers import (admin, billing, browse, connection, ingest, insight,
+from .routers import (admin, billing, blog, browse, connection, ingest, insight,
                       journal_format, library, manuscripts,
-                      mindmaps, quick_tools, review)
+                      mindmaps, quick_tools, review, superadmin)
 
 
 def _migrate():
@@ -78,9 +78,9 @@ app.add_middleware(
 
 for r in (ingest, manuscripts, insight, browse, review, mindmaps,
           library, journal_format, quick_tools):
-    app.include_router(r.router, prefix="/api", dependencies=[Depends(deny_institution_admins)])
+    app.include_router(r.router, prefix="/api", dependencies=[Depends(deny_admin_roles)])
 
-for r in (admin, connection, billing):
+for r in (admin, connection, billing, blog, superadmin):
     app.include_router(r.router, prefix="/api")
 
 

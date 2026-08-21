@@ -90,6 +90,17 @@ mark.hl-citation { background: rgba(61, 125, 255, 0.35); color: transparent; }
 .report-md li { @apply mb-0.5; }
 .report-md strong { @apply font-semibold; }
 
+/* Public blog post body (marketing/slate palette, not the ink/brand app theme) */
+.blog-md h1, .blog-md h2 { @apply font-inter text-2xl font-semibold mt-8 mb-3 text-slate-900 dark:text-slate-100; }
+.blog-md h3 { @apply font-inter text-xl font-semibold mt-6 mb-2 text-slate-900 dark:text-slate-100; }
+.blog-md p { @apply text-[15px] leading-relaxed mb-4 text-slate-700 dark:text-slate-300; }
+.blog-md a { @apply text-pcblue underline; }
+.blog-md ul, .blog-md ol { @apply list-disc pl-5 mb-4 text-[15px] text-slate-700 dark:text-slate-300; }
+.blog-md li { @apply mb-1; }
+.blog-md strong { @apply font-semibold text-slate-900 dark:text-slate-100; }
+.blog-md blockquote { @apply border-l-4 border-slate-300 dark:border-slate-700 pl-4 italic text-slate-600 dark:text-slate-400 my-4; }
+.blog-md code { @apply bg-slate-100 dark:bg-slate-800 rounded px-1 py-0.5 text-[13px]; }
+
 /* Evidence drawer slide */
 .drawer-enter {
   animation: drawer-in 220ms cubic-bezier(.22,1,.36,1);

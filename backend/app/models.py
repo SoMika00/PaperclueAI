@@ -200,6 +200,25 @@ class DatabaseConnection(Base):
     updated_at = Column(DateTime(timezone=True), default=now, onupdate=now)
 
 
+class BlogPost(Base):
+    __tablename__ = "blog_posts"
+    id = Column(String, primary_key=True, default=uid)
+    slug = Column(String, unique=True, index=True, nullable=False)
+    title = Column(String, default="")
+    excerpt = Column(Text, default="")
+    content = Column(Text, default="")  # markdown
+    author = Column(String, default="")
+    category = Column(String, default="")
+    read_time = Column(String, default="")
+    image = Column(String, nullable=True)  # external image URL
+    featured = Column(Boolean, default=False)
+    tags = Column(JSON, default=list)
+    published = Column(Boolean, default=False)
+    created_by = Column(String, nullable=True)  # platform_admin user_id
+    created_at = Column(DateTime(timezone=True), default=now)
+    updated_at = Column(DateTime(timezone=True), default=now, onupdate=now)
+
+
 class Subscription(Base):
     """One row per Supabase user, tracking their Stripe subscription state.
     `status` in (active, trialing) grants premium entitlement."""

@@ -1,25 +1,31 @@
 "use client";
 /* Public Blog page. Faithful recreation of the original blog layout (header,
    search + category filters, article list, newsletter signup), rebuilt in the
-   redesign design system. The original loads posts from a backend that is not
-   part of this login-only app, so the article list shows the empty state — no
-   posts are fabricated. Bilingual by locale. */
-import { useState } from "react";
+   redesign design system. Posts come from the platform-admin-managed
+   /api/blog/posts endpoint (backend/app/routers/blog.py); the empty state
+   still shows when there are genuinely zero published posts. Bilingual by
+   locale. */
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Search } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
+import { api } from "@/lib/api";
+import { CATEGORIES } from "@/lib/blog-categories";
 import SiteNav from "@/components/landing/SiteNav";
 import SiteFooter from "@/components/landing/SiteFooter";
 
-// Categories are English-only static labels in the original source.
-const CATEGORIES = [
-  "All Categories",
-  "Academic Writing",
-  "Research Technology",
-  "Research Methods",
-  "Academic Standards",
-  "Research Management",
-  "Publishing",
-];
+interface BlogPostSummary {
+  slug: string;
+  title: string;
+  excerpt: string;
+  author: string;
+  category: string;
+  read_time: string;
+  image: string | null;
+  featured: boolean;
+  tags: string[];
+  created_at: string | null;
+}
 
 const CONTENT = {
   en: {
@@ -58,11 +64,26 @@ export default function BlogPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All Categories");
   const [email, setEmail] = useState("");
+  const [posts, setPosts] = useState<BlogPostSummary[] | null>(null);
+
+  useEffect(() => {
+    api<BlogPostSummary[]>("/blog/posts?limit=100")
+      .then(setPosts)
+      .catch(() => setPosts([]));
+  }, []);
 
   const reset = () => {
     setQuery("");
     setCategory("All Categories");
   };
+
+  const filtered = (posts || []).filter((p) => {
+    const matchesCategory = category === "All Categories" || p.category === category;
+    const q = query.trim().toLowerCase();
+    const matchesQuery =
+      !q || p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q);
+    return matchesCategory && matchesQuery;
+  });
 
   return (
     <div className="min-h-screen font-inter bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
@@ -106,15 +127,46 @@ export default function BlogPage() {
           </div>
         </div>
 
-        {/* Article list (empty state — no posts in this app) */}
+        {/* Article list */}
         <div className="mt-12">
           <h2 className="font-inter text-2xl font-semibold mb-6">{c.latestArticles}</h2>
-          <div className="card text-center py-16">
-            <p className="text-slate-600 dark:text-slate-300">{c.noArticlesFound}</p>
-            <button onClick={reset} className="btn btn-outline mt-4 inline-flex px-5 py-2">
-              {c.resetFilters}
-            </button>
-          </div>
+          {posts !== null && filtered.length > 0 ? (
+            <div className="grid gap-6 sm:grid-cols-2">
+              {filtered.map((p) => (
+                <Link
+                  key={p.slug}
+                  href={`/blog/${p.slug}`}
+                  className="card p-5 flex flex-col hover:shadow-lift transition-shadow"
+                >
+                  <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                    {p.category && <span>{p.category}</span>}
+                    {p.read_time && (
+                      <>
+                        <span>·</span>
+                        <span>{p.read_time}</span>
+                      </>
+                    )}
+                  </div>
+                  <h3 className="font-inter text-lg font-semibold text-slate-900 dark:text-slate-100">
+                    {p.title}
+                  </h3>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 mt-2 flex-grow">
+                    {p.excerpt}
+                  </p>
+                  <div className="text-[12px] text-slate-500 dark:text-slate-400 mt-4">
+                    {p.author}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="card text-center py-16">
+              <p className="text-slate-600 dark:text-slate-300">{c.noArticlesFound}</p>
+              <button onClick={reset} className="btn btn-outline mt-4 inline-flex px-5 py-2">
+                {c.resetFilters}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Newsletter */}
