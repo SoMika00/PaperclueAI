@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import Link from "next/link";
 import { supabase } from "./supabase";
 import { useLocale } from "./i18n";
 import { usePathname, useRouter } from "next/navigation";
@@ -83,7 +84,7 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
   const { t, locale, toggle: toggleLocale } = useLocale();
   const pathname = usePathname();
   const router = useRouter();
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -101,6 +102,7 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
   const isPublicRoute =
     pathname === "/" ||
     pathname === "/login" ||
+    pathname === "/reset-password" ||
     pathname === "/privacy" ||
     pathname === "/terms" ||
     pathname === "/about-us" ||
@@ -125,6 +127,15 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
     setError(null);
     setInfo(null);
     setLoading(true);
+    if (mode === "forgot") {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      setLoading(false);
+      if (error) { setError(error.message); return; }
+      setInfo(t("forgot_password_sent"));
+      return;
+    }
     if (mode === "signup") {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -154,12 +165,14 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
         >
           {locale === "en" ? "日本語" : "English"}
         </button>
-        <img src="/paperclue-logo.png" alt="PaperClue" className="mx-auto h-9 w-auto" />
+        <Link href="/" className="inline-block">
+          <img src="/paperclue-logo.png" alt="PaperClue" className="mx-auto h-9 w-auto" />
+        </Link>
         <h1 className="font-serif text-xl font-semibold mt-3">
-          {mode === "signup" ? t("signup_title") : t("signin_title")}
+          {mode === "signup" ? t("signup_title") : mode === "forgot" ? t("forgot_password_title") : t("signin_title")}
         </h1>
         <p className="text-sm text-inkmut dark:text-dark-inkmut mt-1 mb-5">
-          {mode === "signup" ? t("signup_subtitle") : t("signin_subtitle")}
+          {mode === "signup" ? t("signup_subtitle") : mode === "forgot" ? t("forgot_password_subtitle") : t("signin_subtitle")}
         </p>
         {mode === "signup" && (
           <input
@@ -179,32 +192,63 @@ export function SignInGate({ children }: { children: React.ReactNode }) {
           className="w-full rounded-lg border border-line dark:border-dark-line bg-surface2 dark:bg-dark-surface2 dark:text-dark-ink px-3 py-2 text-sm mb-2"
           required
         />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder={t("signin_password_placeholder")}
-          className="w-full rounded-lg border border-line dark:border-dark-line bg-surface2 dark:bg-dark-surface2 dark:text-dark-ink px-3 py-2 text-sm mb-3"
-          required
-        />
+        {mode !== "forgot" && (
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder={t("signin_password_placeholder")}
+            className="w-full rounded-lg border border-line dark:border-dark-line bg-surface2 dark:bg-dark-surface2 dark:text-dark-ink px-3 py-2 text-sm mb-3"
+            required
+          />
+        )}
+        {mode === "signin" && (
+          <button
+            type="button"
+            onClick={() => {
+              setMode("forgot");
+              setError(null);
+              setInfo(null);
+            }}
+            className="block ml-auto -mt-2 mb-3 text-xs text-inkmut dark:text-dark-inkmut hover:text-ink dark:hover:text-dark-ink"
+          >
+            {t("forgot_password_link")}
+          </button>
+        )}
         {error && <p className="text-xs text-red-600 mb-3">{error}</p>}
         {info && <p className="text-xs text-manuscript mb-3">{info}</p>}
         <button type="submit" disabled={loading} className="btn btn-primary w-full justify-center">
-          {loading
-            ? mode === "signup" ? t("signup_loading") : t("signin_loading")
-            : mode === "signup" ? t("signup_button") : t("signin_button")}
+          {mode === "forgot"
+            ? loading ? t("forgot_password_loading") : t("forgot_password_button")
+            : loading
+              ? mode === "signup" ? t("signup_loading") : t("signin_loading")
+              : mode === "signup" ? t("signup_button") : t("signin_button")}
         </button>
-        <button
-          type="button"
-          onClick={() => {
-            setMode(mode === "signup" ? "signin" : "signup");
-            setError(null);
-            setInfo(null);
-          }}
-          className="mt-4 text-xs text-inkmut dark:text-dark-inkmut hover:text-ink dark:hover:text-dark-ink"
-        >
-          {mode === "signup" ? t("signup_have_account") : t("signup_no_account")}
-        </button>
+        {mode === "forgot" ? (
+          <button
+            type="button"
+            onClick={() => {
+              setMode("signin");
+              setError(null);
+              setInfo(null);
+            }}
+            className="mt-4 text-xs text-inkmut dark:text-dark-inkmut hover:text-ink dark:hover:text-dark-ink"
+          >
+            {t("forgot_password_back")}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => {
+              setMode(mode === "signup" ? "signin" : "signup");
+              setError(null);
+              setInfo(null);
+            }}
+            className="mt-4 text-xs text-inkmut dark:text-dark-inkmut hover:text-ink dark:hover:text-dark-ink"
+          >
+            {mode === "signup" ? t("signup_have_account") : t("signup_no_account")}
+          </button>
+        )}
       </form>
     </div>
   );
