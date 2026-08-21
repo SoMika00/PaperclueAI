@@ -103,7 +103,7 @@ async def list_users(
             select p.id, p.full_name, p.email, p.role, p.institution_id, p.created_at,
                    s.status as sub_status, s.plan as sub_plan, s.current_period_end
             from profiles p
-            left join subscriptions s on s.user_id = p.id
+            left join subscriptions s on s.user_id = p.id::text
             {where_sql}
             order by p.created_at desc
             limit :limit offset :offset
@@ -112,7 +112,7 @@ async def list_users(
         params,
     ).mappings().all()
     suspended = await _suspended_ids()
-    return [{**dict(r), "suspended": r["id"] in suspended} for r in rows]
+    return [{**dict(r), "suspended": str(r["id"]) in suspended} for r in rows]
 
 
 async def _set_suspended(user_id: str, ban_duration: str) -> dict:
@@ -171,7 +171,7 @@ def subscriptions_recent(current_user: dict = Depends(get_current_user), db=Depe
             select s.user_id, s.status, s.plan, s.current_period_end, s.updated_at,
                    p.email, p.full_name
             from subscriptions s
-            left join profiles p on p.id = s.user_id
+            left join profiles p on p.id::text = s.user_id
             order by s.updated_at desc
             limit 20
             """
