@@ -162,9 +162,17 @@ export default function ChatDock() {
                   }`}
                 >
                   {m.role === "assistant" && m.content ? (
-                    <div className="report-md">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
-                    </div>
+                    i === messages.length - 1 && streaming ? (
+                      // Still streaming: the accumulated text is often not
+                      // valid markdown yet (a half-written table row, an
+                      // unterminated link...) and remark-gfm throws on that
+                      // mid-parse. Render plain text until the message is done.
+                      <div className="whitespace-pre-wrap">{m.content}</div>
+                    ) : (
+                      <div className="report-md">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                      </div>
+                    )
                   ) : (
                     m.content || (streaming ? "…" : "")
                   )}
