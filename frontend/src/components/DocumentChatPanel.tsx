@@ -21,7 +21,15 @@ export default function DocumentChatPanel() {
   const [streaming, setStreaming] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), [messages]);
+  // Braces on purpose, not a shorthand arrow: scrollIntoView is spec'd to
+  // return undefined, but an implicit-return effect body hands React
+  // whatever the call happens to return in the real runtime, and React
+  // treats any non-undefined, non-function return as a cleanup to invoke
+  // later -- a crash if it isn't one. Force the effect body to return
+  // undefined regardless of what scrollIntoView actually gives back.
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   const ask = useCallback(async () => {
     const q = question.trim();
