@@ -2,8 +2,15 @@
 import { X } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import UploadDropzone from "./UploadDropzone";
+import type { Manuscript } from "@/lib/types";
 
-export default function UploadModal({ onClose }: { onClose: () => void }) {
+export default function UploadModal({
+  onClose,
+  onUploaded,
+}: {
+  onClose: () => void;
+  onUploaded?: (ms: Manuscript) => void;
+}) {
   const { t } = useLocale();
   return (
     <div
@@ -20,7 +27,7 @@ export default function UploadModal({ onClose }: { onClose: () => void }) {
             <X className="h-5 w-5" />
           </button>
         </div>
-        <UploadDropzone />
+        <UploadDropzone onUploaded={onUploaded} />
       </div>
     </div>
   );

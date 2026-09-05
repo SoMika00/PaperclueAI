@@ -4,12 +4,25 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FileText, FolderOpen, HelpCircle, Network, Trash2 } from "lucide-react";
+import { FileText, FolderOpen, HelpCircle, Network, Trash2, Upload } from "lucide-react";
 import { api } from "@/lib/api";
 import type { Manuscript, MindMapRecord, SavedPaper } from "@/lib/types";
 import GlobalShell from "@/components/GlobalShell";
+import UploadModal from "@/components/UploadModal";
 import { Spinner } from "@/components/ui";
 import { useLocale } from "@/lib/i18n";
+
+/** Poll the manuscript until the visible ingestion pipeline (parsing,
+    references, metadata) has finished — mind-map creation needs the title
+    and extracted references, not the lazy semantic index. */
+async function waitUntilReady(id: string): Promise<Manuscript> {
+  for (let i = 0; i < 120; i++) {
+    const ms = await api<Manuscript>(`/manuscripts/${id}`);
+    if (ms.status !== "ingesting") return ms;
+    await new Promise((r) => setTimeout(r, 1500));
+  }
+  throw new Error("Timed out waiting for the manuscript to finish processing.");
+}
 
 type Mode = "question" | "manuscript" | "collection" | null;
 
@@ -25,6 +38,8 @@ export default function MindMapsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showUpload, setShowUpload] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
 
   const loadMaps = () =>
     api<MindMapRecord[]>("/mindmaps").then(setMaps).catch(() => setMaps([]));
@@ -41,26 +56,76 @@ export default function MindMapsPage() {
     api<SavedPaper[]>("/library").then(setLibrary).catch(() => {});
   }, []);
 
+  const createFromManuscript = async (manuscriptId: string) => {
+    const { id } = await api<{ id: string }>("/mindmaps", {
+      method: "POST",
+      body: JSON.stringify({ seed_type: "manuscript", manuscript_id: manuscriptId }),
+    });
+    router.push(`/mind-maps/${id}`);
+  };
+
   const create = async () => {
     if (creating) return;
     setError(null);
-    let body: any = null;
-    if (mode === "question" && question.trim())
-      body = { seed_type: "question", question: question.trim() };
-    if (mode === "manuscript" && msId)
-      body = { seed_type: "manuscript", manuscript_id: msId };
-    if (mode === "collection" && selected.size >= 2)
-      body = { seed_type: "collection", paper_ids: Array.from(selected) };
-    if (!body) return;
+    if (mode === "question" && question.trim()) {
+      setCreating(true);
+      try {
+        const { id } = await api<{ id: string }>("/mindmaps", {
+          method: "POST",
+          body: JSON.stringify({ seed_type: "question", question: question.trim() }),
+        });
+        router.push(`/mind-maps/${id}`);
+      } catch (e: any) {
+        setError(e.message?.slice(0, 160));
+        setCreating(false);
+      }
+      return;
+    }
+    if (mode === "manuscript" && msId) {
+      setCreating(true);
+      try {
+        await createFromManuscript(msId);
+      } catch (e: any) {
+        setError(e.message?.slice(0, 160));
+        setCreating(false);
+      }
+      return;
+    }
+    if (mode === "collection" && selected.size >= 2) {
+      setCreating(true);
+      try {
+        const { id } = await api<{ id: string }>("/mindmaps", {
+          method: "POST",
+          body: JSON.stringify({ seed_type: "collection", paper_ids: Array.from(selected) }),
+        });
+        router.push(`/mind-maps/${id}`);
+      } catch (e: any) {
+        setError(e.message?.slice(0, 160));
+        setCreating(false);
+      }
+    }
+  };
+
+  /** Upload a brand-new PDF from the Mind Maps page itself: it becomes a
+      manuscript, we wait for the visible ingestion pipeline to finish, then
+      immediately build the map from it — no detour through Home. */
+  const handleUploaded = async (ms: Manuscript) => {
+    setShowUpload(false);
+    setError(null);
     setCreating(true);
+    setAnalyzing(true);
     try {
-      const { id } = await api<{ id: string }>("/mindmaps", {
-        method: "POST",
-        body: JSON.stringify(body),
-      });
-      router.push(`/mind-maps/${id}`);
+      const ready = await waitUntilReady(ms.id);
+      if (ready.status === "error") {
+        throw new Error("Processing this PDF failed.");
+      }
+      setMss((prev) => [ready, ...prev.filter((m) => m.id !== ready.id)]);
+      setMsId(ready.id);
+      await createFromManuscript(ready.id);
     } catch (e: any) {
       setError(e.message?.slice(0, 160));
+    } finally {
+      setAnalyzing(false);
       setCreating(false);
     }
   };
@@ -134,34 +199,55 @@ export default function MindMapsPage() {
         {mode === "manuscript" && (
           <div className="card p-4 mb-4 flex flex-col gap-2">
             <label className="section-title">{t("manuscript_label")}</label>
-            {mss.length === 0 ? (
-              <div className="text-sm text-inkmut">
-                {t("no_ready_manuscript")}{" "}
-                <Link href="/home" className="text-brand underline">
-                  {t("home_link")}
-                </Link>
-                .
+            {analyzing ? (
+              <div className="flex items-center gap-2 text-sm text-inkmut py-2">
+                <Spinner className="h-4 w-4 text-brand" />
+                {t("mindmaps_analyzing_pdf")}
               </div>
             ) : (
               <>
-                <select
-                  value={msId}
-                  onChange={(e) => setMsId(e.target.value)}
-                  className="rounded-lg border border-line bg-paper px-3 py-2 text-sm"
+                {mss.length === 0 ? (
+                  <div className="text-sm text-inkmut">
+                    {t("no_ready_manuscript")}{" "}
+                    <Link href="/home" className="text-brand underline">
+                      {t("home_link")}
+                    </Link>
+                    .
+                  </div>
+                ) : (
+                  <>
+                    <select
+                      value={msId}
+                      onChange={(e) => setMsId(e.target.value)}
+                      className="rounded-lg border border-line bg-paper px-3 py-2 text-sm"
+                    >
+                      {mss.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.title.slice(0, 90)}
+                        </option>
+                      ))}
+                    </select>
+                    <button onClick={create} disabled={creating} className="btn btn-primary self-start">
+                      {creating ? <Spinner className="h-4 w-4" /> : <Network className="h-4 w-4" />}
+                      {t("position_manuscript")}
+                    </button>
+                  </>
+                )}
+                <button
+                  onClick={() => setShowUpload(true)}
+                  disabled={creating}
+                  className="btn btn-ghost border border-line self-start"
                 >
-                  {mss.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.title.slice(0, 90)}
-                    </option>
-                  ))}
-                </select>
-                <button onClick={create} disabled={creating} className="btn btn-primary self-start">
-                  {creating ? <Spinner className="h-4 w-4" /> : <Network className="h-4 w-4" />}
-                  {t("position_manuscript")}
+                  <Upload className="h-4 w-4" />
+                  {t("mindmaps_upload_new_pdf")}
                 </button>
               </>
             )}
           </div>
+        )}
+
+        {showUpload && (
+          <UploadModal onClose={() => setShowUpload(false)} onUploaded={handleUploaded} />
         )}
 
         {mode === "collection" && (

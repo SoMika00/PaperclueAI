@@ -11,6 +11,7 @@ import { Download, MessageSquare, Play, ScrollText, Share2 } from "lucide-react"
 import { api, downloadFile } from "@/lib/api";
 import type { Manuscript, Version } from "@/lib/types";
 import { WorkspaceProvider, useWorkspace } from "@/lib/ws";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import EvidenceDrawer from "@/components/EvidenceDrawer";
 import IngestStepper from "@/components/IngestStepper";
 import Sidebar from "@/components/Sidebar";
@@ -193,18 +194,29 @@ function Shell({ children }: { children: React.ReactNode }) {
         </header>
 
         <div className="flex-1 min-h-0 overflow-hidden relative">
-          {withPdf ? (
-            <div className="h-full flex">
-              {children}
-              {/* Keyed on the manuscript only: navigating between PDF sections
-                  keeps this exact viewer instance — the PDF never reloads. */}
-              <section className="flex-1 min-w-0">
-                <PdfViewer key={ms.id} />
-              </section>
-            </div>
-          ) : (
-            children
-          )}
+          <ErrorBoundary
+            fallback={(retry) => (
+              <div className="flex items-center gap-3 p-6 text-sm text-danger">
+                <span>{t("ws_crashed")}</span>
+                <button onClick={retry} className="btn btn-outline px-2.5 py-1">
+                  {t("retry_label")}
+                </button>
+              </div>
+            )}
+          >
+            {withPdf ? (
+              <div className="h-full flex">
+                {children}
+                {/* Keyed on the manuscript only: navigating between PDF sections
+                    keeps this exact viewer instance — the PDF never reloads. */}
+                <section className="flex-1 min-w-0">
+                  <PdfViewer key={ms.id} />
+                </section>
+              </div>
+            ) : (
+              children
+            )}
+          </ErrorBoundary>
           {drawerOpen && <EvidenceDrawer />}
         </div>
       </div>

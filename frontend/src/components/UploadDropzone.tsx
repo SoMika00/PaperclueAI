@@ -4,8 +4,18 @@ import { useCallback, useRef, useState } from "react";
 import { FileUp, Loader2 } from "lucide-react";
 import { upload } from "@/lib/api";
 import { useLocale } from "@/lib/i18n";
+import type { Manuscript } from "@/lib/types";
 
-export default function UploadDropzone({ compact = false }: { compact?: boolean }) {
+export default function UploadDropzone({
+  compact = false,
+  onUploaded,
+}: {
+  compact?: boolean;
+  /** If provided, called with the freshly-created manuscript instead of
+      navigating to its overview page — lets a caller (e.g. Mind Maps) fold
+      the upload into its own flow. */
+  onUploaded?: (ms: Manuscript) => void;
+}) {
   const { t } = useLocale();
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -23,13 +33,14 @@ export default function UploadDropzone({ compact = false }: { compact?: boolean 
       setError(null);
       try {
         const ms = await upload(file);
-        router.push(`/manuscripts/${ms.id}/overview`);
+        if (onUploaded) onUploaded(ms);
+        else router.push(`/manuscripts/${ms.id}/overview`);
       } catch (e: any) {
         setError(e.message?.slice(0, 160) || t("upload_failed"));
         setBusy(false);
       }
     },
-    [router, t]
+    [router, t, onUploaded]
   );
 
   return (
