@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { api, pollTask } from "@/lib/api";
 import type { BrowsePaper } from "@/lib/types";
+import ErrorBoundary from "./ErrorBoundary";
 import { ScopeBadge, Spinner, TaskProgress } from "./ui";
 import { useLocale } from "@/lib/i18n";
 
@@ -347,30 +348,41 @@ export default function LiteratureSearch({
       {view === "synthesis" && (
         <article className="report-md max-w-2xl">
           {linked ? (
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={{
-                a: ({ href, children }) => {
-                  const m = href?.match(/^#paper-(\d+)$/);
-                  if (m)
-                    return (
-                      <button
-                        onClick={() => jumpTo(m[1])}
-                        className="inline-block align-super text-[10px] font-bold text-brand-deep bg-brand-soft rounded px-1 mx-0.5 hover:bg-brand hover:text-white transition-colors"
-                      >
-                        {m[1]}
-                      </button>
-                    );
-                  return (
-                    <a href={href} target="_blank" rel="noopener noreferrer" className="text-pub underline">
-                      {children}
-                    </a>
-                  );
-                },
-              }}
+            <ErrorBoundary
+              fallback={(retry) => (
+                <div className="flex items-center gap-3 text-sm text-danger py-8">
+                  <span>{t("ws_crashed")}</span>
+                  <button onClick={retry} className="btn btn-outline px-2.5 py-1">
+                    {t("retry_label")}
+                  </button>
+                </div>
+              )}
             >
-              {linked}
-            </ReactMarkdown>
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  a: ({ href, children }) => {
+                    const m = href?.match(/^#paper-(\d+)$/);
+                    if (m)
+                      return (
+                        <button
+                          onClick={() => jumpTo(m[1])}
+                          className="inline-block align-super text-[10px] font-bold text-brand-deep bg-brand-soft rounded px-1 mx-0.5 hover:bg-brand hover:text-white transition-colors"
+                        >
+                          {m[1]}
+                        </button>
+                      );
+                    return (
+                      <a href={href} target="_blank" rel="noopener noreferrer" className="text-pub underline">
+                        {children}
+                      </a>
+                    );
+                  },
+                }}
+              >
+                {linked}
+              </ReactMarkdown>
+            </ErrorBoundary>
           ) : (
             <div className="text-sm text-inkmut py-8">
               {t("synthesis_empty_state")}

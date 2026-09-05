@@ -10,6 +10,7 @@ import { Paperclip, Send, Loader2 } from "lucide-react";
 import { useLocale } from "@/lib/i18n";
 import { callEdgeFunction, type EdgeFunctionName } from "@/lib/edge-functions";
 import { parseFile, isSupportedFile, type ParsedDocument } from "@/lib/parse-file";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 export function QuickToolPage({
   titleKey,
@@ -196,7 +197,20 @@ export function QuickToolPage({
               &ldquo;{result.prompt || tk(titleKey)}&rdquo;
             </span>
           </div>
-          <div className="px-5 py-3">{renderBody(result.data)}</div>
+          <div className="px-5 py-3">
+            <ErrorBoundary
+              fallback={(retry) => (
+                <div className="flex items-center gap-3 text-sm text-danger">
+                  <span>{t("ws_crashed")}</span>
+                  <button onClick={retry} className="btn btn-outline px-2.5 py-1">
+                    {t("retry_label")}
+                  </button>
+                </div>
+              )}
+            >
+              {renderBody(result.data)}
+            </ErrorBoundary>
+          </div>
         </div>
       )}
     </div>
